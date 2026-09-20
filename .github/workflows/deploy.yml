@@ -16,9 +16,9 @@ jobs:
 
       # 1. Setup Node.js to build the frontend
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       # 2. Install dependencies and build React app
       - name: Build Frontend
