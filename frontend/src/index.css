@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3e0f8d;
+  --color-secondary: #9564dd;
+  --color-accent: #e4da72;
+  --color-bgLight: #eeeeee;
+}
+
+@layer base {
+  body {
+    @apply bg-bgLight text-slate-800;
+  }
+}
+
+/* Print specific styles for invoice */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-invoice, #printable-invoice * {
+    visibility: visible;
+  }
+  #printable-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  .no-print {
+    display: none !important;
+  }
+}

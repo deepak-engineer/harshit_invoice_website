@@ -1,0 +1,81 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main  # This runs the deployment whenever you push to the 'main' branch
+
+jobs:
+  build-and-deploy:
+    name: Build React & Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # 1. Setup Node.js to build the frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 2. Install dependencies and build React app
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      # 3. Setup PHP to install backend dependencies
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, libxml, mbstring, SimpleXML, xml, xmlreader, xmlwriter, zip, zlib
+          coverage: none
+
+      # 4. Install backend dependencies using Composer
+      - name: Install Backend Dependencies
+        run: |
+          cd invoice_backend
+          composer install --no-dev --optimize-autoloader
+
+      # 5. Prepare the final deploy folder
+      # We move everything that needs to go to public_html into a new 'deploy_folder'
+      - name: Prepare Deployment Folder
+        run: |
+          mkdir deploy_folder
+          
+          # Move compiled frontend files (index.html, assets, etc.) to the root of deploy_folder
+          cp -r frontend/dist/* deploy_folder/
+          
+          # Create a .htaccess file for React Router to work correctly on Apache (Hostinger)
+          echo "<IfModule mod_rewrite.c>
+            RewriteEngine On
+            RewriteBase /
+            RewriteRule ^index\.html$ - [L]
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule . /index.html [L]
+          </IfModule>" > deploy_folder/.htaccess
+          
+          # Move the backend API into the deploy_folder
+          cp -r invoice_backend deploy_folder/
+          
+          # Optional: Remove backend tests, docs, or .env files if needed to keep it clean
+          rm -rf deploy_folder/invoice_backend/.git* deploy_folder/invoice_backend/tests
+
+      # 6. Upload to Hostinger using FTP
+      - name: Sync to Hostinger FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # The local folder we prepared
+          local-dir: ./deploy_folder/
+          
+          # The folder on Hostinger where the website lives
+          server-dir: /public_html/
