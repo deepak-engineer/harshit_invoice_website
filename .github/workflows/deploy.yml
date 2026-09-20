@@ -66,6 +66,28 @@ jobs:
           # Optional: Remove backend tests, docs, or .env files if needed to keep it clean
           rm -rf deploy_folder/invoice_backend/.git* deploy_folder/invoice_backend/tests
 
+      # 5.5 Validate FTP Secret Format (Diagnostic)
+      - name: Validate FTP Server Secret Format
+        run: |
+          SERVER="${{ secrets.FTP_SERVER }}"
+          if [[ -z "$SERVER" ]]; then
+            echo "ERROR: FTP_SERVER secret is empty!"
+            exit 1
+          fi
+          if [[ "$SERVER" == *"ftp://"* ]] || [[ "$SERVER" == *"ftps://"* ]]; then
+            echo "ERROR: Remove 'ftp://' or 'ftps://' from your FTP_SERVER secret. It must be JUST the IP or domain."
+            exit 1
+          fi
+          if [[ "$SERVER" == *":"* ]]; then
+            echo "ERROR: Do not include the port (like :21) in the FTP_SERVER secret."
+            exit 1
+          fi
+          if [[ "$SERVER" =~ \ $ ]] || [[ "$SERVER" =~ ^\  ]]; then
+            echo "ERROR: You have an extra space at the beginning or end of your FTP_SERVER secret."
+            exit 1
+          fi
+          echo "FTP_SERVER format looks good!"
+
       # 6. Upload to Hostinger using FTP
       - name: Sync to Hostinger FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
