@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, Plus, Trash2, ArrowLeft, Download, FileText, FileSpreadsheet } from 'lucide-react';
+import { Save, Plus, Trash2, ArrowLeft, Download, FileText, FileSpreadsheet, Undo, Redo } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import toast from 'react-hot-toast';
@@ -151,6 +151,81 @@ const InvoiceForm = () => {
     }));
   }, [items]);
 
+  const historyRef = useRef([]);
+  const historyIndexRef = useRef(-1);
+  const isUndoRedoRef = useRef(false);
+
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (isUndoRedoRef.current) {
+      isUndoRedoRef.current = false;
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      const currentHistory = historyRef.current;
+      const currentIndex = historyIndexRef.current;
+      
+      const newHistory = currentHistory.slice(0, currentIndex + 1);
+      
+      const newState = { 
+        invoice: JSON.parse(JSON.stringify(invoice)), 
+        vendor: JSON.parse(JSON.stringify(vendor)), 
+        items: JSON.parse(JSON.stringify(items)) 
+      };
+      
+      const lastState = newHistory[newHistory.length - 1];
+      if (lastState && JSON.stringify(lastState) === JSON.stringify(newState)) {
+          return;
+      }
+      
+      newHistory.push(newState);
+      if (newHistory.length > 50) newHistory.shift();
+      
+      historyRef.current = newHistory;
+      historyIndexRef.current = newHistory.length - 1;
+      
+      setCanUndo(historyIndexRef.current > 0);
+      setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [invoice, vendor, items, loading]);
+
+  const handleUndo = () => {
+    if (historyIndexRef.current > 0) {
+      isUndoRedoRef.current = true;
+      historyIndexRef.current -= 1;
+      
+      const prevState = historyRef.current[historyIndexRef.current];
+      setInvoice(prevState.invoice);
+      setVendor(prevState.vendor);
+      setItems(prevState.items);
+      
+      setCanUndo(historyIndexRef.current > 0);
+      setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      isUndoRedoRef.current = true;
+      historyIndexRef.current += 1;
+      
+      const nextState = historyRef.current[historyIndexRef.current];
+      setInvoice(nextState.invoice);
+      setVendor(nextState.vendor);
+      setItems(nextState.items);
+      
+      setCanUndo(historyIndexRef.current > 0);
+      setCanRedo(historyIndexRef.current < historyRef.current.length - 1);
+    }
+  };
+
   const fetchVendor = async () => {
     try {
       const res = await api.get('/vendors');
@@ -274,6 +349,24 @@ const InvoiceForm = () => {
           Back to Dashboard
         </button>
         <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center bg-slate-100 rounded-lg p-1">
+            <button
+              onClick={handleUndo}
+              disabled={!canUndo}
+              className={`p-2 rounded-md flex items-center justify-center transition-colors ${canUndo ? 'text-slate-700 hover:bg-white hover:shadow-sm' : 'text-slate-400 cursor-not-allowed'}`}
+              title="Undo"
+            >
+              <Undo className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleRedo}
+              disabled={!canRedo}
+              className={`p-2 rounded-md flex items-center justify-center transition-colors ${canRedo ? 'text-slate-700 hover:bg-white hover:shadow-sm' : 'text-slate-400 cursor-not-allowed'}`}
+              title="Redo"
+            >
+              <Redo className="w-4 h-4" />
+            </button>
+          </div>
           {id && (
             <>
               <button
