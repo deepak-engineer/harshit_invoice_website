@@ -91,6 +91,8 @@ jobs:
       # 6. Upload to Hostinger using FTP
       - name: Sync to Hostinger FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
         with:
           protocol: ftps
           server: ${{ secrets.FTP_SERVER }}
