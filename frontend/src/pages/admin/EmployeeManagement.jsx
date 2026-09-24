@@ -252,7 +252,7 @@ const EmployeeManagement = () => {
     };
 
     const openEdit = (emp) => {
-        setFormData({ ...emp, password: '', photo: '' }); // Don't reload photo in form to prevent massive base64 payload unless changed
+        setFormData({ ...emp, password: '' }); // Don't clear photo, backend ignores if not base64
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
         setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(emp);
@@ -626,7 +626,11 @@ const EmployeeManagement = () => {
                                     <input type="file" accept="image/*" onChange={handlePhotoChange} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
                                     {formData.photo && (
                                         <div className="mt-2">
-                                            <img src={formData.photo} alt="Preview" className="w-16 h-16 rounded-full object-cover" />
+                                            <img 
+                                                src={formData.photo.startsWith('data:image') ? formData.photo : `${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${formData.photo}`} 
+                                                alt="Preview" 
+                                                className="w-16 h-20 object-cover border border-slate-200 rounded-md" 
+                                            />
                                         </div>
                                     )}
                                 </div>
