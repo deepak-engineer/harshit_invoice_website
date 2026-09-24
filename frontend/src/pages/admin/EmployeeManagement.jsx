@@ -261,100 +261,190 @@ const EmployeeManagement = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <table className="w-full text-left text-sm text-slate-600">
-                    <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
-                        <tr>
-                            <th className="px-6 py-4">ID</th>
-                            <th className="px-6 py-4">Photo</th>
-                            <th className="px-6 py-4">Name</th>
-                            <th className="px-6 py-4">Phone</th>
-                            <th className="px-6 py-4">Username</th>
-                            <th className="px-6 py-4">Assigned Team</th>
-                            <th className="px-6 py-4">Assigned Site</th>
-                            <th className="px-6 py-4">Salary/Day</th>
-                            <th className="px-6 py-4">Status</th>
-                            <th className="px-6 py-4">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                        {employees.map(emp => (
-                            <tr key={emp.id} className="hover:bg-slate-50">
-                                <td className="px-6 py-4 font-mono text-xs">{emp.emp_id}</td>
-                                <td className="px-6 py-4">
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-left text-sm text-slate-600">
+                        <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
+                            <tr>
+                                <th className="px-6 py-4">ID</th>
+                                <th className="px-6 py-4">Photo</th>
+                                <th className="px-6 py-4">Name</th>
+                                <th className="px-6 py-4">Phone</th>
+                                <th className="px-6 py-4">Username</th>
+                                <th className="px-6 py-4">Assigned Team</th>
+                                <th className="px-6 py-4">Assigned Site</th>
+                                <th className="px-6 py-4">Salary/Day</th>
+                                <th className="px-6 py-4">Status</th>
+                                <th className="px-6 py-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {employees.map(emp => (
+                                <tr key={emp.id} className="hover:bg-slate-50">
+                                    <td className="px-6 py-4 font-mono text-xs">{emp.emp_id}</td>
+                                    <td className="px-6 py-4">
+                                        {emp.photo ? (
+                                            <button 
+                                                onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
+                                                className="focus:outline-none hover:opacity-80 transition-opacity rounded-md shadow-sm ring-2 ring-transparent hover:ring-primary/50 overflow-hidden block"
+                                                title="View enlarged photo"
+                                            >
+                                                <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-16 h-20 object-cover border border-slate-200" />
+                                            </button>
+                                        ) : (
+                                            <div className="w-16 h-20 rounded-md bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
+                                                <Camera className="w-6 h-6" />
+                                            </div>
+                                        )}
+                                    </td>
+                                    <td className="px-6 py-4 font-medium text-slate-800">{emp.name}</td>
+                                    <td className="px-6 py-4">{emp.phone || '-'}</td>
+                                    <td className="px-6 py-4">{emp.username}</td>
+                                    <td className="px-6 py-4 text-xs">
+                                        <div className="flex items-center space-x-2">
+                                            <span>{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-slate-400 italic">None</span>}</span>
+                                            <button onClick={() => handleUpdateSalary(emp)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Quick Edit Assignments">
+                                                <Edit2 className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4 text-xs">
+                                        <div className="flex items-center space-x-2">
+                                            <span>{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-slate-400 italic">None</span>}</span>
+                                            <button onClick={() => handleUpdateSalary(emp)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Quick Edit Assignments">
+                                                <Edit2 className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center space-x-2">
+                                            <span>₹{emp.daily_salary}</span>
+                                            <button onClick={() => handleUpdateSalary(emp)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Quick Edit Assignments">
+                                                <Edit2 className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}`}>
+                                            {emp.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex space-x-3">
+                                            {emp.status === 'PENDING' && (
+                                                <button onClick={() => handleApprove(emp)} className="text-green-600 hover:text-green-800" title="Approve Employee">
+                                                    <CheckCircle className="w-4 h-4" />
+                                                </button>
+                                            )}
+                                            <button onClick={() => openEdit(emp)} className="text-blue-600 hover:text-blue-800" title="Edit Profile">
+                                                <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => openSalaryReport(emp)} className="text-green-600 hover:text-green-800" title="Employee Salary Report">
+                                                <Wallet className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => openPassword(emp)} className="text-amber-600 hover:text-amber-800" title="Reset Password">
+                                                <Key className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => openFace(emp)} className="text-purple-600 hover:text-purple-800" title="Register Face">
+                                                <Camera className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => handleDelete(emp.id)} className="text-red-600 hover:text-red-800" title="Delete/Reject Employee">
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Mobile Grid View */}
+                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                    {employees.map(emp => (
+                        <div key={emp.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-4">
+                            <div className="flex justify-between items-start">
+                                <div className="flex items-center space-x-3">
                                     {emp.photo ? (
                                         <button 
                                             onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
-                                            className="focus:outline-none hover:opacity-80 transition-opacity rounded-md shadow-sm ring-2 ring-transparent hover:ring-primary/50 overflow-hidden block"
-                                            title="View enlarged photo"
+                                            className="focus:outline-none rounded-lg overflow-hidden border border-slate-200 shrink-0"
                                         >
-                                            <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-16 h-20 object-cover border border-slate-200" />
+                                            <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-12 h-12 object-cover" />
                                         </button>
                                     ) : (
-                                        <div className="w-16 h-20 rounded-md bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200">
-                                            <Camera className="w-6 h-6" />
+                                        <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 border border-slate-200 shrink-0">
+                                            <Camera className="w-5 h-5" />
                                         </div>
                                     )}
-                                </td>
-                                <td className="px-6 py-4 font-medium text-slate-800">{emp.name}</td>
-                                <td className="px-6 py-4">{emp.phone || '-'}</td>
-                                <td className="px-6 py-4">{emp.username}</td>
-                                <td className="px-6 py-4 text-xs">
-                                    <div className="flex items-center space-x-2">
-                                        <span>{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-slate-400 italic">None</span>}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Quick Edit Assignments">
-                                            <Edit2 className="w-3 h-3" />
-                                        </button>
+                                    <div>
+                                        <h3 className="font-bold text-slate-800 leading-tight">{emp.name}</h3>
+                                        <p className="text-xs text-slate-500 font-mono mt-0.5">{emp.emp_id} | {emp.username}</p>
                                     </div>
-                                </td>
-                                <td className="px-6 py-4 text-xs">
-                                    <div className="flex items-center space-x-2">
-                                        <span>{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-slate-400 italic">None</span>}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Quick Edit Assignments">
-                                            <Edit2 className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex items-center space-x-2">
-                                        <span>₹{emp.daily_salary}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="text-slate-400 hover:text-blue-600 transition-colors" title="Quick Edit Assignments">
-                                            <Edit2 className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-800'}`}>
-                                        {emp.status}
+                                </div>
+                                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 ${emp.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}>
+                                    {emp.status}
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Phone</span>
+                                    <span className="font-medium text-slate-700">{emp.phone || '-'}</span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Salary/Day</span>
+                                    <span className="font-medium text-slate-700 flex items-center">
+                                        ₹{emp.daily_salary}
+                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 text-slate-400 hover:text-blue-600"><Edit2 className="w-3 h-3" /></button>
                                     </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex space-x-3">
-                                        {emp.status === 'PENDING' && (
-                                            <button onClick={() => handleApprove(emp)} className="text-green-600 hover:text-green-800" title="Approve Employee">
-                                                <CheckCircle className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                        <button onClick={() => openEdit(emp)} className="text-blue-600 hover:text-blue-800" title="Edit Profile">
-                                            <Edit2 className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Team</span>
+                                    <span className="font-medium text-slate-700 flex items-center">
+                                        <span className="truncate max-w-[80px] block">{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-slate-400 italic">None</span>}</span>
+                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 text-slate-400 hover:text-blue-600 shrink-0"><Edit2 className="w-3 h-3" /></button>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Site</span>
+                                    <span className="font-medium text-slate-700 flex items-center">
+                                        <span className="truncate max-w-[80px] block">{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-slate-400 italic">None</span>}</span>
+                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 text-slate-400 hover:text-blue-600 shrink-0"><Edit2 className="w-3 h-3" /></button>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-between items-center pt-2">
+                                <div className="flex flex-wrap gap-2">
+                                    {emp.status === 'PENDING' && (
+                                        <button onClick={() => handleApprove(emp)} className="p-2 bg-green-50 hover:bg-green-100 text-green-600 rounded-lg transition-colors border border-green-100">
+                                            <CheckCircle className="w-4 h-4" />
                                         </button>
-                                        <button onClick={() => openSalaryReport(emp)} className="text-green-600 hover:text-green-800" title="Employee Salary Report">
-                                            <Wallet className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => openPassword(emp)} className="text-amber-600 hover:text-amber-800" title="Reset Password">
-                                            <Key className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => openFace(emp)} className="text-purple-600 hover:text-purple-800" title="Register Face">
-                                            <Camera className="w-4 h-4" />
-                                        </button>
-                                        <button onClick={() => handleDelete(emp.id)} className="text-red-600 hover:text-red-800" title="Delete/Reject Employee">
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                                    )}
+                                    <button onClick={() => openEdit(emp)} className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors border border-blue-100">
+                                        <Edit2 className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={() => openSalaryReport(emp)} className="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors border border-emerald-100">
+                                        <Wallet className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={() => openPassword(emp)} className="p-2 bg-amber-50 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors border border-amber-100">
+                                        <Key className="w-4 h-4" />
+                                    </button>
+                                    <button onClick={() => openFace(emp)} className="p-2 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg transition-colors border border-purple-100">
+                                        <Camera className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <button onClick={() => handleDelete(emp.id)} className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-100">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {employees.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-slate-400 text-sm">No employees found.</div>
+                    )}
+                </div>
             </div>
 
             {/* Form Modal */}

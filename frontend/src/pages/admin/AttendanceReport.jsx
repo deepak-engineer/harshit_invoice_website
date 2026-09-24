@@ -274,7 +274,8 @@ const AttendanceReport = () => {
                                     Salary Summary - {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
                                 </h3>
                             </div>
-                            <div className="overflow-x-auto">
+                            {/* Desktop Table View */}
+                            <div className="hidden lg:block overflow-x-auto">
                                 <table className="w-full text-left text-sm text-slate-600">
                                     <thead className="bg-white text-slate-500 font-medium border-b border-slate-100">
                                         <tr>
@@ -301,6 +302,26 @@ const AttendanceReport = () => {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+
+                            {/* Mobile Grid View */}
+                            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                                {salarySummary.map(sum => (
+                                    <div key={sum.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col">
+                                        <h4 className="font-bold text-slate-800 text-lg mb-3 border-b border-slate-100 pb-2">{sum.name}</h4>
+                                        <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                                            <div><span className="text-slate-400 text-xs block mb-0.5">Daily Salary</span><span className="font-medium text-slate-700">₹{sum.daily_salary.toFixed(2)}</span></div>
+                                            <div><span className="text-slate-400 text-xs block mb-0.5">Full Days</span><span className="font-bold text-green-600">{sum.present_days}</span></div>
+                                            <div><span className="text-slate-400 text-xs block mb-0.5">Half Days</span><span className="font-bold text-amber-600">{sum.half_days}</span></div>
+                                            <div><span className="text-slate-400 text-xs block mb-0.5">Paid Holidays</span><span className="font-bold text-blue-600">{sum.holiday_days}</span></div>
+                                            <div><span className="text-slate-400 text-xs block mb-0.5">Absent</span><span className="font-bold text-red-600">{sum.absent_days}</span></div>
+                                        </div>
+                                        <div className="mt-auto pt-3 border-t border-slate-100 flex justify-between items-center bg-primary/5 -mx-4 -mb-4 p-4 rounded-b-xl">
+                                            <span className="text-slate-600 font-semibold">Total Earned</span>
+                                            <span className="text-primary font-black text-xl">₹{sum.total_salary.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     )}
