@@ -327,7 +327,7 @@ const InvoiceForm = () => {
         localStorage.removeItem('draft_invoice');
         localStorage.removeItem('draft_vendor');
         localStorage.removeItem('draft_items');
-        navigate(`/invoice/${res.data.id}/edit`, { replace: true });
+        navigate(`/admin/invoice/${res.data.id}/edit`, { replace: true });
       }
     } catch (err) {
       console.error(err);

@@ -9,6 +9,10 @@ export default defineConfig({
       '/invoice_backend/api': {
         target: 'http://localhost/harshit_invoice_website',
         changeOrigin: true,
+      },
+      '/invoice_backend/uploads': {
+        target: 'http://localhost/harshit_invoice_website',
+        changeOrigin: true,
       }
     }
   }

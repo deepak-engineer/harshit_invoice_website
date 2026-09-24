@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, FileText, Settings, LogOut } from 'lucide-react';
+import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-dark.svg';
 
@@ -8,6 +8,7 @@ const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const isAdmin = location.pathname.startsWith('/admin');
 
   const handleLogout = async () => {
     try {
@@ -19,14 +20,28 @@ const Layout = () => {
     }
   };
 
-  const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'New Invoice', path: '/invoice/new', icon: FileText },
-    { name: 'Vendor Settings', path: '/settings', icon: Settings },
+  const adminNavItems = [
+    { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'Attendance Report', path: '/admin/attendance-report', icon: Calendar },
+    { name: 'Employees', path: '/admin/employees', icon: Users },
+    { name: 'Teams', path: '/admin/teams', icon: Users },
+    { name: 'Sites', path: '/admin/sites', icon: MapPin },
+    { name: 'Invoices', path: '/admin/invoices', icon: FileText },
+    { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
+  const employeeNavItems = [
+    { name: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
+    { name: 'Mark Attendance', path: '/employee/attendance', icon: Camera },
+  ];
+
+  const navItems = isAdmin ? adminNavItems : employeeNavItems;
+
   const isActive = (path) => {
-    if (path === '/' && location.pathname !== '/') return false;
+    if (path === '/admin/dashboard' && location.pathname === '/admin/dashboard') return true;
+    if (path === '/employee/dashboard' && location.pathname === '/employee/dashboard') return true;
+    if (path === '/admin/invoices' && (location.pathname === '/admin/invoices' || location.pathname.includes('/invoice/'))) return true;
+    if (path === '/admin/settings' && location.pathname === '/admin/settings') return true;
     return location.pathname.startsWith(path);
   };
 
@@ -53,7 +68,10 @@ const Layout = () => {
             </Link>
           ))}
         </nav>
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-slate-800 flex flex-col space-y-2">
+            <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                {isAdmin ? 'ADMINISTRATOR' : 'EMPLOYEE'}
+            </div>
           <button
             onClick={handleLogout}
             className="flex items-center space-x-3 px-4 py-3 w-full rounded-xl text-slate-300 hover:bg-red-500/20 hover:text-red-200 transition-all duration-200"
@@ -75,6 +93,9 @@ const Layout = () => {
         {isMobileMenuOpen && (
           <div className="absolute w-full bg-primary border-t border-secondary/30 shadow-xl">
             <nav className="flex flex-col p-4 space-y-2">
+              <div className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {isAdmin ? 'ADMINISTRATOR' : 'EMPLOYEE'}
+              </div>
               {navItems.map((item) => (
                 <Link
                   key={item.name}

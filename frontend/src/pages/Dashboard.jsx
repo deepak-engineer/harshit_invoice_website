@@ -80,7 +80,7 @@ const Dashboard = () => {
           <p className="text-slate-500 text-sm mt-1">Manage and track your service bills</p>
         </div>
         <Link
-          to="/invoice/new"
+          to="/admin/invoice/new"
           className="w-full md:w-auto inline-flex items-center justify-center space-x-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-primary/30 transition-all"
         >
           <Plus className="w-5 h-5" />
@@ -199,7 +199,7 @@ const Dashboard = () => {
                             <span className="text-xs font-semibold">Excel</span>
                           </button>
                           <button
-                            onClick={() => navigate(`/invoice/${inv.id}/edit`)}
+                            onClick={() => navigate(`/admin/invoice/${inv.id}/edit`)}
                             className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                             title="Edit"
                           >
@@ -281,7 +281,7 @@ const Dashboard = () => {
                           <span className="text-xs font-semibold">Excel</span>
                         </button>
                         <button
-                          onClick={() => navigate(`/invoice/${inv.id}/edit`)}
+                          onClick={() => navigate(`/admin/invoice/${inv.id}/edit`)}
                           className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
                           title="Edit"
                         >
