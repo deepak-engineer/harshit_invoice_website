@@ -15,6 +15,7 @@ const SiteManagement = () => {
 
     const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
     const [bulkData, setBulkData] = useState('');
+    const [selectedIds, setSelectedIds] = useState([]);
 
     const fetchSites = async () => {
         try {
@@ -85,7 +86,6 @@ const SiteManagement = () => {
         lines.forEach(line => {
             const cols = line.split('\t');
             if (cols.length >= 2) {
-                // Assume format: Name | Code | State | Address
                 sitesToAdd.push({
                     name: cols[0]?.trim() || '',
                     code: cols[1]?.trim() || '',
@@ -111,6 +111,36 @@ const SiteManagement = () => {
         }
     };
 
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedIds(sites.map(s => s.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelect = (id) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        if (window.confirm(`Are you sure you want to delete ${selectedIds.length} sites?`)) {
+            try {
+                await api.post('/admin/sites/bulk-delete', { ids: selectedIds });
+                toast.success('Sites deleted successfully');
+                setSelectedIds([]);
+                fetchSites();
+            } catch (error) {
+                toast.error(error.response?.data?.error || 'Failed to delete sites');
+            }
+        }
+    };
+
     if (loading) return <div>Loading...</div>;
 
     return (
@@ -118,6 +148,12 @@ const SiteManagement = () => {
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-slate-800">Site Management</h1>
                 <div className="flex space-x-3">
+                    {selectedIds.length > 0 && (
+                        <button onClick={handleBulkDelete} className="flex items-center space-x-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">
+                            <Trash2 className="w-5 h-5" />
+                            <span>Delete ({selectedIds.length})</span>
+                        </button>
+                    )}
                     <button onClick={() => setIsBulkModalOpen(true)} className="flex items-center space-x-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
                         <span>Bulk Add (Paste)</span>
                     </button>
@@ -132,6 +168,14 @@ const SiteManagement = () => {
                 <table className="w-full text-left text-sm text-slate-600">
                     <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
                         <tr>
+                            <th className="px-6 py-4 w-10">
+                                <input 
+                                    type="checkbox" 
+                                    className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                                    checked={sites.length > 0 && selectedIds.length === sites.length}
+                                    onChange={handleSelectAll}
+                                />
+                            </th>
                             <th className="px-6 py-4">Site Name</th>
                             <th className="px-6 py-4">Branch Code</th>
                             <th className="px-6 py-4">State</th>
@@ -144,7 +188,15 @@ const SiteManagement = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                         {sites.map(site => (
-                            <tr key={site.id} className="hover:bg-slate-50">
+                            <tr key={site.id} className={`hover:bg-slate-50 ${selectedIds.includes(site.id) ? 'bg-primary/5' : ''}`}>
+                                <td className="px-6 py-4">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                                        checked={selectedIds.includes(site.id)}
+                                        onChange={() => handleSelect(site.id)}
+                                    />
+                                </td>
                                 <td className="px-6 py-4 font-medium text-slate-800">{site.name}</td>
                                 <td className="px-6 py-4">{site.code}</td>
                                 <td className="px-6 py-4 font-medium text-primary">{site.state || '-'}</td>

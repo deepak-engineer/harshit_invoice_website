@@ -261,6 +261,23 @@ if (preg_match('/^admin\/sites\/bulk$/', $route)) {
         exit;
     }
 }
+if (preg_match('/^admin\/sites\/bulk-delete$/', $route)) {
+    checkAdminAuth();
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (isset($data['ids']) && is_array($data['ids']) && count($data['ids']) > 0) {
+            $inQuery = implode(',', array_fill(0, count($data['ids']), '?'));
+            $stmt = $pdo->prepare("DELETE FROM sites WHERE id IN ($inQuery)");
+            $stmt->execute($data['ids']);
+            echo json_encode(["success" => true, "deleted" => $stmt->rowCount()]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "No IDs provided"]);
+        }
+        exit;
+    }
+}
+
 if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];
