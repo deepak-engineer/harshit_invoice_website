@@ -38,6 +38,23 @@ function checkAdminAuth() {
         echo json_encode(["error" => "Forbidden: Admin access required"]);
         exit;
     }
+    
+    // Single Device Enforce for Admin
+    global $pdo;
+    if (isset($pdo) && isset($_SESSION['session_token'])) {
+        $stmt = $pdo->prepare("SELECT session_token FROM admin_users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $dbToken = $stmt->fetchColumn();
+        
+        if ($dbToken !== $_SESSION['session_token']) {
+            session_unset();
+            session_destroy();
+            header('Content-Type: application/json');
+            http_response_code(401);
+            echo json_encode(["error" => "Session invalid. You have logged in from another device."]);
+            exit;
+        }
+    }
 }
 
 function checkEmployeeAuth() {

@@ -57,6 +57,17 @@ if ($route === 'login' && $method === 'POST') {
     }
     
     if ($user && password_verify($password, $user['password_hash'])) {
+        // Enforce Single Device Login for Admin
+        if ($role === 'admin') {
+            $session_token = bin2hex(random_bytes(32));
+            try {
+                // Ensure column exists first
+                $pdo->exec("ALTER TABLE admin_users ADD COLUMN session_token VARCHAR(255) NULL");
+            } catch (Exception $e) {}
+            $pdo->prepare("UPDATE admin_users SET session_token = ? WHERE id = ?")->execute([$session_token, $user['id']]);
+            $_SESSION['session_token'] = $session_token;
+        }
+
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $role;
         $_SESSION['login_attempts'] = 0;

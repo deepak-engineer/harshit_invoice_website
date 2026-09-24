@@ -2,6 +2,24 @@
 // Expense Routes
 // Expects variables $route, $method, $pdo from index.php
 
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS expenses (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        emp_id INT NOT NULL,
+        team_id INT NULL,
+        state VARCHAR(100) NULL,
+        category VARCHAR(50) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        description TEXT,
+        receipt_photo VARCHAR(255) NULL,
+        expense_date DATE NOT NULL,
+        status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+} catch (PDOException $e) {
+    // Ignore error if table exists
+}
+
 if (preg_match('/^expenses$/', $route)) {
     if ($method === 'GET') {
         checkAdminAuth();
