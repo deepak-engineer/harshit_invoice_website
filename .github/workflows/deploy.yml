@@ -100,10 +100,10 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           
-          # Force FTP protocol and port 21 as Hostinger often blocks FTPS from GitHub IPs
-          protocol: ftp
+          # Use FTPS (Hostinger requires this) and a very high timeout
+          protocol: ftps
           port: 21
-          timeout: 120000
+          timeout: 600000
           
           # The local folder we prepared
           local-dir: ./deploy_folder/
