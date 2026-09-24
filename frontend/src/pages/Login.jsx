@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, User, Camera, X } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-light.svg';
-import { getFaceDescriptor } from '../utils/faceApi';
+import { getFaceDescriptor, hasFace } from '../utils/faceApi';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -26,6 +26,8 @@ const Login = () => {
   const [stream, setStream] = useState(null);
   const [cameraStatus, setCameraStatus] = useState('');
   const [isProcessingFace, setIsProcessingFace] = useState(false);
+  const [isFaceDetected, setIsFaceDetected] = useState(false);
+  const faceCheckInterval = useRef(null);
 
   const navigate = useNavigate();
 
@@ -78,6 +80,16 @@ const Login = () => {
           setStream(mediaStream);
           if (videoRef.current) {
               videoRef.current.srcObject = mediaStream;
+              
+              // Start checking for face continuously
+              faceCheckInterval.current = setInterval(async () => {
+                  if (videoRef.current && videoRef.current.readyState === 4 && !isProcessingFace) {
+                      try {
+                          const detected = await hasFace(videoRef.current);
+                          setIsFaceDetected(detected);
+                      } catch(e) {}
+                  }
+              }, 500);
           }
           setCameraStatus('Position your face clearly in the frame');
       } catch (err) {
@@ -87,6 +99,12 @@ const Login = () => {
   };
 
   const stopCamera = () => {
+      if (faceCheckInterval.current) {
+          clearInterval(faceCheckInterval.current);
+          faceCheckInterval.current = null;
+      }
+      setIsFaceDetected(false);
+      
       if (stream) {
           stream.getTracks().forEach(track => track.stop());
           setStream(null);
@@ -114,6 +132,11 @@ const Login = () => {
           canvas.width = videoRef.current.videoWidth;
           canvas.height = videoRef.current.videoHeight;
           const ctx = canvas.getContext('2d');
+          
+          // Mirror the canvas context so the saved photo matches the mirrored video preview
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          
           ctx.drawImage(videoRef.current, 0, 0);
           
           setPhoto(canvas.toDataURL('image/jpeg'));
@@ -384,10 +407,10 @@ const Login = () => {
                         autoPlay 
                         playsInline
                         muted
-                        className="w-full h-64 object-cover rounded-lg bg-black"
+                        className="w-full h-64 object-cover rounded-lg bg-black scale-x-[-1]"
                     />
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                        <div className="w-48 h-56 border-2 border-dashed border-white/50 rounded-full"></div>
+                        <div className={`w-48 h-56 border-4 border-dashed rounded-full transition-all duration-300 ${isFaceDetected ? 'border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.6)]' : 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.6)]'}`}></div>
                     </div>
                 </div>
                 

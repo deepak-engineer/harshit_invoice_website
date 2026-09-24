@@ -19,6 +19,14 @@ export const loadModels = async () => {
     }
 };
 
+export const hasFace = async (imageElement) => {
+    if (!modelsLoaded) await loadModels();
+    
+    // Detect a single face (faster than getting full descriptor)
+    const detection = await faceapi.detectSingleFace(imageElement);
+    return !!detection;
+};
+
 export const getFaceDescriptor = async (imageElement) => {
     if (!modelsLoaded) await loadModels();
     
