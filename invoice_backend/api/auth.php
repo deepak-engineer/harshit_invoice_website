@@ -51,17 +51,7 @@ function checkEmployeeAuth() {
 }
 
 function checkBruteForce() {
-    if (isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >= 5) {
-        if (time() - $_SESSION['last_failed_login'] < 900) { // 15 minutes lockout
-            header('Content-Type: application/json');
-            http_response_code(429);
-            echo json_encode(["error" => "Too many failed attempts. Try again in 15 minutes."]);
-            exit;
-        } else {
-            // Reset after 15 minutes
-            $_SESSION['login_attempts'] = 0;
-        }
-    }
+    // Brute force lockout removed as per request
 }
 
 function recordFailedLogin() {
