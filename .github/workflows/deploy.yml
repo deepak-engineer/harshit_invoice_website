@@ -100,6 +100,9 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           
+          # Increase timeout to prevent control socket errors (120 seconds)
+          timeout: 120000
+          
           # The local folder we prepared
           local-dir: ./deploy_folder/
           
