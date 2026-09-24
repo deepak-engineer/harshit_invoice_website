@@ -103,8 +103,8 @@ jobs:
           # The local folder we prepared
           local-dir: ./deploy_folder/
           
-          # The folder on Hostinger where the website lives
-          server-dir: ./public_html/
+          # The folder on Hostinger where the website lives (root of the FTP user for this domain)
+          server-dir: ./
           
           # PREVENT overwriting or deleting user uploaded files on the server
           exclude: |
