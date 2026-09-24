@@ -241,6 +241,26 @@ if (preg_match('/^admin\/sites$/', $route)) {
     }
 }
 
+if (preg_match('/^admin\/sites\/bulk$/', $route)) {
+    checkAdminAuth();
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (isset($data['sites']) && is_array($data['sites'])) {
+            $stmt = $pdo->prepare("INSERT INTO sites (name, code, state, address) VALUES (?, ?, ?, ?)");
+            $added = 0;
+            foreach ($data['sites'] as $site) {
+                if (empty($site['name']) || empty($site['code'])) continue;
+                $stmt->execute([$site['name'], $site['code'], $site['state'] ?? null, $site['address'] ?? '']);
+                $added++;
+            }
+            echo json_encode(["success" => true, "added" => $added]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "Invalid payload"]);
+        }
+        exit;
+    }
+}
 if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];

@@ -13,6 +13,9 @@ const SiteManagement = () => {
     });
     const [editId, setEditId] = useState(null);
 
+    const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+    const [bulkData, setBulkData] = useState('');
+
     const fetchSites = async () => {
         try {
             const res = await api.get('/admin/sites');
@@ -69,16 +72,60 @@ const SiteManagement = () => {
         setIsModalOpen(true);
     };
 
+    const handleBulkSubmit = async (e) => {
+        e.preventDefault();
+        if (!bulkData.trim()) {
+            toast.error("Please paste some data first.");
+            return;
+        }
+
+        const lines = bulkData.trim().split('\n');
+        const sitesToAdd = [];
+
+        lines.forEach(line => {
+            const cols = line.split('\t');
+            if (cols.length >= 2) {
+                // Assume format: Name | Code | State | Address
+                sitesToAdd.push({
+                    name: cols[0]?.trim() || '',
+                    code: cols[1]?.trim() || '',
+                    state: cols[2]?.trim() || '',
+                    address: cols[3]?.trim() || ''
+                });
+            }
+        });
+
+        if (sitesToAdd.length === 0) {
+            toast.error("Could not parse data. Ensure it is tab-separated.");
+            return;
+        }
+
+        try {
+            const res = await api.post('/admin/sites/bulk', { sites: sitesToAdd });
+            toast.success(`Successfully added ${res.data.added} sites`);
+            setIsBulkModalOpen(false);
+            setBulkData('');
+            fetchSites();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Bulk operation failed');
+        }
+    };
+
     if (loading) return <div>Loading...</div>;
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-slate-800">Site Management</h1>
-                <button onClick={openNew} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                    <Plus className="w-5 h-5" />
-                    <span>Add Site</span>
-                </button>
+                <div className="flex space-x-3">
+                    <button onClick={() => setIsBulkModalOpen(true)} className="flex items-center space-x-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
+                        <span>Bulk Add (Paste)</span>
+                    </button>
+                    <button onClick={openNew} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                        <Plus className="w-5 h-5" />
+                        <span>Add Single Site</span>
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -176,6 +223,28 @@ const SiteManagement = () => {
                             <div className="flex justify-end space-x-3 mt-6">
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
                                 <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">Save Site</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {isBulkModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl flex flex-col max-h-[90vh]">
+                        <h2 className="text-xl font-bold text-slate-800 mb-2">Bulk Add Sites (Excel Paste)</h2>
+                        <p className="text-sm text-slate-500 mb-4">Paste data directly from Excel. Ensure columns are ordered: <strong>Name | Branch Code | State | Address</strong></p>
+                        
+                        <form onSubmit={handleBulkSubmit} className="space-y-4 flex flex-col flex-1 min-h-0">
+                            <textarea 
+                                value={bulkData}
+                                onChange={e => setBulkData(e.target.value)}
+                                placeholder="e.g.&#10;Delhi Hub&#9;DEL-01&#9;Delhi&#9;Near Station&#10;Mumbai Base&#9;MUM-02&#9;Maharashtra&#9;Andheri East"
+                                className="w-full flex-1 p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none whitespace-pre font-mono text-sm min-h-[300px] resize-none"
+                            ></textarea>
+                            <div className="flex justify-end space-x-3 mt-4 shrink-0">
+                                <button type="button" onClick={() => setIsBulkModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors">Process & Add Sites</button>
                             </div>
                         </form>
                     </div>
