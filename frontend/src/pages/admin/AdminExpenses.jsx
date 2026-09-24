@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Receipt, Search, Filter, CheckCircle, XCircle, Clock, MapPin, Users, Download, IndianRupee } from 'lucide-react';
+import { Receipt, Search, Filter, CheckCircle, XCircle, Clock, MapPin, Users, Download, IndianRupee, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -18,6 +18,7 @@ const AdminExpenses = () => {
     const [states, setStates] = useState([]);
 
     const [selectedExpense, setSelectedExpense] = useState(null);
+    const [viewingPhoto, setViewingPhoto] = useState(null);
 
     useEffect(() => {
         fetchExpenses();
@@ -51,6 +52,18 @@ const AdminExpenses = () => {
             fetchExpenses();
         } catch (err) {
             toast.error('Failed to update status');
+        }
+    };
+
+    const handleDeleteExpense = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this expense? This cannot be undone.")) return;
+        try {
+            await api.delete(`/expenses/${id}`);
+            toast.success("Expense deleted successfully");
+            setSelectedExpense(null);
+            fetchExpenses();
+        } catch (err) {
+            toast.error("Failed to delete expense");
         }
     };
 
@@ -379,12 +392,15 @@ const AdminExpenses = () => {
                             <div>
                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Receipt / Bill Photo</p>
                                 {selectedExpense.receipt_photo ? (
-                                    <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-100 flex justify-center">
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-100 flex justify-center cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/expenses/${selectedExpense.receipt_photo}`)}>
                                         <img 
                                             src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/expenses/${selectedExpense.receipt_photo}`} 
                                             alt="Receipt" 
                                             className="max-h-64 object-contain"
                                         />
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/10 transition-opacity">
+                                            <span className="bg-black/60 text-white px-3 py-1.5 rounded-lg text-sm font-semibold backdrop-blur-sm shadow-lg">Click to Enlarge</span>
+                                        </div>
                                     </div>
                                 ) : (
                                     <div className="bg-slate-50 border border-dashed border-slate-200 p-6 rounded-xl text-center text-slate-400">
@@ -393,6 +409,42 @@ const AdminExpenses = () => {
                                 )}
                             </div>
                         </div>
+
+                        {/* Actions */}
+                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
+                            <button 
+                                onClick={() => handleDeleteExpense(selectedExpense.id)}
+                                className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2.5 rounded-xl font-bold transition-colors shadow-sm flex items-center justify-center"
+                            >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete Expense
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Photo Viewer Modal */}
+            {viewingPhoto && (
+                <div 
+                    className="fixed inset-0 bg-black/80 flex items-center justify-center z-[100] p-4 backdrop-blur-sm"
+                    onClick={() => setViewingPhoto(null)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 rounded-full p-2 transition-all"
+                        onClick={() => setViewingPhoto(null)}
+                    >
+                        <XCircle className="w-6 h-6" />
+                    </button>
+                    <div 
+                        className="max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/20"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <img 
+                            src={viewingPhoto} 
+                            alt="Enlarged Receipt" 
+                            className="w-auto h-auto max-w-full max-h-[90vh] object-contain"
+                        />
                     </div>
                 </div>
             )}

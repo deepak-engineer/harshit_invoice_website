@@ -91,4 +91,28 @@ if (preg_match('/^expenses\/(\d+)\/status$/', $route, $matches)) {
         exit;
     }
 }
+
+if (preg_match('/^expenses\/(\d+)$/', $route, $matches)) {
+    checkAdminAuth();
+    if ($method === 'DELETE') {
+        $id = $matches[1];
+        
+        $stmt = $pdo->prepare("SELECT receipt_photo FROM expenses WHERE id = ?");
+        $stmt->execute([$id]);
+        $exp = $stmt->fetch();
+        
+        if ($exp && $exp['receipt_photo']) {
+            $path = '../uploads/expenses/' . $exp['receipt_photo'];
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM expenses WHERE id = ?");
+        $stmt->execute([$id]);
+        
+        echo json_encode(["success" => true]);
+        exit;
+    }
+}
 ?>

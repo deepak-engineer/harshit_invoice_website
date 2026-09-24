@@ -572,16 +572,8 @@ if (preg_match('/^attendance\/check-out$/', $route)) {
         $diff = $check_in_time->diff($check_out_time);
         $minutes = ($diff->days * 24 * 60) + ($diff->h * 60) + $diff->i;
         
-        // Simple logic: > 4h half day, > 8h full day
         $status = 'PRESENT';
         $earned = $record['daily_salary_snapshot'];
-        if ($minutes < 240) {
-            $status = 'ABSENT';
-            $earned = 0;
-        } else if ($minutes < 480) {
-            $status = 'HALF_DAY';
-            $earned = $record['daily_salary_snapshot'] / 2;
-        }
         
         $photo_filename = processBase64Image($data['photo'] ?? null);
         
