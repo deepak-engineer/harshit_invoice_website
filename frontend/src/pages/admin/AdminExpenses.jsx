@@ -69,6 +69,12 @@ const AdminExpenses = () => {
 
     const totalAmount = filteredExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
 
+    const teamExpenses = filteredExpenses.reduce((acc, exp) => {
+        const t = exp.team_name || 'No Team';
+        acc[t] = (acc[t] || 0) + parseFloat(exp.amount || 0);
+        return acc;
+    }, {});
+
     const getStatusIcon = (status) => {
         if (status === 'APPROVED') return <CheckCircle className="w-4 h-4 text-green-500" />;
         if (status === 'REJECTED') return <XCircle className="w-4 h-4 text-red-500" />;
@@ -77,24 +83,38 @@ const AdminExpenses = () => {
 
     return (
         <div className="space-y-6 max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800 flex items-center">
-                        <Receipt className="w-7 h-7 mr-3 text-primary" />
-                        Expense Tracker
-                    </h1>
-                    <p className="text-slate-500 text-sm mt-1">Track and manage employee expenses by site/team</p>
-                </div>
-                
-                <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between min-w-[200px]">
+            <div className="flex flex-col gap-4">
+                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total (Filtered)</p>
-                        <p className="text-xl font-bold text-slate-800 flex items-center">
-                            <IndianRupee className="w-5 h-5 mr-1 text-primary" />
-                            {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                        </p>
+                        <h1 className="text-2xl font-bold text-slate-800 flex items-center">
+                            <Receipt className="w-7 h-7 mr-3 text-primary" />
+                            Expense Tracker
+                        </h1>
+                        <p className="text-slate-500 text-sm mt-1">Track and manage employee expenses by site/team</p>
+                    </div>
+                    
+                    <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between min-w-[200px]">
+                        <div>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total (Filtered)</p>
+                            <p className="text-xl font-bold text-slate-800 flex items-center">
+                                <IndianRupee className="w-5 h-5 mr-1 text-primary" />
+                                {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                            </p>
+                        </div>
                     </div>
                 </div>
+
+                {/* Team-wise Summary Breakdown */}
+                {Object.keys(teamExpenses).length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                        {Object.entries(teamExpenses).map(([team, amount]) => (
+                            <div key={team} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-primary/50 transition-colors">
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider truncate mb-1" title={team}>{team}</span>
+                                <span className="text-xl font-black text-primary">₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -217,7 +237,7 @@ const AdminExpenses = () => {
                                                 onClick={() => setSelectedExpense(exp)}
                                                 className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition-colors"
                                             >
-                                                View / Process
+                                                View Details
                                             </button>
                                         </td>
                                     </tr>
@@ -278,7 +298,7 @@ const AdminExpenses = () => {
                                         onClick={() => setSelectedExpense(exp)}
                                         className="w-full px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-semibold rounded-lg text-sm transition-colors border border-primary/20"
                                     >
-                                        View Details & Process
+                                        View Details
                                     </button>
                                 </div>
                             </div>
@@ -372,32 +392,6 @@ const AdminExpenses = () => {
                                     </div>
                                 )}
                             </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
-                            <button 
-                                onClick={() => handleUpdateStatus(selectedExpense.id, 'APPROVED')}
-                                disabled={selectedExpense.status === 'APPROVED'}
-                                className="flex-1 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-xl font-bold transition-colors shadow-sm"
-                            >
-                                Approve
-                            </button>
-                            <button 
-                                onClick={() => handleUpdateStatus(selectedExpense.id, 'REJECTED')}
-                                disabled={selectedExpense.status === 'REJECTED'}
-                                className="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2.5 rounded-xl font-bold transition-colors shadow-sm"
-                            >
-                                Reject
-                            </button>
-                            <button 
-                                onClick={() => handleUpdateStatus(selectedExpense.id, 'PENDING')}
-                                disabled={selectedExpense.status === 'PENDING'}
-                                className="flex-1 bg-slate-200 hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 py-2.5 rounded-xl font-bold transition-colors"
-                            >
-                                Mark Pending
-                            </button>
-                        </div>
                     </div>
                 </div>
             )}
