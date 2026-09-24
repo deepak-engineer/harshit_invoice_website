@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar } from 'lucide-react';
+import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-dark.svg';
 
@@ -26,6 +26,7 @@ const Layout = () => {
     { name: 'Employees', path: '/admin/employees', icon: Users },
     { name: 'Teams', path: '/admin/teams', icon: Users },
     { name: 'Sites', path: '/admin/sites', icon: MapPin },
+    { name: 'Expenses', path: '/admin/expenses', icon: Receipt },
     { name: 'Invoices', path: '/admin/invoices', icon: FileText },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
@@ -33,6 +34,7 @@ const Layout = () => {
   const employeeNavItems = [
     { name: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
     { name: 'Mark Attendance', path: '/employee/attendance', icon: Camera },
+    { name: 'My Expenses', path: '/employee/expenses', icon: Receipt },
   ];
 
   const navItems = isAdmin ? adminNavItems : employeeNavItems;
@@ -42,6 +44,8 @@ const Layout = () => {
     if (path === '/employee/dashboard' && location.pathname === '/employee/dashboard') return true;
     if (path === '/admin/invoices' && (location.pathname === '/admin/invoices' || location.pathname.includes('/invoice/'))) return true;
     if (path === '/admin/settings' && location.pathname === '/admin/settings') return true;
+    if (path === '/admin/expenses' && location.pathname === '/admin/expenses') return true;
+    if (path === '/employee/expenses' && location.pathname === '/employee/expenses') return true;
     return location.pathname.startsWith(path);
   };
 

@@ -13,10 +13,12 @@ import EmployeeManagement from './pages/admin/EmployeeManagement';
 import SiteManagement from './pages/admin/SiteManagement';
 import TeamManagement from './pages/admin/TeamManagement';
 import AttendanceReport from './pages/admin/AttendanceReport';
+import AdminExpenses from './pages/admin/AdminExpenses';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import AttendanceFlow from './pages/employee/AttendanceFlow';
+import EmployeeExpenses from './pages/employee/EmployeeExpenses';
 
 import api from './utils/api';
 
@@ -74,6 +76,7 @@ function App() {
             <Route path="employees" element={<EmployeeManagement />} />
             <Route path="teams" element={<TeamManagement />} />
             <Route path="sites" element={<SiteManagement />} />
+            <Route path="expenses" element={<AdminExpenses />} />
             
             {/* Existing Admin Features */}
             <Route path="invoices" element={<Dashboard />} />
@@ -88,6 +91,7 @@ function App() {
           <Route path="/employee" element={<Layout />}>
             <Route path="dashboard" element={<EmployeeDashboard />} />
             <Route path="attendance" element={<AttendanceFlow />} />
+            <Route path="expenses" element={<EmployeeExpenses />} />
           </Route>
         </Route>
         
