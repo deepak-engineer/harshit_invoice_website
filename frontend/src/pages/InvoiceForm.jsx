@@ -514,7 +514,7 @@ const InvoiceForm = () => {
                         <label className="block text-xs font-semibold text-slate-500 mb-1">Project / Site Details</label>
                         <input type="text" value={item.project_site_details || ''} onChange={(e) => handleItemChange(item.id, 'project_site_details', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Site Name" />
                       </div>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-slate-500 mb-1">Client Project</label>
                           <input type="text" value={item.client_project || ''} onChange={(e) => handleItemChange(item.id, 'client_project', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Project" />
@@ -538,7 +538,7 @@ const InvoiceForm = () => {
 
                     {/* Pricing */}
                     <div className="lg:col-span-3 flex flex-col justify-between space-y-4">
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-slate-500 mb-1">Qty</label>
                           <input type="number" value={item.qty} onChange={(e) => handleItemChange(item.id, 'qty', e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-right" min="1" />

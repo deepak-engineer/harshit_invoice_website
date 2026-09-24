@@ -363,7 +363,7 @@ const EmployeeManagement = () => {
                     <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl">
                         <h2 className="text-xl font-bold text-slate-800 mb-4">{selectedEmp ? 'Edit Employee' : 'New Employee'}</h2>
                         <form onSubmit={handleFormSubmit} className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Employee ID</label>
                                     <input type="text" required value={formData.emp_id} onChange={e => setFormData({...formData, emp_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
@@ -382,7 +382,7 @@ const EmployeeManagement = () => {
                                     <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
                                     <input type="text" value={formData.phone || ''} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
@@ -392,7 +392,7 @@ const EmployeeManagement = () => {
                                     <input type="text" required value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {!selectedEmp && (
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
@@ -400,7 +400,7 @@ const EmployeeManagement = () => {
                                     </div>
                                 )}
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Daily Salary (₹)</label>
                                     <input type="number" step="0.01" required value={formData.daily_salary} onChange={e => setFormData({...formData, daily_salary: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
@@ -413,7 +413,7 @@ const EmployeeManagement = () => {
                                     </select>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Team</label>
                                     <select value={formData.team_id} onChange={e => setFormData({...formData, team_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
