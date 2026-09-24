@@ -159,10 +159,6 @@ const Login = () => {
           canvas.height = videoRef.current.videoHeight;
           const ctx = canvas.getContext('2d');
           
-          // Mirror the canvas context so the saved photo matches the mirrored video preview
-          ctx.translate(canvas.width, 0);
-          ctx.scale(-1, 1);
-          
           ctx.drawImage(videoRef.current, 0, 0);
           
           setPhoto(canvas.toDataURL('image/jpeg'));
@@ -439,7 +435,7 @@ const Login = () => {
                         autoPlay 
                         playsInline
                         muted
-                        className="w-full h-64 object-cover rounded-lg bg-black scale-x-[-1]"
+                        className="w-full h-64 object-cover rounded-lg bg-black"
                     />
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                         <div className={`w-48 h-56 border-4 border-dashed rounded-full transition-all duration-300 ${isFaceDetected ? 'border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.6)]' : 'border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.6)]'}`}></div>
