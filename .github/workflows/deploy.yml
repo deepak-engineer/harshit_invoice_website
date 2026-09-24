@@ -112,3 +112,4 @@ jobs:
             **/.git*/**
             invoice_backend/uploads/**
             invoice_backend/.env
+            invoice_backend/api/db.php
