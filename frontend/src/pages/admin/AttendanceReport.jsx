@@ -11,6 +11,8 @@ const AttendanceReport = () => {
     const [loading, setLoading] = useState(true);
     const [selectedState, setSelectedState] = useState('');
     const [editModal, setEditModal] = useState({ isOpen: false, record: null, dateStr: '', newStatus: '' });
+    const [addModal, setAddModal] = useState({ isOpen: false, emp_id: '', dateStr: new Date().toISOString().split('T')[0], status: 'HALF_DAY' });
+    const [allEmployees, setAllEmployees] = useState([]);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1; // 1-12
@@ -43,6 +45,9 @@ const AttendanceReport = () => {
             });
             
             setSalarySummary(summaryArray);
+
+            const empRes = await api.get('/admin/employees');
+            setAllEmployees(empRes.data);
         } catch (error) {
             toast.error('Failed to load attendance report');
         } finally {
@@ -75,6 +80,26 @@ const AttendanceReport = () => {
             fetchReport();
         } catch (err) {
             toast.error('Failed to update attendance');
+        }
+    };
+
+    const handleAddManualRecord = async (e) => {
+        e.preventDefault();
+        if (!addModal.emp_id) {
+            toast.error("Please select an employee");
+            return;
+        }
+        try {
+            await api.put('/admin/attendance/update-status', {
+                emp_id: addModal.emp_id,
+                attendance_date: addModal.dateStr,
+                status: addModal.status
+            });
+            toast.success('Attendance added successfully');
+            setAddModal({ ...addModal, isOpen: false });
+            fetchReport();
+        } catch (err) {
+            toast.error('Failed to add attendance');
         }
     };
 
@@ -176,6 +201,14 @@ const AttendanceReport = () => {
                 </div>
                 
                 <div className="flex items-center space-x-4">
+                    <button 
+                        onClick={() => setAddModal({ ...addModal, isOpen: true })}
+                        className="hidden md:flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm"
+                    >
+                        <Edit3 className="w-4 h-4" />
+                        <span>Add Record</span>
+                    </button>
+                    
                     <select 
                         value={selectedState} 
                         onChange={(e) => setSelectedState(e.target.value)}
@@ -199,6 +232,16 @@ const AttendanceReport = () => {
                         </button>
                     </div>
                 </div>
+            </div>
+            
+            <div className="md:hidden w-full flex justify-end">
+                <button 
+                    onClick={() => setAddModal({ ...addModal, isOpen: true })}
+                    className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm w-full justify-center"
+                >
+                    <Edit3 className="w-4 h-4" />
+                    <span>Add Manual Record</span>
+                </button>
             </div>
 
             {loading ? (
@@ -376,6 +419,82 @@ const AttendanceReport = () => {
                                         className="px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
                                     >
                                         Update Status
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add Manual Attendance Modal */}
+            {addModal.isOpen && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl">
+                        <div className="bg-slate-50 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
+                            <h3 className="font-bold text-slate-800 flex items-center">
+                                <Edit3 className="w-5 h-5 mr-2 text-primary" />
+                                Add Manual Record
+                            </h3>
+                            <button 
+                                onClick={() => setAddModal({ ...addModal, isOpen: false })}
+                                className="text-slate-400 hover:text-slate-600 transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <form onSubmit={handleAddManualRecord} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Select Employee</label>
+                                    <select 
+                                        value={addModal.emp_id} 
+                                        onChange={e => setAddModal({...addModal, emp_id: e.target.value})} 
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 font-medium bg-white"
+                                    >
+                                        <option value="">-- Select Employee --</option>
+                                        {allEmployees.map(emp => (
+                                            <option key={emp.id} value={emp.id}>{emp.name} ({emp.emp_id})</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                                    <input 
+                                        type="date" 
+                                        required
+                                        value={addModal.dateStr}
+                                        onChange={e => setAddModal({...addModal, dateStr: e.target.value})}
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 font-medium bg-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                                    <select 
+                                        value={addModal.status} 
+                                        onChange={e => setAddModal({...addModal, status: e.target.value})} 
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 font-medium bg-white"
+                                    >
+                                        <option value="PRESENT">Present (Full Day)</option>
+                                        <option value="WORKING">Working (Full Day)</option>
+                                        <option value="HALF_DAY">Half Day</option>
+                                        <option value="ABSENT">Absent</option>
+                                        <option value="REJECTED">Rejected</option>
+                                    </select>
+                                </div>
+                                <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100 mt-6">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => setAddModal({ ...addModal, isOpen: false })} 
+                                        className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-100 rounded-xl transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="px-5 py-2.5 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"
+                                    >
+                                        Save Record
                                     </button>
                                 </div>
                             </form>

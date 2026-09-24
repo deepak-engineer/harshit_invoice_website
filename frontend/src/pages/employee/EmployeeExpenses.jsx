@@ -184,7 +184,7 @@ const EmployeeExpenses = () => {
                         </div>
                         <div className="p-5 overflow-y-auto custom-scrollbar">
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1">Amount (₹)</label>
                                         <input 
@@ -228,7 +228,7 @@ const EmployeeExpenses = () => {
                                     <label className="block text-sm font-medium text-slate-700 mb-2">Receipt / Bill Photo</label>
                                     
                                     {!formData.receipt_photo && !useCamera && (
-                                        <div className="grid grid-cols-2 gap-3">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             <button 
                                                 type="button" 
                                                 onClick={startCamera}

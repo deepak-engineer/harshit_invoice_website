@@ -377,8 +377,15 @@ if (preg_match('/^admin\/attendance\/update-status$/', $route)) {
             exit;
         }
 
-        $stmt = $pdo->prepare("UPDATE attendance SET status = ? WHERE employee_id = ? AND attendance_date = ?");
-        $stmt->execute([$data['status'], $data['emp_id'], $data['attendance_date']]);
+        $stmt = $pdo->prepare("SELECT id FROM attendance WHERE employee_id = ? AND attendance_date = ?");
+        $stmt->execute([$data['emp_id'], $data['attendance_date']]);
+        if ($stmt->fetch()) {
+            $stmt = $pdo->prepare("UPDATE attendance SET status = ? WHERE employee_id = ? AND attendance_date = ?");
+            $stmt->execute([$data['status'], $data['emp_id'], $data['attendance_date']]);
+        } else {
+            $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, attendance_date, status, clock_in_time, clock_in_photo, location_lat, location_lng) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['emp_id'], $data['attendance_date'], $data['status'], date('H:i:s'), 'manual_by_admin', '0', '0']);
+        }
         
         echo json_encode(["success" => true]);
         exit;

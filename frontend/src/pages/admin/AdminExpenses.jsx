@@ -316,7 +316,7 @@ const AdminExpenses = () => {
                                 </div>
                             </div>
                             
-                            <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
                                 <div>
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">State / Site</p>
                                     <p className="text-sm font-semibold text-slate-700 flex items-center">
