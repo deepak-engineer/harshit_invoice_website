@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, User, Camera, X } from 'lucide-react';
+import { Eye, EyeOff, Lock, User, Camera, X, RefreshCcw } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-light.svg';
 import { getFaceDescriptor, hasFace } from '../utils/faceApi';
@@ -22,6 +22,7 @@ const Login = () => {
   
   // Camera state
   const [showCamera, setShowCamera] = useState(false);
+  const [facingMode, setFacingMode] = useState('user');
   const videoRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [cameraStatus, setCameraStatus] = useState('');
@@ -71,30 +72,55 @@ const Login = () => {
       }
   };
 
-  const startCamera = async () => {
+  const startCamera = async (mode = 'user') => {
+      setFacingMode(mode);
       setShowPhotoModal(false);
       setShowCamera(true);
       setCameraStatus('Initializing camera...');
       try {
-          const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+          const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode } });
           setStream(mediaStream);
           if (videoRef.current) {
               videoRef.current.srcObject = mediaStream;
               
               // Start checking for face continuously
-              faceCheckInterval.current = setInterval(async () => {
-                  if (videoRef.current && videoRef.current.readyState === 4 && !isProcessingFace) {
-                      try {
-                          const detected = await hasFace(videoRef.current);
-                          setIsFaceDetected(detected);
-                      } catch(e) {}
-                  }
-              }, 500);
+              if (!faceCheckInterval.current) {
+                  faceCheckInterval.current = setInterval(async () => {
+                      if (videoRef.current && videoRef.current.readyState === 4 && !isProcessingFace) {
+                          try {
+                              const detected = await hasFace(videoRef.current);
+                              setIsFaceDetected(detected);
+                          } catch(e) {}
+                      }
+                  }, 500);
+              }
           }
           setCameraStatus('Position your face clearly in the frame');
       } catch (err) {
           console.error(err);
           setCameraStatus('Failed to access camera.');
+      }
+  };
+
+  const switchCamera = async () => {
+      const newMode = facingMode === 'user' ? 'environment' : 'user';
+      setFacingMode(newMode);
+      
+      if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+      }
+      setCameraStatus('Switching camera...');
+      
+      try {
+          const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: newMode } });
+          setStream(mediaStream);
+          if (videoRef.current) {
+              videoRef.current.srcObject = mediaStream;
+          }
+          setCameraStatus('Position your face clearly in the frame');
+      } catch (err) {
+          console.error(err);
+          setCameraStatus('Failed to switch camera.');
       }
   };
 
@@ -368,7 +394,7 @@ const Login = () => {
             <div className="space-y-3">
               <button 
                 type="button"
-                onClick={startCamera}
+                onClick={() => startCamera('user')}
                 className="flex items-center justify-center w-full px-4 py-3 bg-primary text-white font-medium rounded-xl hover:bg-primary/90 transition-colors"
               >
                 <Camera className="w-5 h-5 mr-2" />
@@ -396,9 +422,15 @@ const Login = () => {
             <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
                 <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50">
                     <h3 className="font-bold text-slate-800">Face Registration</h3>
-                    <button onClick={stopCamera} className="text-slate-400 hover:text-slate-600">
-                        <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center space-x-3">
+                        <button onClick={switchCamera} className="text-slate-600 hover:text-primary flex items-center bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                            <RefreshCcw className="w-4 h-4 mr-2" />
+                            Switch
+                        </button>
+                        <button onClick={stopCamera} className="text-slate-400 hover:text-red-500 p-1.5 bg-white border border-slate-200 rounded-lg transition-colors shadow-sm">
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
                 
                 <div className="p-4 flex flex-col items-center bg-slate-900 relative">
