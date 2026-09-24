@@ -20,6 +20,7 @@ header('Content-Type: application/json');
 
 require_once 'db.php';
 require_once 'auth.php';
+require_once 'attendance_helper.php';
 
 $requestUri = $_SERVER['REQUEST_URI'];
 $path = parse_url($requestUri, PHP_URL_PATH);
@@ -36,16 +37,31 @@ if ($route === 'login' && $method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $username = $data['username'] ?? '';
     $password = $data['password'] ?? '';
+    $role = $data['role'] ?? 'employee'; // default to employee if not provided
     
-    $stmt = $pdo->prepare("SELECT id, password_hash FROM admin_users WHERE username = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
+    $user = null;
+    if ($role === 'admin') {
+        $stmt = $pdo->prepare("SELECT id, password_hash FROM admin_users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+    } else {
+        $stmt = $pdo->prepare("SELECT id, password_hash, status FROM employees WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+        if ($user && $user['status'] !== 'ACTIVE') {
+            http_response_code(403);
+            $msg = $user['status'] === 'PENDING' ? "Account is pending admin approval." : "Account is inactive.";
+            echo json_encode(["error" => $msg]);
+            exit;
+        }
+    }
     
     if ($user && password_verify($password, $user['password_hash'])) {
         $_SESSION['user_id'] = $user['id'];
+        $_SESSION['role'] = $role;
         $_SESSION['login_attempts'] = 0;
         $_SESSION['last_activity'] = time();
-        echo json_encode(["success" => true]);
+        echo json_encode(["success" => true, "role" => $role]);
     } else {
         recordFailedLogin();
         http_response_code(401);
@@ -61,10 +77,61 @@ if ($route === 'logout' && $method === 'POST') {
     exit;
 }
 
+if ($route === 'employee-signup' && $method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = trim($data['name'] ?? '');
+    $phone = trim($data['phone'] ?? '');
+    $password = $data['password'] ?? '';
+    $photo = $data['photo'] ?? null;
+    $faceDescriptor = $data['face_descriptor'] ?? null;
+    
+    if (empty($name) || empty($phone) || empty($password) || empty($photo)) {
+        http_response_code(400);
+        echo json_encode(["error" => "All fields including photo are required"]);
+        exit;
+    }
+    
+    // Generate username / emp_id
+    // name + first 4 digits of phone
+    $baseName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
+    if (strlen($baseName) > 10) $baseName = substr($baseName, 0, 10);
+    $phonePrefix = substr(preg_replace('/[^0-9]/', '', $phone), 0, 4);
+    $generatedId = $baseName . $phonePrefix;
+    
+    // Ensure uniqueness
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM employees WHERE username = ?");
+    $stmt->execute([$generatedId]);
+    if ($stmt->fetchColumn() > 0) {
+        $generatedId = $generatedId . rand(10, 99);
+    }
+
+    $hash = password_hash($password, PASSWORD_DEFAULT);
+    
+    try {
+        $photo_filename = processBase64Image($photo, '../uploads/employees/');
+        $faceJson = $faceDescriptor ? json_encode($faceDescriptor) : null;
+        
+        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, photo, face_descriptor, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING')");
+        $stmt->execute([$generatedId, $name, $phone, $generatedId, $hash, $photo_filename, $faceJson]);
+        echo json_encode([
+            "success" => true, 
+            "username" => $generatedId,
+            "message" => "Account created successfully! Your Username/ID is: " . $generatedId . ". Your account is pending admin approval."
+        ]);
+    } catch(PDOException $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Registration failed. " . $e->getMessage()]);
+    }
+    exit;
+}
+
 checkAuth();
 
 if ($route === 'check-auth' && $method === 'GET') {
-    echo json_encode(["authenticated" => true]);
+    echo json_encode([
+        "authenticated" => true,
+        "role" => $_SESSION['role'] ?? 'employee'
+    ]);
     exit;
 }
 
@@ -258,6 +325,8 @@ if (preg_match('/^vendors(\/default)?$/', $route)) {
         exit;
     }
 }
+
+require_once 'attendance_routes.php';
 
 http_response_code(404);
 echo json_encode(["error" => "Endpoint not found"]);

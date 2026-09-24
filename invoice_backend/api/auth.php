@@ -30,6 +30,26 @@ function checkAuth() {
     $_SESSION['last_activity'] = time();
 }
 
+function checkAdminAuth() {
+    checkAuth();
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Admin access required"]);
+        exit;
+    }
+}
+
+function checkEmployeeAuth() {
+    checkAuth();
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'employee') {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Employee access required"]);
+        exit;
+    }
+}
+
 function checkBruteForce() {
     if (isset($_SESSION['login_attempts']) && $_SESSION['login_attempts'] >= 5) {
         if (time() - $_SESSION['last_failed_login'] < 900) { // 15 minutes lockout

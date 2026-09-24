@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # 1. Setup Node.js to build the frontend
       - name: Setup Node.js
@@ -32,7 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, libxml, mbstring, SimpleXML, xml, xmlreader, xmlwriter, zip, zlib
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json, libxml, SimpleXML, xmlreader, xmlwriter, zip, zlib
           coverage: none
 
       # 4. Install backend dependencies using Composer
@@ -47,14 +47,16 @@ jobs:
         run: |
           mkdir deploy_folder
           
-          # Move compiled frontend files (index.html, assets, etc.) to the root of deploy_folder
-          cp -r frontend/dist/* deploy_folder/
+          # Move compiled frontend files (index.html, assets, etc.) to the root of deploy_folder safely
+          cp -a frontend/dist/. deploy_folder/
           
           # Create a .htaccess file for React Router to work correctly on Apache (Hostinger)
+          # We also exclude /invoice_backend/ from being rewritten to index.html so API works!
           echo "<IfModule mod_rewrite.c>
             RewriteEngine On
             RewriteBase /
             RewriteRule ^index\.html$ - [L]
+            RewriteCond %{REQUEST_URI} !^/invoice_backend/
             RewriteCond %{REQUEST_FILENAME} !-f
             RewriteCond %{REQUEST_FILENAME} !-d
             RewriteRule . /index.html [L]
@@ -103,3 +105,10 @@ jobs:
           
           # The folder on Hostinger where the website lives
           server-dir: ./public_html/
+          
+          # PREVENT overwriting or deleting user uploaded files on the server
+          exclude: |
+            **/.git*
+            **/.git*/**
+            invoice_backend/uploads/**
+            invoice_backend/.env
