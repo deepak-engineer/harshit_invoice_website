@@ -167,7 +167,7 @@ const AttendanceReport = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-primary/10 text-primary rounded-xl">
                         <CalendarIcon className="w-6 h-6" />
