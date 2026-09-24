@@ -475,11 +475,7 @@ const AttendanceReport = () => {
                                         onChange={e => setAddModal({...addModal, status: e.target.value})} 
                                         className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800 font-medium bg-white"
                                     >
-                                        <option value="PRESENT">Present (Full Day)</option>
-                                        <option value="WORKING">Working (Full Day)</option>
                                         <option value="HALF_DAY">Half Day</option>
-                                        <option value="ABSENT">Absent</option>
-                                        <option value="REJECTED">Rejected</option>
                                     </select>
                                 </div>
                                 <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100 mt-6">

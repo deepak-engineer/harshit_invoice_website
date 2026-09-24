@@ -26,6 +26,9 @@ const EmployeeManagement = () => {
     const [formData, setFormData] = useState({
         emp_id: '', name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
     });
+    const [newSiteData, setNewSiteData] = useState({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
+    const [newTeamData, setNewTeamData] = useState({ name: '', site_id: '', state: '' });
+    const [submittingForm, setSubmittingForm] = useState(false);
     const [newPassword, setNewPassword] = useState('');
 
     const fetchData = async () => {
@@ -51,18 +54,44 @@ const EmployeeManagement = () => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+        setSubmittingForm(true);
         try {
+            let finalSiteId = formData.site_id;
+            let finalTeamId = formData.team_id;
+
+            if (finalSiteId === 'NEW_SITE') {
+                const siteRes = await api.post('/admin/sites', newSiteData);
+                finalSiteId = siteRes.data.id;
+            }
+
+            if (finalTeamId === 'NEW_TEAM') {
+                const teamPayload = { ...newTeamData };
+                if (teamPayload.site_id === 'NEW_SITE') {
+                    teamPayload.site_id = finalSiteId; // link to newly created site if applicable
+                }
+                const teamRes = await api.post('/admin/teams', teamPayload);
+                finalTeamId = teamRes.data.id;
+            }
+
+            const payload = { 
+                ...formData, 
+                site_id: finalSiteId === 'NEW_SITE' || !finalSiteId ? '' : finalSiteId, 
+                team_id: finalTeamId === 'NEW_TEAM' || !finalTeamId ? '' : finalTeamId 
+            };
+
             if (selectedEmp) {
-                await api.put(`/admin/employees/${selectedEmp.id}`, formData);
+                await api.put(`/admin/employees/${selectedEmp.id}`, payload);
                 toast.success('Employee updated');
             } else {
-                await api.post('/admin/employees', formData);
+                await api.post('/admin/employees', payload);
                 toast.success('Employee created');
             }
             setIsFormOpen(false);
             fetchData();
         } catch (error) {
             toast.error(error.response?.data?.error || 'Operation failed');
+        } finally {
+            setSubmittingForm(false);
         }
     };
 
@@ -216,12 +245,16 @@ const EmployeeManagement = () => {
 
     const openNew = () => {
         setFormData({ emp_id: '', name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
+        setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
+        setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(null);
         setIsFormOpen(true);
     };
 
     const openEdit = (emp) => {
         setFormData({ ...emp, password: '', photo: '' }); // Don't reload photo in form to prevent massive base64 payload unless changed
+        setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
+        setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(emp);
         setIsFormOpen(true);
     };
@@ -499,6 +532,7 @@ const EmployeeManagement = () => {
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Site</label>
                                     <select value={formData.site_id} onChange={e => setFormData({...formData, site_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
                                         <option value="">-- None --</option>
+                                        <option value="NEW_SITE" className="text-primary font-bold">+ Add New Site</option>
                                         {sites.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
                                     </select>
                                 </div>
@@ -508,6 +542,7 @@ const EmployeeManagement = () => {
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Team</label>
                                     <select value={formData.team_id} onChange={e => setFormData({...formData, team_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
                                         <option value="">-- None --</option>
+                                        <option value="NEW_TEAM" className="text-primary font-bold">+ Add New Team</option>
                                         {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                     </select>
                                 </div>
@@ -520,6 +555,71 @@ const EmployeeManagement = () => {
                                     </select>
                                 </div>
                             </div>
+
+                            {/* New Site Inline Form */}
+                            {formData.site_id === 'NEW_SITE' && (
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-4 space-y-3 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+                                    <h3 className="font-bold text-sm text-slate-800 flex items-center"><Plus className="w-4 h-4 mr-1 text-primary"/> Create New Site</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Site Name</label>
+                                            <input type="text" required value={newSiteData.name} onChange={e => setNewSiteData({...newSiteData, name: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. HDFC Phase 4" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Branch Code</label>
+                                            <input type="text" required value={newSiteData.code} onChange={e => setNewSiteData({...newSiteData, code: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. HDFC123" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">State (For Holidays)</label>
+                                            <select required value={newSiteData.state} onChange={e => setNewSiteData({...newSiteData, state: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
+                                                <option value="">Select State</option>
+                                                {Object.keys(holidays2026).map(st => (
+                                                    <option key={st} value={st}>{st}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Address</label>
+                                            <input type="text" value={newSiteData.address} onChange={e => setNewSiteData({...newSiteData, address: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="Full address" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* New Team Inline Form */}
+                            {formData.team_id === 'NEW_TEAM' && (
+                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 mt-4 space-y-3 relative overflow-hidden">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                                    <h3 className="font-bold text-sm text-slate-800 flex items-center"><Plus className="w-4 h-4 mr-1 text-blue-500"/> Create New Team</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Team Name</label>
+                                            <input type="text" required value={newTeamData.name} onChange={e => setNewTeamData({...newTeamData, name: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="e.g. Alpha Team" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Link to Site</label>
+                                            <select value={newTeamData.site_id} onChange={e => setNewTeamData({...newTeamData, site_id: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                                <option value="">-- Independent Team --</option>
+                                                {formData.site_id === 'NEW_SITE' && <option value="NEW_SITE">Link to New Site Being Created</option>}
+                                                {sites.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-600 mb-1">State (For Holidays)</label>
+                                        <select value={newTeamData.state} onChange={e => setNewTeamData({...newTeamData, state: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                            <option value="">-- Inherit from Site --</option>
+                                            {Object.keys(holidays2026).map(st => (
+                                                <option key={st} value={st}>{st}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-1 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Profile Photo</label>
@@ -533,7 +633,9 @@ const EmployeeManagement = () => {
                             </div>
                             <div className="flex justify-end space-x-3 mt-6">
                                 <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90">Save Employee</button>
+                                <button type="submit" disabled={submittingForm} className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 flex items-center">
+                                    {submittingForm ? 'Saving...' : 'Save Employee'}
+                                </button>
                             </div>
                         </form>
                     </div>
