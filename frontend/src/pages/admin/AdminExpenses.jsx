@@ -392,6 +392,7 @@ const AdminExpenses = () => {
                                     </div>
                                 )}
                             </div>
+                        </div>
                     </div>
                 </div>
             )}
