@@ -394,12 +394,6 @@ if (preg_match('/^me$/', $route)) {
         $emp = $stmt->fetch();
         if ($emp) {
             $emp['face_registered'] = !empty($emp['face_descriptor']);
-            unset($emp['face_descriptor']); // Don't send descriptor to frontend unless needed for verification (wait, we need it for verification on frontend! So send it.)
-            
-            // Re-fetch with descriptor
-            $stmt2 = $pdo->prepare("SELECT id, emp_id, name, username, daily_salary, site_id, team_id, face_descriptor FROM employees WHERE id = ?");
-            $stmt2->execute([$_SESSION['user_id']]);
-            $emp = $stmt2->fetch();
             
             $team_stmt = $pdo->prepare("SELECT * FROM teams WHERE id = ?");
             $team_stmt->execute([$emp['team_id']]);
