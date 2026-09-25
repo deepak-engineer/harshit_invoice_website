@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { MapPin, CheckCircle, Navigation } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { MapPin, CheckCircle, Camera, Upload } from 'lucide-react'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
 
@@ -8,8 +8,11 @@ const AttendanceFlow = () => {
   const [attendance, setAttendance] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const [status, setStatus] = useState('Ready to mark attendance')
+  const [status, setStatus] = useState('Upload register photo to mark attendance')
   const [processing, setProcessing] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState(null)
+  const [photoBase64, setPhotoBase64] = useState(null)
+  const fileInputRef = useRef(null)
 
   const fetchMe = async () => {
     try {
@@ -30,35 +33,65 @@ const AttendanceFlow = () => {
     fetchMe()
   }, [])
 
-  const getGPSLocation = () => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by your browser'))
-      } else {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 10000,
-        })
-      }
-    })
+  const handlePhotoCapture = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+        toast.error('Please select a valid image file.')
+        return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+        const img = new Image()
+        img.onload = () => {
+            // Resize image to max 800x800 to save bandwidth
+            const canvas = document.createElement('canvas')
+            let width = img.width
+            let height = img.height
+            const maxSize = 800
+
+            if (width > height && width > maxSize) {
+                height *= maxSize / width
+                width = maxSize
+            } else if (height > maxSize) {
+                width *= maxSize / height
+                height = maxSize
+            }
+
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(img, 0, 0, width, height)
+
+            const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8)
+            setPhotoPreview(resizedBase64)
+            
+            // Remove the data:image/jpeg;base64, prefix for the backend
+            const base64Data = resizedBase64.split(',')[1]
+            setPhotoBase64(base64Data)
+            setStatus('Photo captured. Ready to submit.')
+        }
+        img.src = event.target.result
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleAction = async (type) => {
+    if (type === 'CHECK IN' && !photoBase64) {
+        toast.error('Please upload a photo of the register entry first.')
+        return
+    }
+
     setProcessing(true)
     try {
-      setStatus('Getting location...')
-
-      const position = await getGPSLocation()
+      setStatus(`Marking ${type}...`)
 
       const payload = {
         site_id: employee.site_id,
-        lat: position.coords.latitude,
-        lng: position.coords.longitude,
-        acc: position.coords.accuracy,
+        photo: photoBase64
       }
-
-      setStatus(`Marking ${type}...`)
 
       if (type === 'CHECK IN') {
         await api.post('/attendance/check-in', payload)
@@ -70,14 +103,13 @@ const AttendanceFlow = () => {
         )
       }
 
+      setPhotoPreview(null)
+      setPhotoBase64(null)
       fetchMe() // Refresh
       setStatus('Success')
     } catch (error) {
       console.error(error)
       let msg = error.response?.data?.error || error.message || 'Operation failed'
-      if (error.response?.data?.distance) {
-          msg += ` (Distance: ${error.response.data.distance}m, Max allowed: ${error.response.data.radius}m)`
-      }
       setStatus(`Failed: ${msg}`)
       toast.error(msg)
     } finally {
@@ -145,10 +177,39 @@ const AttendanceFlow = () => {
             </p>
           </div>
         ) : (
-          <div className="p-10 text-center space-y-6">
-            <div className="w-32 h-32 mx-auto bg-slate-50 rounded-full flex items-center justify-center border-4 border-slate-100">
-                <Navigation className={`w-12 h-12 text-primary ${processing ? 'animate-pulse' : ''}`} />
-            </div>
+          <div className="p-8 text-center space-y-6">
+            
+            {!isCheckedIn && (
+                <div className="space-y-4">
+                    <p className="text-sm font-medium text-slate-600">Upload Register Entry Photo</p>
+                    
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        capture="environment" 
+                        onChange={handlePhotoCapture} 
+                        className="hidden" 
+                        ref={fileInputRef} 
+                    />
+                    
+                    {photoPreview ? (
+                        <div className="relative w-48 h-48 mx-auto rounded-xl overflow-hidden border-2 border-primary cursor-pointer" onClick={() => fileInputRef.current.click()}>
+                            <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <Camera className="w-8 h-8 text-white" />
+                            </div>
+                        </div>
+                    ) : (
+                        <div 
+                            onClick={() => fileInputRef.current.click()}
+                            className="w-48 h-48 mx-auto bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-100 hover:border-primary transition-colors"
+                        >
+                            <Upload className="w-10 h-10 text-slate-400 mb-2" />
+                            <span className="text-sm text-slate-500">Tap to Camera</span>
+                        </div>
+                    )}
+                </div>
+            )}
             
             <p
               className={`text-sm font-medium ${processing ? 'text-blue-600 animate-pulse' : 'text-slate-600'}`}
@@ -160,22 +221,22 @@ const AttendanceFlow = () => {
               onClick={() =>
                 handleAction(isCheckedIn ? 'CHECK OUT' : 'CHECK IN')
               }
-              disabled={processing}
-              className={`flex items-center justify-center space-x-2 w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all disabled:opacity-50
+              disabled={processing || (!isCheckedIn && !photoBase64)}
+              className={`flex items-center justify-center space-x-2 w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed
                                 ${isCheckedIn ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30' : 'bg-primary hover:bg-primary/90 text-white shadow-primary/30'}
                             `}
             >
               {processing ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                <MapPin className="w-6 h-6" />
+                isCheckedIn ? <CheckCircle className="w-6 h-6" /> : <Camera className="w-6 h-6" />
               )}
               <span>
                 {processing
                   ? 'Processing...'
                   : isCheckedIn
                     ? 'CHECK OUT'
-                    : 'CHECK IN'}
+                    : 'CHECK IN WITH PHOTO'}
               </span>
             </button>
           </div>
