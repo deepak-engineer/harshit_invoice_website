@@ -14,10 +14,7 @@ const EmployeeExpenses = () => {
         receipt_photo: null
     });
     
-    // Camera handling
-    const [useCamera, setUseCamera] = useState(false);
-    const videoRef = useRef(null);
-    const streamRef = useRef(null);
+    // Camera handling removed per user request
 
     useEffect(() => {
         fetchExpenses();
@@ -34,38 +31,7 @@ const EmployeeExpenses = () => {
         }
     };
 
-    const startCamera = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-            }
-            streamRef.current = stream;
-            setUseCamera(true);
-        } catch (err) {
-            toast.error("Could not access camera");
-        }
-    };
-
-    const stopCamera = () => {
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(track => track.stop());
-            streamRef.current = null;
-        }
-        setUseCamera(false);
-    };
-
-    const capturePhoto = () => {
-        if (videoRef.current) {
-            const canvas = document.createElement('canvas');
-            canvas.width = videoRef.current.videoWidth;
-            canvas.height = videoRef.current.videoHeight;
-            canvas.getContext('2d').drawImage(videoRef.current, 0, 0);
-            setFormData({ ...formData, receipt_photo: canvas.toDataURL('image/jpeg', 0.7) });
-            stopCamera();
-        }
-    };
-
+    // Camera functions removed
     const handleFileUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -173,10 +139,7 @@ const EmployeeExpenses = () => {
                         <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 dark:bg-gray-800/50">
                             <h2 className="text-xl font-bold text-slate-800 dark:text-white/90">New Expense</h2>
                             <button 
-                                onClick={() => {
-                                    setShowModal(false);
-                                    stopCamera();
-                                }} 
+                                onClick={() => setShowModal(false)} 
                                 className="text-slate-400 hover:text-red-500"
                             >
                                 <XCircle className="w-6 h-6" />
@@ -227,32 +190,12 @@ const EmployeeExpenses = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Receipt / Bill Photo</label>
                                     
-                                    {!formData.receipt_photo && !useCamera && (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <button 
-                                                type="button" 
-                                                onClick={startCamera}
-                                                className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-slate-500 hover:text-primary"
-                                            >
-                                                <Camera className="w-8 h-8 mb-2" />
-                                                <span className="text-sm font-medium">Use Camera</span>
-                                            </button>
-                                            <label className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-200 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-slate-500 hover:text-primary cursor-pointer">
-                                                <Upload className="w-8 h-8 mb-2" />
-                                                <span className="text-sm font-medium">Upload File</span>
-                                                <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
-                                            </label>
-                                        </div>
-                                    )}
-
-                                    {useCamera && !formData.receipt_photo && (
-                                        <div className="relative rounded-xl overflow-hidden bg-black aspect-[3/4]">
-                                            <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover"></video>
-                                            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
-                                                <button type="button" onClick={stopCamera} className="bg-white text-slate-800 px-4 py-2 rounded-full font-bold shadow-lg text-sm">Cancel</button>
-                                                <button type="button" onClick={capturePhoto} className="bg-primary text-white px-6 py-2 rounded-full font-bold shadow-lg text-sm">Capture</button>
-                                            </div>
-                                        </div>
+                                    {!formData.receipt_photo && (
+                                        <label className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 dark:border-gray-700 rounded-xl hover:border-primary hover:bg-primary/5 transition-all text-slate-500 hover:text-primary cursor-pointer w-full">
+                                            <Upload className="w-10 h-10 mb-3" />
+                                            <span className="text-sm font-medium">Upload File or Take Photo</span>
+                                            <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+                                        </label>
                                     )}
 
                                     {formData.receipt_photo && (

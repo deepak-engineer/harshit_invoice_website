@@ -55,6 +55,7 @@ const Layout = () => {
     { name: 'Mark Attendance', path: '/employee/attendance', icon: Camera },
     { name: 'Site Work', path: '/employee/work', icon: CheckSquare },
     { name: 'My Expenses', path: '/employee/expenses', icon: Receipt },
+    { name: 'Sites', path: '/employee/sites', icon: MapPin },
   ];
 
   const navItems = isAdmin ? adminNavItems : employeeNavItems;
@@ -66,6 +67,7 @@ const Layout = () => {
     if (path === '/admin/settings' && location.pathname === '/admin/settings') return true;
     if (path === '/admin/expenses' && location.pathname === '/admin/expenses') return true;
     if (path === '/employee/expenses' && location.pathname === '/employee/expenses') return true;
+    if (path === '/employee/sites' && location.pathname === '/employee/sites') return true;
     return location.pathname.startsWith(path);
   };
 

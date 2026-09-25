@@ -96,6 +96,7 @@ function App() {
             <Route path="attendance" element={<AttendanceFlow />} />
             <Route path="work" element={<WorkChecklist />} />
             <Route path="expenses" element={<EmployeeExpenses />} />
+            <Route path="sites" element={<SiteManagement />} />
           </Route>
         </Route>
         

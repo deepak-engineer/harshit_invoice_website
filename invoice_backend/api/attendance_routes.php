@@ -265,7 +265,7 @@ if (preg_match('/^admin\/teams\/(\d+)$/', $route, $matches)) {
 
 // Site Management
 if (preg_match('/^admin\/sites$/', $route)) {
-    checkAdminAuth();
+    checkAuth();
     if ($method === 'GET') {
         $stmt = $pdo->query("SELECT * FROM sites ORDER BY name ASC");
         echo json_encode($stmt->fetchAll());
@@ -284,7 +284,7 @@ if (preg_match('/^admin\/sites$/', $route)) {
 }
 
 if (preg_match('/^admin\/sites\/bulk$/', $route)) {
-    checkAdminAuth();
+    checkAuth();
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['sites']) && is_array($data['sites'])) {
@@ -304,7 +304,7 @@ if (preg_match('/^admin\/sites\/bulk$/', $route)) {
     }
 }
 if (preg_match('/^admin\/sites\/bulk-delete$/', $route)) {
-    checkAdminAuth();
+    checkAuth();
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['ids']) && is_array($data['ids']) && count($data['ids']) > 0) {
@@ -321,7 +321,7 @@ if (preg_match('/^admin\/sites\/bulk-delete$/', $route)) {
 }
 
 if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
-    checkAdminAuth();
+    checkAuth();
     $id = $matches[1];
     if ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
