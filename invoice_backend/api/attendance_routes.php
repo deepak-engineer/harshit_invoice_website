@@ -716,22 +716,26 @@ if (preg_match('/^attendance\/check-in$/', $route)) {
         $distance = null;
         $geofence_radius = 100; // Default
         
-        if ($site && !empty($site['latitude']) && !empty($site['longitude'])) {
-            $geofence_radius = $site['geofence_radius'] ? (int)$site['geofence_radius'] : 100;
-            $distance = haversineGreatCircleDistance(
-                (float)$data['lat'], (float)$data['lng'], 
-                (float)$site['latitude'], (float)$site['longitude']
-            );
-            
-            if ($distance > $geofence_radius) {
-                http_response_code(400);
-                echo json_encode([
-                    "error" => "Outside geofence", 
-                    "distance" => round($distance, 2), 
-                    "radius" => $geofence_radius
-                ]);
-                exit;
-            }
+        if (!$site || empty($site['latitude']) || empty($site['longitude'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "This site has not been configured with a valid attendance location. Please contact the administrator."]);
+            exit;
+        }
+
+        $geofence_radius = $site['geofence_radius'] ? (int)$site['geofence_radius'] : 100;
+        $distance = haversineGreatCircleDistance(
+            (float)$data['lat'], (float)$data['lng'], 
+            (float)$site['latitude'], (float)$site['longitude']
+        );
+        
+        if ($distance > $geofence_radius) {
+            http_response_code(400);
+            echo json_encode([
+                "error" => "You are outside the allowed attendance area.", 
+                "distance" => round($distance, 2), 
+                "radius" => $geofence_radius
+            ]);
+            exit;
         }
         
         $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, site_id, attendance_date, status, check_in_time, check_in_lat, check_in_lng, check_in_acc, check_in_photo, check_in_face_score, check_in_distance, geofence_radius, daily_salary_snapshot) VALUES (?, ?, ?, 'WORKING', ?, ?, ?, ?, ?, ?, ?, ?, (SELECT daily_salary FROM employees WHERE id=?))");

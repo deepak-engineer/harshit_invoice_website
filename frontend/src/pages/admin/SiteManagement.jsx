@@ -3,13 +3,14 @@ import { Plus, Edit2, MapPin, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { holidays2026 } from '../../utils/holidays2026';
+import SiteLocationPicker from '../../components/SiteLocationPicker';
 
 const SiteManagement = () => {
     const [sites, setSites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
-        name: '', code: '', address: '', city: '', location: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100
+        name: '', code: '', address: '', city: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100
     });
     const [editId, setEditId] = useState(null);
 
@@ -17,11 +18,7 @@ const SiteManagement = () => {
     const [bulkData, setBulkData] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     
-    // Address Suggestion states
-    const [addressQuery, setAddressQuery] = useState('');
-    const [addressSuggestions, setAddressSuggestions] = useState([]);
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    
+
     // Search states
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -62,64 +59,7 @@ const SiteManagement = () => {
         }
     }, [debouncedSearch, sites]);
 
-    useEffect(() => {
-        const fetchSuggestionsAndAutoFill = async () => {
-            if (addressQuery.length > 5) {
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}&countrycodes=in&limit=5`);
-                    const data = await res.json();
-                    
-                    setAddressSuggestions(data);
-                    
-                    // Auto-fill coordinates from the top result silently
-                    if (data && data.length > 0) {
-                        const { lat, lon } = data[0];
-                        setFormData(prev => ({ 
-                            ...prev, 
-                            latitude: lat, 
-                            longitude: lon 
-                        }));
-                    }
-                    
-                    setShowSuggestions(true);
-                } catch (error) {
-                    console.error("Failed to fetch address suggestions");
-                }
-            } else {
-                setAddressSuggestions([]);
-                setShowSuggestions(false);
-            }
-        };
 
-        const timer = setTimeout(() => {
-            fetchSuggestionsAndAutoFill();
-        }, 800);
-
-        return () => clearTimeout(timer);
-    }, [addressQuery]);
-
-    const fetchCoordinates = async () => {
-        if (!formData.address) {
-            toast.error("Please enter an address first.");
-            return;
-        }
-        
-        try {
-            toast.loading("Fetching coordinates...", { id: "geocoding" });
-            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.address)}`);
-            const data = await response.json();
-            
-            if (data && data.length > 0) {
-                const { lat, lon } = data[0];
-                setFormData(prev => ({ ...prev, latitude: lat, longitude: lon }));
-                toast.success("Coordinates found and filled!", { id: "geocoding" });
-            } else {
-                toast.error("Could not find coordinates. Please be more specific.", { id: "geocoding" });
-            }
-        } catch (error) {
-            toast.error("Error fetching coordinates.", { id: "geocoding" });
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -134,28 +74,6 @@ const SiteManagement = () => {
                 const res = await api.post('/admin/sites', currentData);
                 savedId = res.data.id;
                 toast.success('Site created successfully');
-            }
-
-            // Auto fetch coordinates if not provided
-            if (!currentData.latitude || !currentData.longitude) {
-                toast.loading("Auto-fetching coordinates based on address...", { id: "auto_geo" });
-                try {
-                    const searchQuery = `${currentData.address || ''}, ${currentData.city || ''}, ${currentData.state || ''}`.replace(/,\s*,/g, ',').trim();
-                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
-                    const data = await geoRes.json();
-                    
-                    if (data && data.length > 0) {
-                        const { lat, lon } = data[0];
-                        currentData.latitude = lat;
-                        currentData.longitude = lon;
-                        await api.put(`/admin/sites/${savedId}`, currentData);
-                        toast.success("Coordinates auto-fetched and saved!", { id: "auto_geo" });
-                    } else {
-                        toast.error("Could not auto-fetch coordinates.", { id: "auto_geo" });
-                    }
-                } catch (error) {
-                    toast.error("Error auto-fetching coordinates.", { id: "auto_geo" });
-                }
             }
 
             setIsModalOpen(false);
@@ -180,16 +98,12 @@ const SiteManagement = () => {
     const openEdit = (site) => {
         setFormData(site);
         setEditId(site.id);
-        setAddressQuery('');
-        setShowSuggestions(false);
         setIsModalOpen(true);
     };
 
     const openNew = () => {
-        setFormData({ name: '', code: '', address: '', city: '', location: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100 });
+        setFormData({ name: '', code: '', address: '', city: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100 });
         setEditId(null);
-        setAddressQuery('');
-        setShowSuggestions(false);
         setIsModalOpen(true);
     };
 
@@ -251,41 +165,7 @@ const SiteManagement = () => {
         }
     };
 
-    const autoDetectMissingCoordinates = async () => {
-        const sitesToProcess = sites.filter(s => selectedIds.includes(s.id) && !s.latitude && s.address);
-        if (sitesToProcess.length === 0) {
-            toast.error("Please select sites that have an Address but missing Latitude.");
-            return;
-        }
 
-        toast.loading(`Processing ${sitesToProcess.length} sites. Please do not close this window...`, { id: "bulk_geo" });
-        
-        let successCount = 0;
-        let failCount = 0;
-
-        for (const site of sitesToProcess) {
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(site.address)}`);
-                const data = await response.json();
-                
-                if (data && data.length > 0) {
-                    const { lat, lon } = data[0];
-                    await api.put(`/admin/sites/${site.id}`, { ...site, latitude: lat, longitude: lon });
-                    successCount++;
-                } else {
-                    failCount++;
-                }
-            } catch (error) {
-                failCount++;
-            }
-            // Wait 1.5 seconds to respect Nominatim API limits (1 req/sec)
-            await new Promise(r => setTimeout(r, 1500)); 
-        }
-
-        toast.success(`Completed! ${successCount} successful, ${failCount} failed.`, { id: "bulk_geo" });
-        fetchSites();
-        setSelectedIds([]);
-    };
 
     const handleSelect = (id) => {
         if (selectedIds.includes(id)) {
@@ -326,10 +206,6 @@ const SiteManagement = () => {
                     <div className="flex space-x-3 flex-wrap gap-y-2">
                     {selectedIds.length > 0 && (
                         <>
-                            <button onClick={autoDetectMissingCoordinates} className="flex items-center space-x-2 bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
-                                <MapPin className="w-5 h-5" />
-                                <span>Auto-Detect Lat/Lng</span>
-                            </button>
                             <button onClick={handleBulkDelete} className="flex items-center space-x-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">
                                 <Trash2 className="w-5 h-5" />
                                 <span>Delete ({selectedIds.length})</span>
@@ -501,60 +377,27 @@ const SiteManagement = () => {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
-                                    <input type="text" value={formData.location || ''} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
-                                </div>
-                                <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
                                     <input type="text" value={formData.city || ''} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
-                                </div>
-                            </div>
-                            <div className="relative">
-                                <div className="flex justify-between items-end mb-1">
-                                    <label className="block text-sm font-medium text-slate-700">Address / Location</label>
-                                    <button type="button" onClick={fetchCoordinates} className="text-xs text-primary hover:underline flex items-center">
-                                        <MapPin className="w-3 h-3 mr-1" /> Auto-fill Lat/Lng
-                                    </button>
-                                </div>
-                                <input 
-                                    type="text" 
-                                    value={addressQuery || formData.address || ''} 
-                                    onChange={e => {
-                                        setAddressQuery(e.target.value);
-                                        setFormData({...formData, address: e.target.value});
-                                    }} 
-                                    onFocus={() => addressSuggestions.length > 0 && setShowSuggestions(true)}
-                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" 
-                                    placeholder="Type to search address suggestions..."
-                                />
-                                {showSuggestions && addressSuggestions.length > 0 && (
-                                    <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                                        {addressSuggestions.map((s, idx) => (
-                                            <div 
-                                                key={idx} 
-                                                className="px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-100 last:border-0"
-                                                onClick={() => handleAddressSuggestionSelect(s)}
-                                            >
-                                                {s.display_name}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Latitude</label>
-                                    <input type="text" value={formData.latitude || ''} onChange={e => setFormData({...formData, latitude: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. 29.9645" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Longitude</label>
-                                    <input type="text" value={formData.longitude || ''} onChange={e => setFormData({...formData, longitude: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. 77.5467" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Geofence Radius (m)</label>
                                     <input type="number" value={formData.geofence_radius || 100} onChange={e => setFormData({...formData, geofence_radius: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                             </div>
+                            
+                            <SiteLocationPicker 
+                                address={formData.address}
+                                latitude={formData.latitude}
+                                longitude={formData.longitude}
+                                onLocationChange={(loc) => setFormData({
+                                    ...formData, 
+                                    address: loc.address, 
+                                    latitude: loc.latitude, 
+                                    longitude: loc.longitude
+                                })}
+                            />
+                            
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">State (For Holidays)</label>
