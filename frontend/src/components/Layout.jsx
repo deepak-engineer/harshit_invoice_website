@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare } from 'lucide-react';
+import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-dark.svg';
 
@@ -22,7 +22,7 @@ const Layout = () => {
 
   const adminNavItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Daily Attendance', path: '/admin/attendance-list', icon: Camera },
+    { name: 'Attendance', path: '/admin/attendance-list', icon: ClipboardCheck },
     { name: 'Attendance Report', path: '/admin/attendance-report', icon: Calendar },
     { name: 'Employees', path: '/admin/employees', icon: Users },
     { name: 'Teams', path: '/admin/teams', icon: Users },

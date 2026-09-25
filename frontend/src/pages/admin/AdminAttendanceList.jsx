@@ -84,7 +84,7 @@ const AdminAttendanceList = () => {
                     <div className="p-2 bg-primary/10 text-primary rounded-xl">
                         <Calendar className="w-6 h-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-800">Daily Attendance</h1>
+                    <h1 className="text-2xl font-bold text-slate-800">Attendance</h1>
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3">
@@ -121,7 +121,7 @@ const AdminAttendanceList = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="overflow-x-auto">
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left text-sm text-slate-600">
                         <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
                             <tr>
@@ -205,6 +205,59 @@ const AdminAttendanceList = () => {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Grid View */}
+                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                    {filteredRecords.map(record => (
+                        <div key={record.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-3">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-bold text-slate-800 leading-tight">{record.emp_name}</h3>
+                                    <p className="text-xs text-slate-500 font-mono mt-0.5">{record.emp_code}</p>
+                                </div>
+                                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 ${
+                                    record.status === 'PRESENT' || record.status === 'WORKING' ? 'bg-green-100 text-green-700' :
+                                    record.status === 'HALF_DAY' ? 'bg-amber-100 text-amber-700' :
+                                    'bg-red-100 text-red-700'
+                                }`}>
+                                    {record.status}
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div className="col-span-2">
+                                    <span className="text-slate-400 block mb-0.5">Site / Team</span>
+                                    <span className="font-medium text-slate-700 block truncate">{record.site_name || 'No Site'} - {record.team_name || 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Check In</span>
+                                    <span className="font-medium text-primary">
+                                        {record.check_in_time ? new Date(record.check_in_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
+                                    </span>
+                                    {record.check_in_distance && (
+                                        <span className={`text-[10px] block mt-0.5 ${record.check_in_distance > record.geofence_radius ? 'text-red-500' : 'text-green-600'}`}>
+                                            Dist: {record.check_in_distance}m
+                                        </span>
+                                    )}
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Check Out</span>
+                                    <span className="font-medium text-primary">
+                                        {record.check_out_time ? new Date(record.check_out_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
+                                    </span>
+                                    {record.working_minutes > 0 && (
+                                        <span className="text-[10px] text-slate-500 block mt-0.5">
+                                            {Math.floor(record.working_minutes/60)}h {record.working_minutes%60}m
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    {filteredRecords.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-slate-400 text-sm">No records found for this date.</div>
+                    )}
                 </div>
             </div>
         </div>

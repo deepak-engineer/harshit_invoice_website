@@ -22,6 +22,10 @@ const EmployeeManagement = () => {
     const [siteInput, setSiteInput] = useState('');
     const [salaryReportModal, setSalaryReportModal] = useState({ isOpen: false, emp: null, month: new Date().getMonth() + 1, year: new Date().getFullYear(), data: null, loading: false, selectedState: '' });
     
+    // Assignment Search states
+    const [siteSearch, setSiteSearch] = useState('');
+    const [teamSearch, setTeamSearch] = useState('');
+
     // Search and bulk delete states
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -336,6 +340,15 @@ const EmployeeManagement = () => {
         setIsFaceOpen(true);
     };
 
+    const filteredSitesOptions = sites.filter(s => 
+        (s.code && s.code.toLowerCase().includes(siteSearch.toLowerCase())) || 
+        (s.name && s.name.toLowerCase().includes(siteSearch.toLowerCase()))
+    );
+
+    const filteredTeamsOptions = teams.filter(t => 
+        (t.name && t.name.toLowerCase().includes(teamSearch.toLowerCase()))
+    );
+
     if (loading) return <div>Loading...</div>;
 
     return (
@@ -622,20 +635,34 @@ const EmployeeManagement = () => {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Site</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search site..." 
+                                        value={siteSearch}
+                                        onChange={e => setSiteSearch(e.target.value)}
+                                        className="w-full px-3 py-1 mb-2 text-xs border rounded-lg focus:ring-1 focus:ring-primary outline-none"
+                                    />
                                     <select value={formData.site_id} onChange={e => setFormData({...formData, site_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
                                         <option value="">-- None --</option>
                                         <option value="NEW_SITE" className="text-primary font-bold">+ Add New Site</option>
-                                        {sites.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
+                                        {filteredSitesOptions.map(s => <option key={s.id} value={s.id}>{s.code} - {s.name}</option>)}
                                     </select>
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Team</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search team..." 
+                                        value={teamSearch}
+                                        onChange={e => setTeamSearch(e.target.value)}
+                                        className="w-full px-3 py-1 mb-2 text-xs border rounded-lg focus:ring-1 focus:ring-primary outline-none"
+                                    />
                                     <select value={formData.team_id} onChange={e => setFormData({...formData, team_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
                                         <option value="">-- None --</option>
                                         <option value="NEW_TEAM" className="text-primary font-bold">+ Add New Team</option>
-                                        {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                        {filteredTeamsOptions.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                     </select>
                                 </div>
                                 <div>
@@ -810,25 +837,39 @@ const EmployeeManagement = () => {
                                 
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Team</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search team..." 
+                                        value={teamSearch}
+                                        onChange={e => setTeamSearch(e.target.value)}
+                                        className="w-full px-3 py-1.5 mb-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-primary outline-none"
+                                    />
                                     <select 
                                         value={teamInput} 
                                         onChange={e => setTeamInput(e.target.value)} 
                                         className="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800"
                                     >
                                         <option value="">-- No Team --</option>
-                                        {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                        {filteredTeamsOptions.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                     </select>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Assigned Site</label>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search site..." 
+                                        value={siteSearch}
+                                        onChange={e => setSiteSearch(e.target.value)}
+                                        className="w-full px-3 py-1.5 mb-2 text-sm border border-slate-200 rounded-lg focus:ring-1 focus:ring-primary outline-none"
+                                    />
                                     <select 
                                         value={siteInput} 
                                         onChange={e => setSiteInput(e.target.value)} 
                                         className="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all text-slate-800"
                                     >
                                         <option value="">-- No Site --</option>
-                                        {sites.map(s => <option key={s.id} value={s.id}>{s.code}</option>)}
+                                        {filteredSitesOptions.map(s => <option key={s.id} value={s.id}>{s.code} - {s.name}</option>)}
                                     </select>
                                 </div>
 

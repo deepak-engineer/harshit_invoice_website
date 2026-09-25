@@ -309,7 +309,8 @@ const SiteManagement = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <table className="w-full text-left text-sm text-slate-600">
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-left text-sm text-slate-600">
                     <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
                         <tr>
                             <th className="px-6 py-4 w-10">
@@ -382,6 +383,66 @@ const SiteManagement = () => {
                         )}
                     </tbody>
                 </table>
+                </div>
+
+                {/* Mobile Grid View */}
+                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                    {filteredSites.map(site => (
+                        <div key={site.id} className={`bg-white p-4 rounded-xl shadow-sm border ${selectedIds.includes(site.id) ? 'border-primary ring-1 ring-primary' : 'border-slate-200'} flex flex-col space-y-3`}>
+                            <div className="flex justify-between items-start">
+                                <div className="flex items-center space-x-3">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer mt-1"
+                                        checked={selectedIds.includes(site.id)}
+                                        onChange={() => handleSelect(site.id)}
+                                    />
+                                    <div>
+                                        <h3 className="font-bold text-slate-800 leading-tight">{site.name}</h3>
+                                        <p className="text-xs text-slate-500 font-mono mt-0.5">{site.code} | ID: {site.id}</p>
+                                    </div>
+                                </div>
+                                <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0 ${site.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {site.status}
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div className="col-span-2">
+                                    <span className="text-slate-400 block mb-0.5">Address</span>
+                                    <span className="font-medium text-slate-700 block truncate">{site.address}</span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">State</span>
+                                    <span className="font-medium text-primary">{site.state || '-'}</span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Op. Status</span>
+                                    <span className={`px-2 py-0.5 rounded border font-semibold
+                                        ${site.operational_status === 'Requirements' ? 'bg-amber-50 text-amber-700 border-amber-200' : 
+                                          site.operational_status === 'Panel Fault' ? 'bg-red-50 text-red-700 border-red-200' :
+                                          site.operational_status === 'Pending' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                          'bg-slate-50 text-slate-600 border-slate-200'}
+                                    `}>
+                                        {site.operational_status || 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-end items-center pt-2 gap-2">
+                                <button onClick={() => openEdit(site)} className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors border border-blue-100">
+                                    <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => handleDelete(site.id)} className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-100">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {filteredSites.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-slate-400 text-sm">No sites found.</div>
+                    )}
+                </div>
             </div>
 
             {isModalOpen && (

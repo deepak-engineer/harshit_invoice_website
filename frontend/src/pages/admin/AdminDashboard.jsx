@@ -78,7 +78,7 @@ const AdminDashboard = () => {
                 <div className="p-6 border-b border-slate-100">
                     <h2 className="text-lg font-bold text-slate-800">Live Attendance Today</h2>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="hidden lg:block overflow-x-auto">
                     <table className="w-full text-left text-sm text-slate-600">
                         <thead className="bg-slate-50 text-slate-500 font-medium">
                             <tr>
@@ -121,6 +121,46 @@ const AdminDashboard = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Mobile Grid View */}
+                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                    {stats.live_attendance.map((record) => (
+                        <div key={record.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-3">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-bold text-slate-800 leading-tight">{record.emp_name}</h3>
+                                </div>
+                                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 ${
+                                    record.status === 'WORKING' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
+                                }`}>
+                                    {record.status}
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div className="col-span-2">
+                                    <span className="text-slate-400 block mb-0.5">Site</span>
+                                    <span className="font-medium text-slate-700 block truncate">{record.site_name || 'N/A'}</span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Check In</span>
+                                    <span className="font-medium text-primary">
+                                        {new Date(record.check_in_time).toLocaleTimeString()}
+                                    </span>
+                                </div>
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Check Out</span>
+                                    <span className="font-medium text-primary">
+                                        {record.check_out_time ? new Date(record.check_out_time).toLocaleTimeString() : '-'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    {stats.live_attendance.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-slate-500">No attendance recorded today</div>
+                    )}
                 </div>
             </div>
         </div>

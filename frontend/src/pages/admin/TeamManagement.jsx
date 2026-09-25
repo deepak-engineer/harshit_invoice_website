@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Users } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { holidays2026 } from '../../utils/holidays2026';
@@ -144,7 +144,8 @@ const TeamManagement = () => {
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <table className="w-full text-left text-sm text-slate-600">
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full text-left text-sm text-slate-600">
                     <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
                         <tr>
                             <th className="px-6 py-4">ID</th>
@@ -179,15 +180,48 @@ const TeamManagement = () => {
                                 </td>
                             </tr>
                         ))}
-                        {filteredTeams.length === 0 && (
-                            <tr>
-                                <td colSpan="4" className="px-6 py-8 text-center text-slate-500">
-                                    No teams found. Create one above!
-                                </td>
-                            </tr>
-                        )}
                     </tbody>
                 </table>
+                </div>
+
+                {/* Mobile Grid View */}
+                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                    {filteredTeams.map(team => (
+                        <div key={team.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-3">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <h3 className="font-bold text-slate-800 leading-tight">{team.name}</h3>
+                                    <p className="text-xs text-slate-500 font-mono mt-0.5">ID: {team.id}</p>
+                                </div>
+                                <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 flex items-center">
+                                    <Users className="w-3 h-3 mr-1" />
+                                    {team.employee_ids?.length || 0} Members
+                                </span>
+                            </div>
+                            
+                            <div className="grid grid-cols-1 gap-2 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <div>
+                                    <span className="text-slate-400 block mb-0.5">Assigned Site</span>
+                                    <span className="font-medium text-primary">
+                                        {team.site_id ? sites.find(s => s.id === team.site_id)?.code || 'Unknown' : <span className="text-slate-400 italic">None</span>}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex justify-end items-center pt-2 gap-2">
+                                <button onClick={() => openEdit(team)} className="p-2 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-lg transition-colors border border-blue-100">
+                                    <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button onClick={() => handleDelete(team.id)} className="p-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-colors border border-red-100">
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {filteredTeams.length === 0 && (
+                        <div className="col-span-full text-center py-8 text-slate-400 text-sm">No teams found. Create one above!</div>
+                    )}
+                </div>
             </div>
 
             {isModalOpen && (
