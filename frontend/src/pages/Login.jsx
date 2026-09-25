@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, User, Camera, X, RefreshCcw } from 'lucide-react';
 import api from '../utils/api';
-import logo from '../assets/crons-logo-light.svg';
+import logo from '../assets/crons-logo-light copy.svg';
 import { getFaceDescriptor, hasFace } from '../utils/faceApi';
 
 const Login = () => {
