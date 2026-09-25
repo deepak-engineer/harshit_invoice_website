@@ -9,7 +9,7 @@ const SiteManagement = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
-        name: '', code: '', address: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100
+        name: '', code: '', address: '', city: '', location: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100
     });
     const [editId, setEditId] = useState(null);
 
@@ -124,13 +124,40 @@ const SiteManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            let currentData = { ...formData };
+            let savedId = editId;
+
             if (editId) {
-                await api.put(`/admin/sites/${editId}`, formData);
+                await api.put(`/admin/sites/${editId}`, currentData);
                 toast.success('Site updated successfully');
             } else {
-                await api.post('/admin/sites', formData);
+                const res = await api.post('/admin/sites', currentData);
+                savedId = res.data.id;
                 toast.success('Site created successfully');
             }
+
+            // Auto fetch coordinates if not provided
+            if (!currentData.latitude || !currentData.longitude) {
+                toast.loading("Auto-fetching coordinates based on address...", { id: "auto_geo" });
+                try {
+                    const searchQuery = `${currentData.address || ''}, ${currentData.city || ''}, ${currentData.state || ''}`.replace(/,\s*,/g, ',').trim();
+                    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+                    const data = await geoRes.json();
+                    
+                    if (data && data.length > 0) {
+                        const { lat, lon } = data[0];
+                        currentData.latitude = lat;
+                        currentData.longitude = lon;
+                        await api.put(`/admin/sites/${savedId}`, currentData);
+                        toast.success("Coordinates auto-fetched and saved!", { id: "auto_geo" });
+                    } else {
+                        toast.error("Could not auto-fetch coordinates.", { id: "auto_geo" });
+                    }
+                } catch (error) {
+                    toast.error("Error auto-fetching coordinates.", { id: "auto_geo" });
+                }
+            }
+
             setIsModalOpen(false);
             fetchSites();
         } catch (error) {
@@ -159,7 +186,7 @@ const SiteManagement = () => {
     };
 
     const openNew = () => {
-        setFormData({ name: '', code: '', address: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100 });
+        setFormData({ name: '', code: '', address: '', city: '', location: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100 });
         setEditId(null);
         setAddressQuery('');
         setShowSuggestions(false);
@@ -468,8 +495,18 @@ const SiteManagement = () => {
                                     <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Branch Code</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">ATM ID (Branch Code)</label>
                                     <input type="text" required value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                                    <input type="text" value={formData.location || ''} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">City</label>
+                                    <input type="text" value={formData.city || ''} onChange={e => setFormData({...formData, city: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                             </div>
                             <div className="relative">
