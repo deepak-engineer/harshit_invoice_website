@@ -9,7 +9,7 @@ const SiteManagement = () => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
-        name: '', code: '', address: '', state: '', status: 'ACTIVE'
+        name: '', code: '', address: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100
     });
     const [editId, setEditId] = useState(null);
 
@@ -68,7 +68,7 @@ const SiteManagement = () => {
     };
 
     const openNew = () => {
-        setFormData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
+        setFormData({ name: '', code: '', address: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100 });
         setEditId(null);
         setIsModalOpen(true);
     };
@@ -252,7 +252,21 @@ const SiteManagement = () => {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
-                                <textarea value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" rows="2"></textarea>
+                                <textarea value={formData.address || ''} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" rows="2"></textarea>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Latitude</label>
+                                    <input type="text" value={formData.latitude || ''} onChange={e => setFormData({...formData, latitude: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. 29.9645" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Longitude</label>
+                                    <input type="text" value={formData.longitude || ''} onChange={e => setFormData({...formData, longitude: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="e.g. 77.5467" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Geofence Radius (m)</label>
+                                    <input type="number" value={formData.geofence_radius || 100} onChange={e => setFormData({...formData, geofence_radius: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                                </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>

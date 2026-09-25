@@ -234,8 +234,13 @@ if (preg_match('/^admin\/sites$/', $route)) {
     }
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$data['name'], $data['code'], $data['address'], $data['state'] ?? null]);
+        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, latitude, longitude, geofence_radius) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
+            $data['latitude'] !== '' ? $data['latitude'] : null,
+            $data['longitude'] !== '' ? $data['longitude'] : null,
+            $data['geofence_radius'] !== '' ? $data['geofence_radius'] : 100
+        ]);
         echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         exit;
     }
@@ -283,8 +288,14 @@ if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
     $id = $matches[1];
     if ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, status=? WHERE id=?");
-        $stmt->execute([$data['name'], $data['code'], $data['address'], $data['state'] ?? null, $data['status'], $id]);
+        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, status=?, latitude=?, longitude=?, geofence_radius=? WHERE id=?");
+        $stmt->execute([
+            $data['name'], $data['code'], $data['address'], $data['state'] ?? null, $data['status'],
+            $data['latitude'] !== '' ? $data['latitude'] : null,
+            $data['longitude'] !== '' ? $data['longitude'] : null,
+            $data['geofence_radius'] !== '' ? $data['geofence_radius'] : 100,
+            $id
+        ]);
         echo json_encode(["success" => true]);
         exit;
     }
@@ -400,6 +411,28 @@ if (preg_match('/^admin\/attendance-report$/', $route)) {
             'calendar' => $calendar,
             'summary' => array_values($summary)
         ]);
+        exit;
+    }
+}
+
+if (preg_match('/^admin\/attendance-list$/', $route)) {
+    checkAdminAuth();
+    if ($method === 'GET') {
+        $date = $_GET['date'] ?? date('Y-m-d');
+        
+        $stmt = $pdo->prepare("
+            SELECT a.*, e.name as emp_name, e.emp_id as emp_code, s.name as site_name, s.code as site_code, t.name as team_name, COALESCE(e.state, t.state, s.state) as state, w.status as work_status, s.latitude as site_lat, s.longitude as site_lng
+            FROM attendance a 
+            JOIN employees e ON a.employee_id = e.id 
+            LEFT JOIN teams t ON e.team_id = t.id
+            LEFT JOIN sites s ON a.site_id = s.id
+            LEFT JOIN work_orders w ON a.id = w.attendance_id
+            WHERE a.attendance_date = ?
+            ORDER BY a.check_in_time DESC
+        ");
+        $stmt->execute([$date]);
+        
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
     }
 }
@@ -571,14 +604,41 @@ if (preg_match('/^attendance\/check-in$/', $route)) {
         
         $site_id = $data['site_id'];
         
+        // Geofence Validation
+        $site_stmt = $pdo->prepare("SELECT latitude, longitude, geofence_radius FROM sites WHERE id = ?");
+        $site_stmt->execute([$site_id]);
+        $site = $site_stmt->fetch();
         
-        $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, site_id, attendance_date, status, check_in_time, check_in_lat, check_in_lng, check_in_acc, check_in_photo, check_in_face_score, daily_salary_snapshot) VALUES (?, ?, ?, 'WORKING', ?, ?, ?, ?, ?, ?, (SELECT daily_salary FROM employees WHERE id=?))");
+        $distance = null;
+        $geofence_radius = 100; // Default
+        
+        if ($site && !empty($site['latitude']) && !empty($site['longitude'])) {
+            $geofence_radius = $site['geofence_radius'] ? (int)$site['geofence_radius'] : 100;
+            $distance = haversineGreatCircleDistance(
+                (float)$data['lat'], (float)$data['lng'], 
+                (float)$site['latitude'], (float)$site['longitude']
+            );
+            
+            if ($distance > $geofence_radius) {
+                http_response_code(400);
+                echo json_encode([
+                    "error" => "Outside geofence", 
+                    "distance" => round($distance, 2), 
+                    "radius" => $geofence_radius
+                ]);
+                exit;
+            }
+        }
+        
+        $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, site_id, attendance_date, status, check_in_time, check_in_lat, check_in_lng, check_in_acc, check_in_photo, check_in_face_score, check_in_distance, geofence_radius, daily_salary_snapshot) VALUES (?, ?, ?, 'WORKING', ?, ?, ?, ?, ?, ?, ?, ?, (SELECT daily_salary FROM employees WHERE id=?))");
         $photo_filename = processBase64Image($data['photo'] ?? null);
         
         $stmt->execute([
             $emp_id, $site_id, $today, $time, 
             $data['lat'], $data['lng'], $data['acc'], 
             $photo_filename, $data['face_score'] ?? null,
+            $distance ? round($distance, 2) : null,
+            $geofence_radius,
             $emp_id
         ]);
         
@@ -612,13 +672,29 @@ if (preg_match('/^attendance\/check-out$/', $route)) {
         $status = 'PRESENT';
         $earned = $record['daily_salary_snapshot'];
         
+        // Geofence Calculation for checkout
+        $site_id = $record['site_id'];
+        $distance = null;
+        if ($site_id) {
+            $site_stmt = $pdo->prepare("SELECT latitude, longitude, geofence_radius FROM sites WHERE id = ?");
+            $site_stmt->execute([$site_id]);
+            $site = $site_stmt->fetch();
+            if ($site && !empty($site['latitude']) && !empty($site['longitude'])) {
+                $distance = haversineGreatCircleDistance(
+                    (float)$data['lat'], (float)$data['lng'], 
+                    (float)$site['latitude'], (float)$site['longitude']
+                );
+            }
+        }
+        
         $photo_filename = processBase64Image($data['photo'] ?? null);
         
-        $stmt = $pdo->prepare("UPDATE attendance SET status=?, check_out_time=?, check_out_lat=?, check_out_lng=?, check_out_acc=?, check_out_photo=?, check_out_face_score=?, working_minutes=?, earned_salary=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE attendance SET status=?, check_out_time=?, check_out_lat=?, check_out_lng=?, check_out_acc=?, check_out_photo=?, check_out_face_score=?, check_out_distance=?, working_minutes=?, earned_salary=? WHERE id=?");
         $stmt->execute([
             $status, $time, 
             $data['lat'], $data['lng'], $data['acc'], 
             $photo_filename, $data['face_score'] ?? null, 
+            $distance ? round($distance, 2) : null,
             $minutes, $earned, $record['id']
         ]);
         

@@ -201,13 +201,24 @@ const EmployeeDashboard = () => {
                                     </div>
                                 )}
                                 
-                                <button 
-                                    onClick={handleUpdateStatus}
-                                    disabled={updating}
-                                    className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                >
-                                    {updating ? 'Updating...' : 'Update Status'}
-                                </button>
+                                <div className="flex space-x-3">
+                                    <button 
+                                        onClick={handleUpdateStatus}
+                                        disabled={updating}
+                                        className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                    >
+                                        {updating ? 'Updating...' : 'Update Status'}
+                                    </button>
+                                    
+                                    {today && today.status === 'WORKING' && (
+                                        <button 
+                                            onClick={() => window.location.href = '/employee/work'}
+                                            className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
+                                        >
+                                            Go to Site Work
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

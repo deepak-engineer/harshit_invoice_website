@@ -13,12 +13,14 @@ import EmployeeManagement from './pages/admin/EmployeeManagement';
 import SiteManagement from './pages/admin/SiteManagement';
 import TeamManagement from './pages/admin/TeamManagement';
 import AttendanceReport from './pages/admin/AttendanceReport';
+import AdminAttendanceList from './pages/admin/AdminAttendanceList';
 import AdminExpenses from './pages/admin/AdminExpenses';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import AttendanceFlow from './pages/employee/AttendanceFlow';
 import EmployeeExpenses from './pages/employee/EmployeeExpenses';
+import WorkChecklist from './pages/employee/WorkChecklist';
 
 import api from './utils/api';
 
@@ -73,6 +75,7 @@ function App() {
           <Route path="/admin" element={<Layout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="attendance-report" element={<AttendanceReport />} />
+            <Route path="attendance-list" element={<AdminAttendanceList />} />
             <Route path="employees" element={<EmployeeManagement />} />
             <Route path="teams" element={<TeamManagement />} />
             <Route path="sites" element={<SiteManagement />} />
@@ -91,6 +94,7 @@ function App() {
           <Route path="/employee" element={<Layout />}>
             <Route path="dashboard" element={<EmployeeDashboard />} />
             <Route path="attendance" element={<AttendanceFlow />} />
+            <Route path="work" element={<WorkChecklist />} />
             <Route path="expenses" element={<EmployeeExpenses />} />
           </Route>
         </Route>

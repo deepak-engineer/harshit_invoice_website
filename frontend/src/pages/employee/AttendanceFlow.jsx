@@ -139,8 +139,10 @@ const AttendanceFlow = () => {
       fetchMe() // Refresh
     } catch (error) {
       console.error(error)
-      const msg =
-        error.response?.data?.error || error.message || 'Operation failed'
+      let msg = error.response?.data?.error || error.message || 'Operation failed'
+      if (error.response?.data?.distance) {
+          msg += ` (Distance: ${error.response.data.distance}m, Max allowed: ${error.response.data.radius}m)`
+      }
       setStatus(`Failed: ${msg}`)
       toast.error(msg)
     } finally {

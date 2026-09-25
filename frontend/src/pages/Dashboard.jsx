@@ -9,6 +9,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('ALL');
+  const [excelModalOpen, setExcelModalOpen] = useState(false);
+  const [pasteData, setPasteData] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,6 +74,76 @@ const Dashboard = () => {
     return matchesSearch && matchesFilter;
   });
 
+  const handleExcelPaste = () => {
+    if (!pasteData.trim()) {
+      toast.error("Please paste some data first");
+      return;
+    }
+    
+    const rows = pasteData.trim().split('\n');
+    if (rows.length === 0) return;
+    
+    const cols = rows[0].split('\t');
+    
+    const clientName = cols[0]?.trim() || '';
+    const clientAddress = cols[1]?.trim() || '';
+    const projectDetails = cols[2]?.trim() || '';
+    const clientProject = cols[3]?.trim() || '';
+    const siteId = cols[4]?.trim() || '';
+    const location = cols[5]?.trim() || '';
+    
+    const invoiceDraft = {
+      invoice_no: '',
+      invoice_date: new Date().toISOString().split('T')[0],
+      payment_terms: 'As mutually agreed',
+      client_name: clientName,
+      client_address: clientAddress,
+      project_site_details: projectDetails,
+      client_project: clientProject,
+      site_id: siteId,
+      location: location,
+      amount_in_words: '',
+      status: 'PENDING',
+      signature_image: null,
+      terms_conditions: [
+        "This bill is raised for the services/charges mentioned above.",
+        "Payment shall be made to the bank account details mentioned in this invoice.",
+        "Any applicable taxes, statutory deductions, or withholding shall be dealt with as mutually agreed between the parties.",
+        "Any discrepancy in this bill should be communicated to the vendor within 7 days of receipt.",
+        "This invoice is subject to mutual confirmation of the services/charges and supporting site records, where applicable."
+      ]
+    };
+    
+    const itemsDraft = rows.map((row) => {
+        const c = row.split('\t');
+        const desc = c[6]?.trim() || '';
+        const qty = parseFloat(c[7]) || 1;
+        const rate = parseFloat(c[8]) || 0;
+        return {
+            id: Math.random(),
+            description: desc,
+            qty: qty,
+            rate: rate,
+            amount: qty * rate,
+            project_site_details: c[2]?.trim() || projectDetails,
+            client_project: c[3]?.trim() || clientProject,
+            site_id: c[4]?.trim() || siteId,
+            location: c[5]?.trim() || location
+        };
+    });
+    
+    if (itemsDraft.length === 0 || (itemsDraft.length === 1 && !itemsDraft[0].description && itemsDraft[0].rate === 0)) {
+        itemsDraft[0] = { id: 1, description: '', qty: 1, rate: 0, amount: 0, project_site_details: '', client_project: '', site_id: '', location: '' };
+    }
+    
+    localStorage.setItem('draft_invoice', JSON.stringify(invoiceDraft));
+    localStorage.setItem('draft_items', JSON.stringify(itemsDraft));
+    
+    toast.success("Data copied! Creating invoice...");
+    setExcelModalOpen(false);
+    navigate('/admin/invoice/new');
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -79,13 +151,25 @@ const Dashboard = () => {
           <h1 className="text-2xl font-bold text-slate-800">Invoice Dashboard</h1>
           <p className="text-slate-500 text-sm mt-1">Manage and track your service bills</p>
         </div>
-        <Link
-          to="/admin/invoice/new"
-          className="w-full md:w-auto inline-flex items-center justify-center space-x-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-primary/30 transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Create Invoice</span>
-        </Link>
+        <div className="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+          <button
+            onClick={() => {
+              setPasteData('');
+              setExcelModalOpen(true);
+            }}
+            className="w-full md:w-auto inline-flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-emerald-600/30 transition-all"
+          >
+            <FileSpreadsheet className="w-5 h-5" />
+            <span>Paste Excel</span>
+          </button>
+          <Link
+            to="/admin/invoice/new"
+            className="w-full md:w-auto inline-flex items-center justify-center space-x-2 bg-primary hover:bg-primary/90 text-white px-5 py-2.5 rounded-xl font-medium shadow-lg shadow-primary/30 transition-all"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Create Invoice</span>
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -303,6 +387,36 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Excel Paste Modal */}
+      {excelModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl flex flex-col max-h-[90vh]">
+            <h2 className="text-xl font-bold text-slate-800 mb-2 flex items-center">
+              <FileSpreadsheet className="w-5 h-5 mr-2 text-emerald-600" />
+              Paste from Excel
+            </h2>
+            <p className="text-sm text-slate-500 mb-4">
+              Copy a row from Excel and paste it here. It will automatically pre-fill the New Invoice form.<br/>
+              <strong>Expected Order:</strong> Client Name | Address | Site Details | Client Project | Site ID | Location | Item Description | Qty | Rate
+            </p>
+            
+            <textarea 
+              value={pasteData}
+              onChange={e => setPasteData(e.target.value)}
+              placeholder="e.g. HDFC Bank \t Mumbai \t ATM Maintenance \t ... "
+              className="w-full flex-1 p-3 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none whitespace-pre font-mono text-sm min-h-[200px] resize-none"
+            ></textarea>
+            
+            <div className="flex justify-end space-x-3 mt-4 shrink-0">
+              <button onClick={() => setExcelModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Cancel</button>
+              <button onClick={handleExcelPaste} className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors shadow-sm">
+                Fill Invoice
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
