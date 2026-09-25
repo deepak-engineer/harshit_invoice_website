@@ -32,6 +32,29 @@ const SiteManagement = () => {
         fetchSites();
     }, []);
 
+    const fetchCoordinates = async () => {
+        if (!formData.address) {
+            toast.error("Please enter an address first.");
+            return;
+        }
+        
+        try {
+            toast.loading("Fetching coordinates...", { id: "geocoding" });
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.address)}`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const { lat, lon } = data[0];
+                setFormData(prev => ({ ...prev, latitude: lat, longitude: lon }));
+                toast.success("Coordinates found and filled!", { id: "geocoding" });
+            } else {
+                toast.error("Could not find coordinates. Please be more specific.", { id: "geocoding" });
+            }
+        } catch (error) {
+            toast.error("Error fetching coordinates.", { id: "geocoding" });
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -119,6 +142,42 @@ const SiteManagement = () => {
         }
     };
 
+    const autoDetectMissingCoordinates = async () => {
+        const sitesToProcess = sites.filter(s => selectedIds.includes(s.id) && !s.latitude && s.address);
+        if (sitesToProcess.length === 0) {
+            toast.error("Please select sites that have an Address but missing Latitude.");
+            return;
+        }
+
+        toast.loading(`Processing ${sitesToProcess.length} sites. Please do not close this window...`, { id: "bulk_geo" });
+        
+        let successCount = 0;
+        let failCount = 0;
+
+        for (const site of sitesToProcess) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(site.address)}`);
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const { lat, lon } = data[0];
+                    await api.put(`/admin/sites/${site.id}`, { ...site, latitude: lat, longitude: lon });
+                    successCount++;
+                } else {
+                    failCount++;
+                }
+            } catch (error) {
+                failCount++;
+            }
+            // Wait 1.5 seconds to respect Nominatim API limits (1 req/sec)
+            await new Promise(r => setTimeout(r, 1500)); 
+        }
+
+        toast.success(`Completed! ${successCount} successful, ${failCount} failed.`, { id: "bulk_geo" });
+        fetchSites();
+        setSelectedIds([]);
+    };
+
     const handleSelect = (id) => {
         if (selectedIds.includes(id)) {
             setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
@@ -149,10 +208,16 @@ const SiteManagement = () => {
                 <h1 className="text-2xl font-bold text-slate-800">Site Management</h1>
                 <div className="flex space-x-3">
                     {selectedIds.length > 0 && (
-                        <button onClick={handleBulkDelete} className="flex items-center space-x-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">
-                            <Trash2 className="w-5 h-5" />
-                            <span>Delete ({selectedIds.length})</span>
-                        </button>
+                        <>
+                            <button onClick={autoDetectMissingCoordinates} className="flex items-center space-x-2 bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
+                                <MapPin className="w-5 h-5" />
+                                <span>Auto-Detect Lat/Lng</span>
+                            </button>
+                            <button onClick={handleBulkDelete} className="flex items-center space-x-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">
+                                <Trash2 className="w-5 h-5" />
+                                <span>Delete ({selectedIds.length})</span>
+                            </button>
+                        </>
                     )}
                     <button onClick={() => setIsBulkModalOpen(true)} className="flex items-center space-x-2 bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700 transition-colors">
                         <span>Bulk Add (Paste)</span>
@@ -251,7 +316,12 @@ const SiteManagement = () => {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
+                                <div className="flex justify-between items-end mb-1">
+                                    <label className="block text-sm font-medium text-slate-700">Address</label>
+                                    <button type="button" onClick={fetchCoordinates} className="text-xs text-primary hover:underline flex items-center">
+                                        <MapPin className="w-3 h-3 mr-1" /> Auto-fill Lat/Lng
+                                    </button>
+                                </div>
                                 <textarea value={formData.address || ''} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" rows="2"></textarea>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
