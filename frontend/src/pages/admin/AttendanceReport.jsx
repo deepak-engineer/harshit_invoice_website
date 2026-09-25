@@ -13,6 +13,10 @@ const AttendanceReport = () => {
     const [editModal, setEditModal] = useState({ isOpen: false, record: null, dateStr: '', newStatus: '' });
     const [addModal, setAddModal] = useState({ isOpen: false, emp_id: '', dateStr: new Date().toISOString().split('T')[0], status: 'HALF_DAY' });
     const [allEmployees, setAllEmployees] = useState([]);
+    
+    // Search states
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth() + 1; // 1-12
@@ -58,6 +62,13 @@ const AttendanceReport = () => {
     useEffect(() => {
         fetchReport();
     }, [month, year]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const prevMonth = () => {
         setCurrentDate(new Date(year, currentDate.getMonth() - 1, 1));
@@ -190,6 +201,8 @@ const AttendanceReport = () => {
         return holidays2026[selectedState].includes(dateStr);
     };
 
+    const filteredSalarySummary = debouncedSearch ? salarySummary.filter(s => s.name?.toLowerCase().includes(debouncedSearch.toLowerCase())) : salarySummary;
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
@@ -234,14 +247,23 @@ const AttendanceReport = () => {
                 </div>
             </div>
             
-            <div className="md:hidden w-full flex justify-end">
-                <button 
-                    onClick={() => setAddModal({ ...addModal, isOpen: true })}
-                    className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm w-full justify-center"
-                >
-                    <Edit3 className="w-4 h-4" />
-                    <span>Add Manual Record</span>
-                </button>
+            <div className="flex flex-col md:flex-row justify-between gap-4">
+                <input 
+                    type="text" 
+                    placeholder="Search Employee..." 
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none w-full md:w-64"
+                />
+                <div className="md:hidden w-full flex justify-end">
+                    <button 
+                        onClick={() => setAddModal({ ...addModal, isOpen: true })}
+                        className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors shadow-sm w-full justify-center"
+                    >
+                        <Edit3 className="w-4 h-4" />
+                        <span>Add Manual Record</span>
+                    </button>
+                </div>
             </div>
 
             {loading ? (
@@ -269,7 +291,12 @@ const AttendanceReport = () => {
                                 if (m === 13) { m = 1; y += 1; }
                                 
                                 const dateStr = `${y}-${m.toString().padStart(2, '0')}-${dayObj.day.toString().padStart(2, '0')}`;
-                                const dayRecords = dayObj.isCurrentMonth ? (reportData[dateStr] || []) : [];
+                                let dayRecords = dayObj.isCurrentMonth ? (reportData[dateStr] || []) : [];
+                                
+                                if (debouncedSearch) {
+                                    dayRecords = dayRecords.filter(r => r.name?.toLowerCase().includes(debouncedSearch.toLowerCase()));
+                                }
+                                
                                 const isSun = isSunday(dayObj);
                                 const isHol = isHoliday(dayObj);
                                 const isOff = isSun || isHol;
@@ -332,7 +359,7 @@ const AttendanceReport = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-100">
-                                        {salarySummary.map((sum) => (
+                                        {filteredSalarySummary.map((sum) => (
                                             <tr key={sum.id} className="hover:bg-slate-50">
                                                 <td className="px-6 py-4 font-medium text-slate-800">{sum.name}</td>
                                                 <td className="px-6 py-4 text-center">₹{sum.daily_salary.toFixed(2)}</td>
@@ -349,7 +376,7 @@ const AttendanceReport = () => {
 
                             {/* Mobile Grid View */}
                             <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
-                                {salarySummary.map(sum => (
+                                {filteredSalarySummary.map(sum => (
                                     <div key={sum.id} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col">
                                         <h4 className="font-bold text-slate-800 text-lg mb-3 border-b border-slate-100 pb-2">{sum.name}</h4>
                                         <div className="grid grid-cols-2 gap-3 text-sm mb-4">

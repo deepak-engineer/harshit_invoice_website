@@ -22,6 +22,12 @@ const EmployeeManagement = () => {
     const [siteInput, setSiteInput] = useState('');
     const [salaryReportModal, setSalaryReportModal] = useState({ isOpen: false, emp: null, month: new Date().getMonth() + 1, year: new Date().getFullYear(), data: null, loading: false, selectedState: '' });
     
+    // Search and bulk delete states
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [selectedIds, setSelectedIds] = useState([]);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
+    
     const [selectedEmp, setSelectedEmp] = useState(null);
     const [formData, setFormData] = useState({
         emp_id: '', name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
@@ -51,6 +57,55 @@ const EmployeeManagement = () => {
     useEffect(() => {
         fetchData();
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (!debouncedSearch) {
+            setFilteredEmployees(employees);
+        } else {
+            const lowerSearch = debouncedSearch.toLowerCase();
+            setFilteredEmployees(employees.filter(emp => 
+                (emp.emp_id && emp.emp_id.toLowerCase().includes(lowerSearch)) ||
+                (emp.name && emp.name.toLowerCase().includes(lowerSearch))
+            ));
+        }
+    }, [debouncedSearch, employees]);
+
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            setSelectedIds(filteredEmployees.map(emp => emp.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelect = (id) => {
+        if (selectedIds.includes(id)) {
+            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+        } else {
+            setSelectedIds([...selectedIds, id]);
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        if (window.confirm(`Are you sure you want to delete ${selectedIds.length} employees?`)) {
+            try {
+                await api.post('/admin/employees/bulk-delete', { ids: selectedIds });
+                toast.success('Employees deleted successfully');
+                setSelectedIds([]);
+                fetchData();
+            } catch (error) {
+                toast.error(error.response?.data?.error || 'Failed to delete employees');
+            }
+        }
+    };
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -287,10 +342,25 @@ const EmployeeManagement = () => {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-slate-800">Employee Management</h1>
-                <button onClick={openNew} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                    <Plus className="w-5 h-5" />
-                    <span>Add Employee</span>
-                </button>
+                <div className="flex space-x-3 items-center w-full sm:w-auto">
+                    <input 
+                        type="text" 
+                        placeholder="Search by ID or Name..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm w-full sm:w-64"
+                    />
+                    {selectedIds.length > 0 && (
+                        <button onClick={handleBulkDelete} className="flex items-center space-x-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-100 transition-colors whitespace-nowrap">
+                            <Trash2 className="w-5 h-5" />
+                            <span className="hidden sm:inline">Delete ({selectedIds.length})</span>
+                        </button>
+                    )}
+                    <button onClick={openNew} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap">
+                        <Plus className="w-5 h-5" />
+                        <span className="hidden sm:inline">Add Employee</span>
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -299,6 +369,14 @@ const EmployeeManagement = () => {
                     <table className="w-full text-left text-sm text-slate-600">
                         <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
                             <tr>
+                                <th className="px-6 py-4 w-10">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                                        checked={filteredEmployees.length > 0 && selectedIds.length === filteredEmployees.length}
+                                        onChange={handleSelectAll}
+                                    />
+                                </th>
                                 <th className="px-6 py-4">ID</th>
                                 <th className="px-6 py-4">Photo</th>
                                 <th className="px-6 py-4">Name</th>
@@ -312,8 +390,16 @@ const EmployeeManagement = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
-                            {employees.map(emp => (
-                                <tr key={emp.id} className="hover:bg-slate-50">
+                            {filteredEmployees.map(emp => (
+                                <tr key={emp.id} className={`hover:bg-slate-50 ${selectedIds.includes(emp.id) ? 'bg-primary/5' : ''}`}>
+                                    <td className="px-6 py-4">
+                                        <input 
+                                            type="checkbox" 
+                                            className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
+                                            checked={selectedIds.includes(emp.id)}
+                                            onChange={() => handleSelect(emp.id)}
+                                        />
+                                    </td>
                                     <td className="px-6 py-4 font-mono text-xs">{emp.emp_id}</td>
                                     <td className="px-6 py-4">
                                         {emp.photo ? (
@@ -394,10 +480,16 @@ const EmployeeManagement = () => {
 
                 {/* Mobile Grid View */}
                 <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
-                    {employees.map(emp => (
-                        <div key={emp.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-4">
+                    {filteredEmployees.map(emp => (
+                        <div key={emp.id} className={`bg-white p-4 rounded-xl shadow-sm border ${selectedIds.includes(emp.id) ? 'border-primary ring-1 ring-primary' : 'border-slate-200'} flex flex-col space-y-4`}>
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center space-x-3">
+                                    <input 
+                                        type="checkbox" 
+                                        className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer mt-1"
+                                        checked={selectedIds.includes(emp.id)}
+                                        onChange={() => handleSelect(emp.id)}
+                                    />
                                     {emp.photo ? (
                                         <button 
                                             onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
@@ -474,7 +566,7 @@ const EmployeeManagement = () => {
                             </div>
                         </div>
                     ))}
-                    {employees.length === 0 && (
+                    {filteredEmployees.length === 0 && (
                         <div className="col-span-full text-center py-8 text-slate-400 text-sm">No employees found.</div>
                     )}
                 </div>

@@ -16,6 +16,16 @@ const SiteManagement = () => {
     const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
     const [bulkData, setBulkData] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
+    
+    // Address Suggestion states
+    const [addressQuery, setAddressQuery] = useState('');
+    const [addressSuggestions, setAddressSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    
+    // Search states
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [filteredSites, setFilteredSites] = useState([]);
 
     const fetchSites = async () => {
         try {
@@ -31,6 +41,50 @@ const SiteManagement = () => {
     useEffect(() => {
         fetchSites();
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (!debouncedSearch) {
+            setFilteredSites(sites);
+        } else {
+            const lowerSearch = debouncedSearch.toLowerCase();
+            setFilteredSites(sites.filter(site => 
+                (site.code && site.code.toLowerCase().includes(lowerSearch)) ||
+                (site.name && site.name.toLowerCase().includes(lowerSearch)) ||
+                (site.id && site.id.toString() === lowerSearch)
+            ));
+        }
+    }, [debouncedSearch, sites]);
+
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (addressQuery.length > 3) {
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}&countrycodes=in&limit=5`);
+                    const data = await res.json();
+                    setAddressSuggestions(data);
+                    setShowSuggestions(true);
+                } catch (error) {
+                    console.error("Failed to fetch address suggestions");
+                }
+            } else {
+                setAddressSuggestions([]);
+                setShowSuggestions(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            fetchSuggestions();
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [addressQuery]);
 
     const fetchCoordinates = async () => {
         if (!formData.address) {
@@ -87,13 +141,29 @@ const SiteManagement = () => {
     const openEdit = (site) => {
         setFormData(site);
         setEditId(site.id);
+        setAddressQuery('');
+        setShowSuggestions(false);
         setIsModalOpen(true);
     };
 
     const openNew = () => {
         setFormData({ name: '', code: '', address: '', state: '', status: 'ACTIVE', latitude: '', longitude: '', geofence_radius: 100 });
         setEditId(null);
+        setAddressQuery('');
+        setShowSuggestions(false);
         setIsModalOpen(true);
+    };
+
+    const handleAddressSuggestionSelect = (suggestion) => {
+        setFormData({ 
+            ...formData, 
+            address: suggestion.display_name,
+            latitude: suggestion.lat,
+            longitude: suggestion.lon
+        });
+        setAddressQuery('');
+        setShowSuggestions(false);
+        toast.success("Address and coordinates auto-filled!", { id: "geocoding" });
     };
 
     const handleBulkSubmit = async (e) => {
@@ -136,7 +206,7 @@ const SiteManagement = () => {
 
     const handleSelectAll = (e) => {
         if (e.target.checked) {
-            setSelectedIds(sites.map(s => s.id));
+            setSelectedIds(filteredSites.map(s => s.id));
         } else {
             setSelectedIds([]);
         }
@@ -206,7 +276,15 @@ const SiteManagement = () => {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-slate-800">Site Management</h1>
-                <div className="flex space-x-3">
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                    <input 
+                        type="text" 
+                        placeholder="Search by Code or Name..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm w-full sm:w-64"
+                    />
+                    <div className="flex space-x-3 flex-wrap gap-y-2">
                     {selectedIds.length > 0 && (
                         <>
                             <button onClick={autoDetectMissingCoordinates} className="flex items-center space-x-2 bg-blue-50 text-blue-600 border border-blue-200 px-4 py-2 rounded-lg hover:bg-blue-100 transition-colors">
@@ -226,6 +304,7 @@ const SiteManagement = () => {
                         <Plus className="w-5 h-5" />
                         <span>Add Single Site</span>
                     </button>
+                    </div>
                 </div>
             </div>
 
@@ -237,10 +316,11 @@ const SiteManagement = () => {
                                 <input 
                                     type="checkbox" 
                                     className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer"
-                                    checked={sites.length > 0 && selectedIds.length === sites.length}
+                                    checked={filteredSites.length > 0 && selectedIds.length === filteredSites.length}
                                     onChange={handleSelectAll}
                                 />
                             </th>
+                            <th className="px-6 py-4">ID</th>
                             <th className="px-6 py-4">Site Name</th>
                             <th className="px-6 py-4">Branch Code</th>
                             <th className="px-6 py-4">State</th>
@@ -252,7 +332,7 @@ const SiteManagement = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                        {sites.map(site => (
+                        {filteredSites.map(site => (
                             <tr key={site.id} className={`hover:bg-slate-50 ${selectedIds.includes(site.id) ? 'bg-primary/5' : ''}`}>
                                 <td className="px-6 py-4">
                                     <input 
@@ -262,6 +342,7 @@ const SiteManagement = () => {
                                         onChange={() => handleSelect(site.id)}
                                     />
                                 </td>
+                                <td className="px-6 py-4 font-mono text-xs">{site.id}</td>
                                 <td className="px-6 py-4 font-medium text-slate-800">{site.name}</td>
                                 <td className="px-6 py-4">{site.code}</td>
                                 <td className="px-6 py-4 font-medium text-primary">{site.state || '-'}</td>
@@ -296,6 +377,9 @@ const SiteManagement = () => {
                                 </td>
                             </tr>
                         ))}
+                        {filteredSites.length === 0 && (
+                            <tr><td colSpan="10" className="text-center py-8 text-slate-400">No sites found</td></tr>
+                        )}
                     </tbody>
                 </table>
             </div>
@@ -307,7 +391,7 @@ const SiteManagement = () => {
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Bank Name</label>
                                     <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                                 <div>
@@ -315,14 +399,37 @@ const SiteManagement = () => {
                                     <input type="text" required value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                             </div>
-                            <div>
+                            <div className="relative">
                                 <div className="flex justify-between items-end mb-1">
-                                    <label className="block text-sm font-medium text-slate-700">Address</label>
+                                    <label className="block text-sm font-medium text-slate-700">Address / Location</label>
                                     <button type="button" onClick={fetchCoordinates} className="text-xs text-primary hover:underline flex items-center">
                                         <MapPin className="w-3 h-3 mr-1" /> Auto-fill Lat/Lng
                                     </button>
                                 </div>
-                                <textarea value={formData.address || ''} onChange={e => setFormData({...formData, address: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" rows="2"></textarea>
+                                <input 
+                                    type="text" 
+                                    value={addressQuery || formData.address || ''} 
+                                    onChange={e => {
+                                        setAddressQuery(e.target.value);
+                                        setFormData({...formData, address: e.target.value});
+                                    }} 
+                                    onFocus={() => addressSuggestions.length > 0 && setShowSuggestions(true)}
+                                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" 
+                                    placeholder="Type to search address suggestions..."
+                                />
+                                {showSuggestions && addressSuggestions.length > 0 && (
+                                    <div className="absolute z-10 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                        {addressSuggestions.map((s, idx) => (
+                                            <div 
+                                                key={idx} 
+                                                className="px-4 py-2 hover:bg-slate-50 cursor-pointer text-sm border-b border-slate-100 last:border-0"
+                                                onClick={() => handleAddressSuggestionSelect(s)}
+                                            >
+                                                {s.display_name}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>

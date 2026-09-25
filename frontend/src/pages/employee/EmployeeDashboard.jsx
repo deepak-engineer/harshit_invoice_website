@@ -10,6 +10,12 @@ const EmployeeDashboard = () => {
     const [requirements, setRequirements] = useState('');
     const [updating, setUpdating] = useState(false);
     
+    // Site Assignment State
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [availableSites, setAvailableSites] = useState([]);
+    const [isAssigning, setIsAssigning] = useState(false);
+    
     // Salary Modal State
     const [salaryReportModal, setSalaryReportModal] = useState({ isOpen: false, month: new Date().getMonth() + 1, year: new Date().getFullYear(), data: null, loading: false });
 
@@ -39,6 +45,39 @@ const EmployeeDashboard = () => {
     useEffect(() => {
         fetchStats();
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (!stats?.employee?.site) {
+            const fetchSites = async () => {
+                try {
+                    const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}`);
+                    setAvailableSites(res.data);
+                } catch (error) {
+                    console.error("Error fetching sites", error);
+                }
+            };
+            fetchSites();
+        }
+    }, [debouncedSearch, stats?.employee?.site]);
+
+    const handleAssignSite = async (siteId) => {
+        setIsAssigning(true);
+        try {
+            await api.post('/me/assign-site', { site_id: siteId });
+            fetchStats();
+        } catch (error) {
+            alert('Failed to assign site.');
+        } finally {
+            setIsAssigning(false);
+        }
+    };
 
     const handleUpdateStatus = async () => {
         setUpdating(true);
@@ -223,7 +262,39 @@ const EmployeeDashboard = () => {
                         </div>
                     </div>
                 ) : (
-                    <p className="text-sm text-slate-500">No site assigned yet.</p>
+                    <div className="space-y-4">
+                        <p className="text-sm text-slate-500">No site assigned yet. Search and assign yourself a site below:</p>
+                        <div>
+                            <input 
+                                type="text" 
+                                placeholder="Search site by Name or Branch Code..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                            />
+                        </div>
+                        {availableSites.length > 0 ? (
+                            <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
+                                {availableSites.map(site => (
+                                    <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                        <div>
+                                            <p className="font-bold text-slate-700 text-sm">{site.name}</p>
+                                            <p className="text-xs text-slate-500">{site.code} - {site.city || site.address}</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => handleAssignSite(site.id)}
+                                            disabled={isAssigning}
+                                            className="px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                        >
+                                            Assign
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-xs text-slate-400 p-2 text-center">No sites found matching "{searchTerm}"</p>
+                        )}
+                    </div>
                 )}
             </div>
             

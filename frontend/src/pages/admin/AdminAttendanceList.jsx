@@ -8,6 +8,10 @@ const AdminAttendanceList = () => {
     const [loading, setLoading] = useState(true);
     const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
     const [filterState, setFilterState] = useState('ALL');
+    
+    // Search states
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
     const fetchRecords = async () => {
         setLoading(true);
@@ -22,7 +26,25 @@ const AdminAttendanceList = () => {
     };
 
     const uniqueStates = [...new Set(records.map(r => r.state || 'N/A'))].filter(Boolean);
-    const filteredRecords = records.filter(r => filterState === 'ALL' || (r.state || 'N/A') === filterState);
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    const filteredRecords = records.filter(r => {
+        const stateMatch = filterState === 'ALL' || (r.state || 'N/A') === filterState;
+        if (!stateMatch) return false;
+        
+        if (!debouncedSearch) return true;
+        const lowerSearch = debouncedSearch.toLowerCase();
+        return (
+            (r.emp_name && r.emp_name.toLowerCase().includes(lowerSearch)) ||
+            (r.emp_code && r.emp_code.toLowerCase().includes(lowerSearch))
+        );
+    });
 
     const exportCSV = () => {
         const headers = ["Employee", "Emp Code", "Team", "State", "Site", "Check-in", "Check-out", "Distance (m)", "Status"];
@@ -66,6 +88,13 @@ const AdminAttendanceList = () => {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-3">
+                    <input 
+                        type="text" 
+                        placeholder="Search Employee..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                    />
                     <input 
                         type="date"
                         value={filterDate}

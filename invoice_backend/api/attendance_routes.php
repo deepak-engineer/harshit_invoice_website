@@ -80,6 +80,28 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
     }
 }
 
+if (preg_match('/^admin\/employees\/bulk-delete$/', $route)) {
+    checkAdminAuth();
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (isset($data['ids']) && is_array($data['ids']) && count($data['ids']) > 0) {
+            $inQuery = implode(',', array_fill(0, count($data['ids']), '?'));
+            try {
+                $stmt = $pdo->prepare("DELETE FROM employees WHERE id IN ($inQuery)");
+                $stmt->execute($data['ids']);
+                echo json_encode(["success" => true, "deleted" => $stmt->rowCount()]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                echo json_encode(["error" => "Cannot delete employees. Some may have linked records."]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "No IDs provided"]);
+        }
+        exit;
+    }
+}
+
 if (preg_match('/^admin\/employees\/(\d+)\/salary-report$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];
@@ -595,6 +617,69 @@ if (preg_match('/^me\/site-status$/', $route)) {
             $data['requirements'] ?? null,
             $emp['site_id']
         ]);
+        
+        echo json_encode(["success" => true]);
+        exit;
+    }
+}
+
+if (preg_match('/^me\/sites$/', $route)) {
+    checkEmployeeAuth();
+    if ($method === 'GET') {
+        $search = $_GET['search'] ?? '';
+        $query = "SELECT id, name, code, city, address FROM sites WHERE status = 'ACTIVE'";
+        $params = [];
+        if (!empty($search)) {
+            $query .= " AND (name LIKE ? OR code LIKE ?)";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+        }
+        $query .= " ORDER BY name ASC LIMIT 20";
+        $stmt = $pdo->prepare($query);
+        $stmt->execute($params);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit;
+    }
+}
+
+if (preg_match('/^me\/assign-site$/', $route)) {
+    checkEmployeeAuth();
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (empty($data['site_id'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "Site ID is required"]);
+            exit;
+        }
+        
+        $stmt = $pdo->prepare("UPDATE employees SET site_id = ? WHERE id = ?");
+        $stmt->execute([$data['site_id'], $_SESSION['user_id']]);
+        
+        // Dynamically geocode if site is missing coordinates
+        $site_stmt = $pdo->prepare("SELECT address, latitude, longitude FROM sites WHERE id = ?");
+        $site_stmt->execute([$data['site_id']]);
+        $site = $site_stmt->fetch();
+        
+        if ($site && (empty($site['latitude']) || empty($site['longitude'])) && !empty($site['address'])) {
+            $address = urlencode($site['address']);
+            $url = "https://nominatim.openstreetmap.org/search?format=json&q={$address}";
+            $options = [
+                "http" => [
+                    "header" => "User-Agent: HarshitInvoiceSystem/1.0\r\n"
+                ]
+            ];
+            $context = stream_context_create($options);
+            $response = @file_get_contents($url, false, $context);
+            if ($response) {
+                $geocode_data = json_decode($response, true);
+                if (!empty($geocode_data) && isset($geocode_data[0]['lat']) && isset($geocode_data[0]['lon'])) {
+                    $lat = $geocode_data[0]['lat'];
+                    $lon = $geocode_data[0]['lon'];
+                    $upd_stmt = $pdo->prepare("UPDATE sites SET latitude = ?, longitude = ? WHERE id = ?");
+                    $upd_stmt->execute([$lat, $lon, $data['site_id']]);
+                }
+            }
+        }
         
         echo json_encode(["success" => true]);
         exit;

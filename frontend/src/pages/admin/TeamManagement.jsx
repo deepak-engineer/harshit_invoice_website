@@ -17,6 +17,11 @@ const TeamManagement = () => {
         state: ''
     });
     const [editId, setEditId] = useState(null);
+    
+    // Search states
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [filteredTeams, setFilteredTeams] = useState([]);
 
     const fetchTeams = async () => {
         try {
@@ -38,6 +43,28 @@ const TeamManagement = () => {
     useEffect(() => {
         fetchTeams();
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        if (!debouncedSearch) {
+            setFilteredTeams(teams);
+        } else {
+            const lowerSearch = debouncedSearch.toLowerCase();
+            setFilteredTeams(teams.filter(team => {
+                const site = sites.find(s => s.id === team.site_id);
+                const siteCodeMatch = site && site.code && site.code.toLowerCase().includes(lowerSearch);
+                const nameMatch = team.name && team.name.toLowerCase().includes(lowerSearch);
+                const idMatch = team.id && team.id.toString() === lowerSearch;
+                return nameMatch || siteCodeMatch || idMatch;
+            }));
+        }
+    }, [debouncedSearch, teams, sites]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -101,10 +128,19 @@ const TeamManagement = () => {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-slate-800">Team Management</h1>
-                <button onClick={openNew} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                    <Plus className="w-5 h-5" />
-                    <span>Add Team</span>
-                </button>
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                    <input 
+                        type="text" 
+                        placeholder="Search by Team or Site Code..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm w-full sm:w-64"
+                    />
+                    <button onClick={openNew} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                        <Plus className="w-5 h-5" />
+                        <span>Add Team</span>
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -119,7 +155,7 @@ const TeamManagement = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                        {teams.map(team => (
+                        {filteredTeams.map(team => (
                             <tr key={team.id} className="hover:bg-slate-50">
                                 <td className="px-6 py-4 font-mono text-xs">{team.id}</td>
                                 <td className="px-6 py-4 font-medium text-slate-800">{team.name}</td>
@@ -143,7 +179,7 @@ const TeamManagement = () => {
                                 </td>
                             </tr>
                         ))}
-                        {teams.length === 0 && (
+                        {filteredTeams.length === 0 && (
                             <tr>
                                 <td colSpan="4" className="px-6 py-8 text-center text-slate-500">
                                     No teams found. Create one above!

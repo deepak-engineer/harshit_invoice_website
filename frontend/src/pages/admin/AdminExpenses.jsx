@@ -9,6 +9,7 @@ const AdminExpenses = () => {
     
     // Filters
     const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('ALL');
     const [teamFilter, setTeamFilter] = useState('');
     const [stateFilter, setStateFilter] = useState('');
@@ -23,6 +24,13 @@ const AdminExpenses = () => {
     useEffect(() => {
         fetchExpenses();
     }, []);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [search]);
 
     const fetchExpenses = async () => {
         try {
@@ -68,10 +76,10 @@ const AdminExpenses = () => {
     };
 
     const filteredExpenses = expenses.filter(exp => {
-        const matchesSearch = search === '' || 
-            exp.emp_name.toLowerCase().includes(search.toLowerCase()) || 
-            (exp.description && exp.description.toLowerCase().includes(search.toLowerCase())) ||
-            exp.emp_code.toLowerCase().includes(search.toLowerCase());
+        const matchesSearch = debouncedSearch === '' || 
+            exp.emp_name.toLowerCase().includes(debouncedSearch.toLowerCase()) || 
+            (exp.description && exp.description.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
+            exp.emp_code.toLowerCase().includes(debouncedSearch.toLowerCase());
             
         const matchesStatus = statusFilter === 'ALL' || exp.status === statusFilter;
         const matchesTeam = teamFilter === '' || exp.team_name === teamFilter;
