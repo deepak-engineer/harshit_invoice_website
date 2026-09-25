@@ -381,7 +381,7 @@ const EmployeeManagement = () => {
 
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
                 {/* Desktop Table View */}
-                <div className="hidden lg:block overflow-x-auto">
+                <div className="hidden lg:block overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
                         <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800">
                             <tr>
@@ -467,24 +467,30 @@ const EmployeeManagement = () => {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center space-x-1.5">
                                             {emp.status === 'PENDING' && (
-                                                <button onClick={() => handleApprove(emp)} className="p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all" title="Approve Employee">
+                                                <button onClick={() => handleApprove(emp)} className="group relative p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all">
                                                     <CheckCircle className="w-4 h-4" strokeWidth={2} />
+                                                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Approve</span>
                                                 </button>
                                             )}
-                                            <button onClick={() => openEdit(emp)} className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all" title="Edit Profile">
+                                            <button onClick={() => openEdit(emp)} className="group relative p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all">
                                                 <Edit2 className="w-4 h-4" strokeWidth={2} />
+                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Edit Profile</span>
                                             </button>
-                                            <button onClick={() => openSalaryReport(emp)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all" title="Employee Salary Report">
+                                            <button onClick={() => openSalaryReport(emp)} className="group relative p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all">
                                                 <Wallet className="w-4 h-4" strokeWidth={2} />
+                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Salary Report</span>
                                             </button>
-                                            <button onClick={() => openPassword(emp)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all" title="Reset Password">
+                                            <button onClick={() => openPassword(emp)} className="group relative p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all">
                                                 <Key className="w-4 h-4" strokeWidth={2} />
+                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Reset Password</span>
                                             </button>
-                                            <button onClick={() => openFace(emp)} className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all" title="Register Face">
+                                            <button onClick={() => openFace(emp)} className="group relative p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
                                                 <Camera className="w-4 h-4" strokeWidth={2} />
+                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Register Face</span>
                                             </button>
-                                            <button onClick={() => handleDelete(emp.id)} className="p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all" title="Delete/Reject Employee">
+                                            <button onClick={() => handleDelete(emp.id)} className="group relative p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
                                                 <Trash2 className="w-4 h-4" strokeWidth={2} />
+                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Delete</span>
                                             </button>
                                         </div>
                                     </td>
@@ -558,25 +564,31 @@ const EmployeeManagement = () => {
                             <div className="flex justify-between items-center pt-2">
                                 <div className="flex flex-wrap gap-1">
                                     {emp.status === 'PENDING' && (
-                                        <button onClick={() => handleApprove(emp)} className="p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all" title="Approve Employee">
+                                        <button onClick={() => handleApprove(emp)} className="group relative p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all">
                                             <CheckCircle className="w-4 h-4" strokeWidth={2} />
+                                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Approve</span>
                                         </button>
                                     )}
-                                    <button onClick={() => openEdit(emp)} className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all" title="Edit Profile">
+                                    <button onClick={() => openEdit(emp)} className="group relative p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all">
                                         <Edit2 className="w-4 h-4" strokeWidth={2} />
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Edit Profile</span>
                                     </button>
-                                    <button onClick={() => openSalaryReport(emp)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all" title="Employee Salary Report">
+                                    <button onClick={() => openSalaryReport(emp)} className="group relative p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all">
                                         <Wallet className="w-4 h-4" strokeWidth={2} />
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Salary Report</span>
                                     </button>
-                                    <button onClick={() => openPassword(emp)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all" title="Reset Password">
+                                    <button onClick={() => openPassword(emp)} className="group relative p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all">
                                         <Key className="w-4 h-4" strokeWidth={2} />
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Reset Password</span>
                                     </button>
-                                    <button onClick={() => openFace(emp)} className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all" title="Register Face">
+                                    <button onClick={() => openFace(emp)} className="group relative p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
                                         <Camera className="w-4 h-4" strokeWidth={2} />
+                                        <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Register Face</span>
                                     </button>
                                 </div>
-                                <button onClick={() => handleDelete(emp.id)} className="p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all" title="Delete/Reject Employee">
+                                <button onClick={() => handleDelete(emp.id)} className="group relative p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
                                     <Trash2 className="w-4 h-4" strokeWidth={2} />
+                                    <span className="absolute bottom-full right-0 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Delete</span>
                                 </button>
                             </div>
                         </div>

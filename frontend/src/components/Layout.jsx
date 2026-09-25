@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck, Sun, Moon } from 'lucide-react';
 import api from '../utils/api';
-import logo from '../assets/crons-logo-light copy.svg';
+import lightLogo from '../assets/crons-logo-light copy.svg';
+import darkLogo from '../assets/crons-logo-darkcopy.svg';
 
 
 const Layout = () => {
@@ -72,8 +73,8 @@ const Layout = () => {
     <div className="flex h-screen bg-gray-50 dark:bg-gray-900 font-sans text-gray-800 dark:text-white/90">
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
-        <div className="p-4 flex items-center h-20 border-b border-gray-100 dark:border-gray-800">
-          <img src={logo} alt="Logo" className="max-h-full w-full object-contain" />
+        <div className="p-6 flex items-center justify-center h-24 border-b border-gray-100 dark:border-gray-800">
+          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="h-12 w-auto max-w-full object-contain" />
         </div>
         <nav className="flex-1 px-4 space-y-1.5 mt-6 overflow-y-auto custom-scrollbar">
           <div className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
@@ -114,8 +115,8 @@ const Layout = () => {
 
       {/* Mobile Header & Menu */}
       <div className="md:hidden fixed top-0 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50">
-        <div className="flex items-center justify-between p-4 h-16">
-          <img src={logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
+        <div className="flex items-center justify-between p-4 h-20">
+          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="h-10 max-w-[200px] object-contain" />
           <div className="flex items-center space-x-2">
             <button onClick={toggleDarkMode} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
