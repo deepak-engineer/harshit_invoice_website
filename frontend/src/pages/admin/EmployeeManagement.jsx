@@ -379,7 +379,7 @@ const EmployeeManagement = () => {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden sm:p-2">
                 {/* Desktop Table View */}
                 <div className="hidden lg:block overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
@@ -465,7 +465,7 @@ const EmployeeManagement = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center space-x-1.5">
+                                        <div className="flex items-center space-x-3">
                                             {emp.status === 'PENDING' && (
                                                 <button onClick={() => handleApprove(emp)} className="group relative p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all">
                                                     <CheckCircle className="w-4 h-4" strokeWidth={2} />
@@ -501,7 +501,7 @@ const EmployeeManagement = () => {
                 </div>
 
                 {/* Mobile Grid View */}
-                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50">
+                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
                     {filteredEmployees.map(emp => (
                         <div key={emp.id} className={`bg-white dark:bg-gray-900 p-4 rounded-xl shadow-theme-xs border ${selectedIds.includes(emp.id) ? 'border-brand-500 ring-1 ring-brand-500' : 'border-gray-200 dark:border-gray-800'} flex flex-col space-y-4`}>
                             <div className="flex justify-between items-start">
