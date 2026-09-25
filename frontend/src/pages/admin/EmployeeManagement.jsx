@@ -438,24 +438,24 @@ const EmployeeManagement = () => {
                                     <td className="px-6 py-4 text-xs">
                                         <div className="flex items-center space-x-2">
                                             <span>{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="text-gray-400 dark:text-gray-500 hover:text-blue-light-600 dark:text-blue-light-500 transition-colors" title="Quick Edit Assignments">
-                                                <Edit2 className="w-3 h-3" />
+                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
+                                                <Edit2 className="w-3 h-3" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-xs">
                                         <div className="flex items-center space-x-2">
                                             <span>{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="text-gray-400 dark:text-gray-500 hover:text-blue-light-600 dark:text-blue-light-500 transition-colors" title="Quick Edit Assignments">
-                                                <Edit2 className="w-3 h-3" />
+                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
+                                                <Edit2 className="w-3 h-3" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center space-x-2">
                                             <span>₹{emp.daily_salary}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="text-gray-400 dark:text-gray-500 hover:text-blue-light-600 dark:text-blue-light-500 transition-colors" title="Quick Edit Assignments">
-                                                <Edit2 className="w-3 h-3" />
+                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
+                                                <Edit2 className="w-3 h-3" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
@@ -465,26 +465,26 @@ const EmployeeManagement = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex space-x-3">
+                                        <div className="flex items-center space-x-2">
                                             {emp.status === 'PENDING' && (
-                                                <button onClick={() => handleApprove(emp)} className="text-success-600 dark:text-success-500 hover:text-success-800 dark:text-success-400" title="Approve Employee">
-                                                    <CheckCircle className="w-4 h-4" />
+                                                <button onClick={() => handleApprove(emp)} className="p-1.5 bg-success-50 dark:bg-success-500/10 hover:bg-success-100 dark:hover:bg-success-500/20 text-success-600 dark:text-success-500 rounded-lg transition-colors border border-green-100 dark:border-green-800/30" title="Approve Employee">
+                                                    <CheckCircle className="w-4 h-4" strokeWidth={1.75} />
                                                 </button>
                                             )}
-                                            <button onClick={() => openEdit(emp)} className="text-blue-light-600 dark:text-blue-light-500 hover:text-blue-light-700 dark:hover:text-blue-light-400" title="Edit Profile">
-                                                <Edit2 className="w-4 h-4" />
+                                            <button onClick={() => openEdit(emp)} className="p-1.5 bg-blue-light-50 dark:bg-blue-light-500/10 hover:bg-blue-100 dark:hover:bg-blue-light-500/20 text-blue-light-600 dark:text-blue-light-500 rounded-lg transition-colors border border-blue-100 dark:border-blue-800/30" title="Edit Profile">
+                                                <Edit2 className="w-4 h-4" strokeWidth={1.75} />
                                             </button>
-                                            <button onClick={() => openSalaryReport(emp)} className="text-success-600 dark:text-success-500 hover:text-success-800 dark:text-success-400" title="Employee Salary Report">
-                                                <Wallet className="w-4 h-4" />
+                                            <button onClick={() => openSalaryReport(emp)} className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-500 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-800/30" title="Employee Salary Report">
+                                                <Wallet className="w-4 h-4" strokeWidth={1.75} />
                                             </button>
-                                            <button onClick={() => openPassword(emp)} className="text-amber-600 hover:text-amber-800" title="Reset Password">
-                                                <Key className="w-4 h-4" />
+                                            <button onClick={() => openPassword(emp)} className="p-1.5 bg-warning-50 dark:bg-warning-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-600 dark:text-amber-500 rounded-lg transition-colors border border-amber-100 dark:border-amber-800/30" title="Reset Password">
+                                                <Key className="w-4 h-4" strokeWidth={1.75} />
                                             </button>
-                                            <button onClick={() => openFace(emp)} className="text-purple-600 hover:text-purple-800" title="Register Face">
-                                                <Camera className="w-4 h-4" />
+                                            <button onClick={() => openFace(emp)} className="p-1.5 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-500 rounded-lg transition-colors border border-purple-100 dark:border-purple-800/30" title="Register Face">
+                                                <Camera className="w-4 h-4" strokeWidth={1.75} />
                                             </button>
-                                            <button onClick={() => handleDelete(emp.id)} className="text-error-600 dark:text-error-500 hover:text-error-800 dark:text-error-400" title="Delete/Reject Employee">
-                                                <Trash2 className="w-4 h-4" />
+                                            <button onClick={() => handleDelete(emp.id)} className="p-1.5 bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:hover:bg-error-500/20 text-error-600 dark:text-error-500 rounded-lg transition-colors border border-red-100 dark:border-red-800/30" title="Delete/Reject Employee">
+                                                <Trash2 className="w-4 h-4" strokeWidth={1.75} />
                                             </button>
                                         </div>
                                     </td>
@@ -537,47 +537,46 @@ const EmployeeManagement = () => {
                                     <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Salary/Day</span>
                                     <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
                                         ₹{emp.daily_salary}
-                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 text-gray-400 dark:text-gray-500 hover:text-blue-light-600 dark:text-blue-light-500"><Edit2 className="w-3 h-3" /></button>
+                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 p-0.5 rounded-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm"><Edit2 className="w-3 h-3" strokeWidth={2} /></button>
                                     </span>
                                 </div>
                                 <div>
                                     <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Team</span>
                                     <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
                                         <span className="truncate max-w-[80px] block">{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 text-gray-400 dark:text-gray-500 hover:text-blue-light-600 dark:text-blue-light-500 shrink-0"><Edit2 className="w-3 h-3" /></button>
+                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 p-0.5 rounded-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm shrink-0"><Edit2 className="w-3 h-3" strokeWidth={2} /></button>
                                     </span>
                                 </div>
                                 <div>
                                     <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Site</span>
                                     <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
                                         <span className="truncate max-w-[80px] block">{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 text-gray-400 dark:text-gray-500 hover:text-blue-light-600 dark:text-blue-light-500 shrink-0"><Edit2 className="w-3 h-3" /></button>
+                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 p-0.5 rounded-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm shrink-0"><Edit2 className="w-3 h-3" strokeWidth={2} /></button>
                                     </span>
                                 </div>
                             </div>
                             
-                            <div className="flex justify-between items-center pt-2">
                                 <div className="flex flex-wrap gap-2">
                                     {emp.status === 'PENDING' && (
-                                        <button onClick={() => handleApprove(emp)} className="p-2 bg-success-50 dark:bg-success-500/10 hover:bg-success-100 dark:bg-success-500/20 text-success-600 dark:text-success-500 rounded-lg transition-colors border border-green-100">
-                                            <CheckCircle className="w-4 h-4" />
+                                        <button onClick={() => handleApprove(emp)} className="p-2 bg-success-50 dark:bg-success-500/10 hover:bg-success-100 dark:hover:bg-success-500/20 text-success-600 dark:text-success-500 rounded-lg transition-colors border border-green-100 dark:border-green-800/30">
+                                            <CheckCircle className="w-4 h-4" strokeWidth={1.75} />
                                         </button>
                                     )}
-                                    <button onClick={() => openEdit(emp)} className="p-2 bg-blue-light-50 dark:bg-blue-light-500/10 hover:bg-blue-100 text-blue-light-600 dark:text-blue-light-500 rounded-lg transition-colors border border-blue-100">
-                                        <Edit2 className="w-4 h-4" />
+                                    <button onClick={() => openEdit(emp)} className="p-2 bg-blue-light-50 dark:bg-blue-light-500/10 hover:bg-blue-100 dark:hover:bg-blue-light-500/20 text-blue-light-600 dark:text-blue-light-500 rounded-lg transition-colors border border-blue-100 dark:border-blue-800/30">
+                                        <Edit2 className="w-4 h-4" strokeWidth={1.75} />
                                     </button>
-                                    <button onClick={() => openSalaryReport(emp)} className="p-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-600 rounded-lg transition-colors border border-emerald-100">
-                                        <Wallet className="w-4 h-4" />
+                                    <button onClick={() => openSalaryReport(emp)} className="p-2 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-500 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-800/30">
+                                        <Wallet className="w-4 h-4" strokeWidth={1.75} />
                                     </button>
-                                    <button onClick={() => openPassword(emp)} className="p-2 bg-warning-50 dark:bg-warning-500/10 hover:bg-amber-100 text-amber-600 rounded-lg transition-colors border border-amber-100">
-                                        <Key className="w-4 h-4" />
+                                    <button onClick={() => openPassword(emp)} className="p-2 bg-warning-50 dark:bg-warning-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-600 dark:text-amber-500 rounded-lg transition-colors border border-amber-100 dark:border-amber-800/30">
+                                        <Key className="w-4 h-4" strokeWidth={1.75} />
                                     </button>
-                                    <button onClick={() => openFace(emp)} className="p-2 bg-purple-50 hover:bg-purple-100 text-purple-600 rounded-lg transition-colors border border-purple-100">
-                                        <Camera className="w-4 h-4" />
+                                    <button onClick={() => openFace(emp)} className="p-2 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-500 rounded-lg transition-colors border border-purple-100 dark:border-purple-800/30">
+                                        <Camera className="w-4 h-4" strokeWidth={1.75} />
                                     </button>
                                 </div>
-                                <button onClick={() => handleDelete(emp.id)} className="p-2 bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:bg-error-500/20 text-error-600 dark:text-error-500 rounded-lg transition-colors border border-red-100">
-                                    <Trash2 className="w-4 h-4" />
+                                <button onClick={() => handleDelete(emp.id)} className="p-2 bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:hover:bg-error-500/20 text-error-600 dark:text-error-500 rounded-lg transition-colors border border-red-100 dark:border-red-800/30">
+                                    <Trash2 className="w-4 h-4" strokeWidth={1.75} />
                                 </button>
                             </div>
                         </div>
