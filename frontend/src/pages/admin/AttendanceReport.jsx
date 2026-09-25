@@ -273,7 +273,9 @@ const AttendanceReport = () => {
             ) : (
                 <div className="space-y-6">
                     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        {/* Days of Week Header */}
+                        <div className="overflow-x-auto">
+                            <div className="min-w-[800px]">
+                                {/* Days of Week Header */}
                         <div className="grid grid-cols-7 border-b border-slate-200 bg-slate-50">
                             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
                                 <div key={day} className="py-3 text-center text-sm font-semibold text-slate-500 uppercase tracking-wider">
@@ -333,6 +335,8 @@ const AttendanceReport = () => {
                                     </div>
                                 );
                             })}
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -63,12 +63,24 @@ const SiteManagement = () => {
     }, [debouncedSearch, sites]);
 
     useEffect(() => {
-        const fetchSuggestions = async () => {
-            if (addressQuery.length > 3) {
+        const fetchSuggestionsAndAutoFill = async () => {
+            if (addressQuery.length > 5) {
                 try {
                     const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressQuery)}&countrycodes=in&limit=5`);
                     const data = await res.json();
+                    
                     setAddressSuggestions(data);
+                    
+                    // Auto-fill coordinates from the top result silently
+                    if (data && data.length > 0) {
+                        const { lat, lon } = data[0];
+                        setFormData(prev => ({ 
+                            ...prev, 
+                            latitude: lat, 
+                            longitude: lon 
+                        }));
+                    }
+                    
                     setShowSuggestions(true);
                 } catch (error) {
                     console.error("Failed to fetch address suggestions");
@@ -80,8 +92,8 @@ const SiteManagement = () => {
         };
 
         const timer = setTimeout(() => {
-            fetchSuggestions();
-        }, 500);
+            fetchSuggestionsAndAutoFill();
+        }, 800);
 
         return () => clearTimeout(timer);
     }, [addressQuery]);

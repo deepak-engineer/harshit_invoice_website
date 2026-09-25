@@ -8,7 +8,8 @@ import { getFaceDescriptor, hasFace } from '../utils/faceApi';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [photo, setPhoto] = useState(null);
   const [faceDescriptor, setFaceDescriptor] = useState(null);
@@ -184,14 +185,15 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-        const res = await api.post('/employee-signup', { name, phone, password, photo, face_descriptor: faceDescriptor });
+        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, password, photo, face_descriptor: faceDescriptor });
         setSuccess(res.data.message);
         setIsSignUp(false);
         setUsername(res.data.username);
         setPassword('');
         setPhoto(null);
         setFaceDescriptor(null);
-        setName('');
+        setFirstName('');
+        setLastName('');
         setPhone('');
     } catch (err) {
         setError(err.response?.data?.error || 'Registration failed');
@@ -252,20 +254,38 @@ const Login = () => {
             <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-6">
               {isSignUp ? (
                 <>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <User className="h-5 w-5" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">First Name</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                          <User className="h-5 w-5" />
+                        </div>
+                        <input
+                          type="text"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          required
+                          className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
+                          placeholder="First Name"
+                        />
                       </div>
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                        placeholder="Enter full name"
-                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                          <User className="h-5 w-5" />
+                        </div>
+                        <input
+                          type="text"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          required
+                          className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
+                          placeholder="Last Name"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div>

@@ -134,6 +134,7 @@ const EmployeeManagement = () => {
 
             const payload = { 
                 ...formData, 
+                name: `${formData.first_name || ''} ${formData.last_name || ''}`.trim(),
                 site_id: finalSiteId === 'NEW_SITE' || !finalSiteId ? '' : finalSiteId, 
                 team_id: finalTeamId === 'NEW_TEAM' || !finalTeamId ? '' : finalTeamId 
             };
@@ -303,7 +304,7 @@ const EmployeeManagement = () => {
     };
 
     const openNew = () => {
-        setFormData({ emp_id: '', name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
+        setFormData({ emp_id: '', first_name: '', last_name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
         setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(null);
@@ -311,7 +312,9 @@ const EmployeeManagement = () => {
     };
 
     const openEdit = (emp) => {
-        setFormData({ ...emp, password: '' }); // Don't clear photo, backend ignores if not base64
+        const [firstName, ...rest] = (emp.name || '').split(' ');
+        const lastName = rest.join(' ');
+        setFormData({ ...emp, first_name: firstName, last_name: lastName, password: '' }); // Don't clear photo, backend ignores if not base64
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
         setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(emp);
@@ -606,8 +609,12 @@ const EmployeeManagement = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                                    <input type="text" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                                    <input type="text" required value={formData.first_name} onChange={e => setFormData({...formData, first_name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                                    <input type="text" required value={formData.last_name} onChange={e => setFormData({...formData, last_name: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none" />
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
