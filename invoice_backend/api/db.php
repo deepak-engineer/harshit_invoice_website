@@ -19,7 +19,7 @@ try {
     // For API responses, return JSON error
     header('Content-Type: application/json');
     http_response_code(500);
-    echo json_encode(["error" => "Database connection failed."]);
+    echo json_encode(["error" => "Database connection failed: " . $e->getMessage()]);
     exit;
 }
 ?>
