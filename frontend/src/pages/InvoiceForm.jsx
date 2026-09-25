@@ -134,11 +134,10 @@ const InvoiceForm = () => {
   }, [items, id]);
 
   useEffect(() => {
+    fetchVendor();
     if (id) {
       fetchInvoice();
     } else {
-      // Always fetch latest default vendor settings for a new invoice
-      fetchVendor();
       if (!invoice.invoice_no) generateInvoiceNumber();
     }
   }, [id]);
