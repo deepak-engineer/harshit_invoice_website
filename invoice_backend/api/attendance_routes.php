@@ -251,7 +251,7 @@ if (preg_match('/^admin\/sites$/', $route)) {
     }
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, latitude, longitude, geofence_radius) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, city, latitude, longitude, geofence_radius) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
             $data['latitude'] !== '' ? $data['latitude'] : null,
@@ -268,7 +268,7 @@ if (preg_match('/^admin\/sites\/bulk$/', $route)) {
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['sites']) && is_array($data['sites'])) {
-            $stmt = $pdo->prepare("INSERT INTO sites (name, code, state, address) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO sites (name, code, city, address) VALUES (?, ?, ?, ?)");
             $added = 0;
             foreach ($data['sites'] as $site) {
                 if (empty($site['name']) || empty($site['code'])) continue;
@@ -305,7 +305,7 @@ if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
     $id = $matches[1];
     if ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, status=?, latitude=?, longitude=?, geofence_radius=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, city=?, status=?, latitude=?, longitude=?, geofence_radius=? WHERE id=?");
         $stmt->execute([
             $data['name'], $data['code'], $data['address'], $data['state'] ?? null, $data['status'],
             $data['latitude'] !== '' ? $data['latitude'] : null,
