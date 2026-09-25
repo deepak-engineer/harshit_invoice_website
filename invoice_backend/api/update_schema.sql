@@ -123,3 +123,4 @@ AND NOT EXISTS (SELECT 1 FROM checklist_items WHERE template_id = checklist_temp
 INSERT INTO checklist_items (template_id, item_name)
 SELECT id, 'Final Panel Test' FROM checklist_templates WHERE name = 'DSC Panel Standard'
 AND NOT EXISTS (SELECT 1 FROM checklist_items WHERE template_id = checklist_templates.id AND item_name = 'Final Panel Test');
+ALTER TABLE attendance ADD COLUMN attendance_photo VARCHAR(255) NULL AFTER status;

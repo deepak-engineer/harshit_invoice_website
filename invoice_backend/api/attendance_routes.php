@@ -273,13 +273,10 @@ if (preg_match('/^admin\/sites$/', $route)) {
     }
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, city, location, status, latitude, longitude, geofence_radius) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, city, location, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
-            $data['city'] ?? null, $data['location'] ?? null, $data['status'] ?? 'ACTIVE',
-            $data['latitude'] !== '' ? $data['latitude'] : null,
-            $data['longitude'] !== '' ? $data['longitude'] : null,
-            $data['geofence_radius'] !== '' ? $data['geofence_radius'] : 100
+            $data['city'] ?? null, $data['location'] ?? null, $data['status'] ?? 'ACTIVE'
         ]);
         echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         exit;
@@ -291,11 +288,11 @@ if (preg_match('/^admin\/sites\/bulk$/', $route)) {
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         if (isset($data['sites']) && is_array($data['sites'])) {
-            $stmt = $pdo->prepare("INSERT INTO sites (name, code, city, address) VALUES (?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO sites (name, code, state, city, address, geofence_radius, status) VALUES (?, ?, ?, ?, ?, 100, 'ACTIVE')");
             $added = 0;
             foreach ($data['sites'] as $site) {
                 if (empty($site['name']) || empty($site['code'])) continue;
-                $stmt->execute([$site['name'], $site['code'], $site['state'] ?? null, $site['address'] ?? '']);
+                $stmt->execute([$site['name'], $site['code'], $site['state'] ?? null, $site['city'] ?? null, $site['address'] ?? '']);
                 $added++;
             }
             echo json_encode(["success" => true, "added" => $added]);
@@ -328,13 +325,10 @@ if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
     $id = $matches[1];
     if ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, city=?, location=?, status=?, latitude=?, longitude=?, geofence_radius=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, city=?, location=?, status=? WHERE id=?");
         $stmt->execute([
             $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
-            $data['city'] ?? null, $data['location'] ?? null, $data['status'],
-            $data['latitude'] !== '' ? $data['latitude'] : null,
-            $data['longitude'] !== '' ? $data['longitude'] : null,
-            $data['geofence_radius'] !== '' ? $data['geofence_radius'] : 100,
+            $data['city'] ?? null, $data['location'] ?? null, $data['status'] ?? 'ACTIVE',
             $id
         ]);
         echo json_encode(["success" => true]);
@@ -708,45 +702,19 @@ if (preg_match('/^attendance\/check-in$/', $route)) {
         
         $site_id = $data['site_id'];
         
-        // Geofence Validation
-        $site_stmt = $pdo->prepare("SELECT latitude, longitude, geofence_radius FROM sites WHERE id = ?");
-        $site_stmt->execute([$site_id]);
-        $site = $site_stmt->fetch();
-        
-        $distance = null;
-        $geofence_radius = 100; // Default
-        
-        if (!$site || empty($site['latitude']) || empty($site['longitude'])) {
+        // Photo Validation
+        if (empty($data['photo'])) {
             http_response_code(400);
-            echo json_encode(["error" => "This site has not been configured with a valid attendance location. Please contact the administrator."]);
-            exit;
-        }
-
-        $geofence_radius = $site['geofence_radius'] ? (int)$site['geofence_radius'] : 100;
-        $distance = haversineGreatCircleDistance(
-            (float)$data['lat'], (float)$data['lng'], 
-            (float)$site['latitude'], (float)$site['longitude']
-        );
-        
-        if ($distance > $geofence_radius) {
-            http_response_code(400);
-            echo json_encode([
-                "error" => "You are outside the allowed attendance area.", 
-                "distance" => round($distance, 2), 
-                "radius" => $geofence_radius
-            ]);
+            echo json_encode(["error" => "Please upload a photo of the register entry to mark attendance."]);
             exit;
         }
         
-        $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, site_id, attendance_date, status, check_in_time, check_in_lat, check_in_lng, check_in_acc, check_in_photo, check_in_face_score, check_in_distance, geofence_radius, daily_salary_snapshot) VALUES (?, ?, ?, 'WORKING', ?, ?, ?, ?, ?, ?, ?, ?, (SELECT daily_salary FROM employees WHERE id=?))");
-        $photo_filename = processBase64Image($data['photo'] ?? null);
+        $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, site_id, attendance_date, status, check_in_time, check_in_photo, daily_salary_snapshot) VALUES (?, ?, ?, 'WORKING', ?, ?, (SELECT daily_salary FROM employees WHERE id=?))");
+        $photo_filename = processBase64Image($data['photo']);
         
         $stmt->execute([
             $emp_id, $site_id, $today, $time, 
-            $data['lat'], $data['lng'], $data['acc'], 
-            $photo_filename, $data['face_score'] ?? null,
-            $distance ? round($distance, 2) : null,
-            $geofence_radius,
+            $photo_filename,
             $emp_id
         ]);
         
