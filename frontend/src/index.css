@@ -40,6 +40,11 @@
   --color-white: #ffffff;
   --color-black: #101828;
 
+  --color-primary: #3E0F8D;
+  --color-secondary: #9564DD;
+  --color-accent: #E4DA72;
+  --color-bgLight: #EEEEEE;
+
   --color-brand-25: #f2f7ff;
   --color-brand-50: #ecf3ff;
   --color-brand-100: #dde9ff;

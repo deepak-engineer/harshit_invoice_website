@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck } from 'lucide-react';
 import api from '../utils/api';
-import logoDark from '../assets/crons-logo-dark.svg';
-import logoLight from '../assets/crons-logo-light.svg';
+import logo from '../assets/crons-logo-light.svg';
+
 
 const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -57,8 +57,7 @@ const Layout = () => {
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
         <div className="p-4 flex items-center h-20 border-b border-gray-100 dark:border-gray-800">
-          <img src={logoDark} alt="Logo" className="max-h-full w-full object-contain dark:hidden" />
-          <img src={logoLight} alt="Logo" className="max-h-full w-full object-contain hidden dark:block" />
+          <img src={logo} alt="Logo" className="max-h-full w-full object-contain" />
         </div>
         <nav className="flex-1 px-4 space-y-1.5 mt-6 overflow-y-auto custom-scrollbar">
           <div className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
@@ -93,8 +92,7 @@ const Layout = () => {
       {/* Mobile Header & Menu */}
       <div className="md:hidden fixed top-0 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50">
         <div className="flex items-center justify-between p-4 h-16">
-          <img src={logoDark} alt="Logo" className="h-8 max-w-[200px] object-contain dark:hidden" />
-          <img src={logoLight} alt="Logo" className="h-8 max-w-[200px] object-contain hidden dark:block" />
+          <img src={logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
