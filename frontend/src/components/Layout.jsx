@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck } from 'lucide-react';
 import api from '../utils/api';
-import logo from '../assets/crons-logo-light.svg';
+import logo from '../assets/crons-logo-light copy.svg';
 
 
 const Layout = () => {
