@@ -421,7 +421,7 @@ if (preg_match('/^admin\/attendance-list$/', $route)) {
         $date = $_GET['date'] ?? date('Y-m-d');
         
         $stmt = $pdo->prepare("
-            SELECT a.*, e.name as emp_name, e.emp_id as emp_code, s.name as site_name, s.code as site_code, t.name as team_name, COALESCE(e.state, t.state, s.state) as state, w.status as work_status, s.latitude as site_lat, s.longitude as site_lng
+            SELECT a.*, e.name as emp_name, e.emp_id as emp_code, s.name as site_name, s.code as site_code, t.name as team_name, COALESCE(e.city, s.city) as state, w.status as work_status, s.latitude as site_lat, s.longitude as site_lng
             FROM attendance a 
             JOIN employees e ON a.employee_id = e.id 
             LEFT JOIN teams t ON e.team_id = t.id
