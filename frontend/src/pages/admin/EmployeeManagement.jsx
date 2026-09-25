@@ -385,7 +385,7 @@ const EmployeeManagement = () => {
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
                         <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800">
                             <tr>
-                                <th className="px-6 py-4 w-10">
+                                <th className="px-4 py-3 w-10">
                                     <input 
                                         type="checkbox" 
                                         className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer"
@@ -393,22 +393,22 @@ const EmployeeManagement = () => {
                                         onChange={handleSelectAll}
                                     />
                                 </th>
-                                <th className="px-6 py-4">ID</th>
-                                <th className="px-6 py-4">Photo</th>
-                                <th className="px-6 py-4">Name</th>
-                                <th className="px-6 py-4">Phone</th>
-                                <th className="px-6 py-4">Username</th>
-                                <th className="px-6 py-4">Assigned Team</th>
-                                <th className="px-6 py-4">Assigned Site</th>
-                                <th className="px-6 py-4">Salary/Day</th>
-                                <th className="px-6 py-4">Status</th>
-                                <th className="px-6 py-4">Actions</th>
+                                <th className="px-4 py-3">ID</th>
+                                <th className="px-4 py-3">Photo</th>
+                                <th className="px-4 py-3">Name</th>
+                                <th className="px-4 py-3">Phone</th>
+                                <th className="px-4 py-3">Username</th>
+                                <th className="px-4 py-3">Assigned Team</th>
+                                <th className="px-4 py-3">Assigned Site</th>
+                                <th className="px-4 py-3">Salary/Day</th>
+                                <th className="px-4 py-3">Status</th>
+                                <th className="px-4 py-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {filteredEmployees.map(emp => (
                                 <tr key={emp.id} className={`hover:bg-gray-50 dark:bg-gray-800/50 ${selectedIds.includes(emp.id) ? 'bg-brand-500/5' : ''}`}>
-                                    <td className="px-6 py-4">
+                                    <td className="px-4 py-3">
                                         <input 
                                             type="checkbox" 
                                             className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer"
@@ -416,8 +416,8 @@ const EmployeeManagement = () => {
                                             onChange={() => handleSelect(emp.id)}
                                         />
                                     </td>
-                                    <td className="px-6 py-4 font-mono text-xs">{emp.emp_id}</td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-4 py-3 font-mono text-xs">{emp.emp_id}</td>
+                                    <td className="px-4 py-3">
                                         {emp.photo ? (
                                             <button 
                                                 onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
@@ -432,10 +432,10 @@ const EmployeeManagement = () => {
                                             </div>
                                         )}
                                     </td>
-                                    <td className="px-6 py-4 font-medium text-gray-800 dark:text-white/90">{emp.name}</td>
-                                    <td className="px-6 py-4">{emp.phone || '-'}</td>
-                                    <td className="px-6 py-4">{emp.username}</td>
-                                    <td className="px-6 py-4 text-xs">
+                                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-white/90">{emp.name}</td>
+                                    <td className="px-4 py-3">{emp.phone || '-'}</td>
+                                    <td className="px-4 py-3">{emp.username}</td>
+                                    <td className="px-4 py-3 text-xs">
                                         <div className="flex items-center space-x-2">
                                             <span>{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
                                             <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
@@ -443,7 +443,7 @@ const EmployeeManagement = () => {
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-xs">
+                                    <td className="px-4 py-3 text-xs">
                                         <div className="flex items-center space-x-2">
                                             <span>{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
                                             <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
@@ -451,7 +451,7 @@ const EmployeeManagement = () => {
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-4 py-3">
                                         <div className="flex items-center space-x-2">
                                             <span>₹{emp.daily_salary}</span>
                                             <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
@@ -459,12 +459,12 @@ const EmployeeManagement = () => {
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-4 py-3">
                                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-success-100 dark:bg-success-500/20 text-success-800 dark:text-success-400' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-error-100 dark:bg-error-500/20 text-error-800 dark:text-error-400'}`}>
                                             {emp.status}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4">
+                                    <td className="px-4 py-3">
                                         <div className="flex items-center space-x-3">
                                             {emp.status === 'PENDING' && (
                                                 <button onClick={() => handleApprove(emp)} className="group relative p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all">
@@ -810,7 +810,7 @@ const EmployeeManagement = () => {
             {salaryModal.isOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl transform transition-all border border-gray-100 dark:border-gray-800">
-                        <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex justify-between items-center">
+                        <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center">
                             <h3 className="font-bold text-gray-800 dark:text-white/90">
                                 {salaryModal.isApproveMode ? 'Approve Employee' : 'Update Assignments'}
                             </h3>
@@ -935,7 +935,7 @@ const EmployeeManagement = () => {
             {salaryReportModal.isOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                        <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 px-6 py-4 flex justify-between items-center shrink-0">
+                        <div className="bg-gray-50 dark:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800 px-4 py-3 flex justify-between items-center shrink-0">
                             <h3 className="font-bold text-gray-800 dark:text-white/90 flex items-center">
                                 <Wallet className="w-5 h-5 mr-2 text-brand-500" />
                                 Salary Report: {salaryReportModal.emp?.name}
