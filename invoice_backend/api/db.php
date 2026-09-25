@@ -1,9 +1,9 @@
 <?php
 // c:\Users\Morningstar\Desktop\harshit_invoice_website\backend\api\db.php
 $host = '127.0.0.1';
-$db   = 'harshit_invoice'; // Change to Hostinger DB name
-$user = 'root'; // Change to Hostinger DB user
-$pass = ''; // Change to Hostinger DB password
+$db   = 'u698707169_harshit';
+$user = 'u698707169_harshit';
+$pass = 'c~5XDl;AEwO';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
