@@ -68,10 +68,10 @@ const FaceRegistrationModal = ({ employee, onClose, onComplete }) => {
 
     return (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-                <div className="flex justify-between items-center p-4 border-b border-slate-100 bg-slate-50">
-                    <h3 className="font-bold text-slate-800">Register Face: {employee.name}</h3>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+                <div className="flex justify-between items-center p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
+                    <h3 className="font-bold text-gray-800 dark:text-white/90">Register Face: {employee.name}</h3>
+                    <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -90,14 +90,14 @@ const FaceRegistrationModal = ({ employee, onClose, onComplete }) => {
                 </div>
                 
                 <div className="p-4 text-center">
-                    <p className={`text-sm mb-4 font-medium ${processing ? 'text-blue-600 animate-pulse' : 'text-slate-600'}`}>
+                    <p className={`text-sm mb-4 font-medium ${processing ? 'text-blue-light-600 dark:text-blue-light-500 animate-pulse' : 'text-gray-600 dark:text-gray-400'}`}>
                         {status}
                     </p>
                     
                     <button 
                         onClick={captureFace} 
                         disabled={processing || !stream}
-                        className="flex items-center justify-center space-x-2 w-full py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50"
+                        className="flex items-center justify-center space-x-2 w-full py-3 bg-brand-500 text-white rounded-xl font-semibold hover:bg-brand-500/90 transition-colors disabled:opacity-50"
                     >
                         {processing ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Camera className="w-5 h-5" />}
                         <span>{processing ? 'Processing...' : 'Capture & Save'}</span>

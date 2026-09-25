@@ -98,8 +98,8 @@ const AdminExpenses = () => {
 
     const getStatusIcon = (status) => {
         if (status === 'APPROVED') return <CheckCircle className="w-4 h-4 text-green-500" />;
-        if (status === 'REJECTED') return <XCircle className="w-4 h-4 text-red-500" />;
-        return <Clock className="w-4 h-4 text-amber-500" />;
+        if (status === 'REJECTED') return <XCircle className="w-4 h-4 text-error-500 dark:text-error-400" />;
+        return <Clock className="w-4 h-4 text-warning-500 dark:text-warning-400" />;
     };
 
     return (
@@ -107,18 +107,18 @@ const AdminExpenses = () => {
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-800 flex items-center">
-                            <Receipt className="w-7 h-7 mr-3 text-primary" />
+                        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90 flex items-center">
+                            <Receipt className="w-7 h-7 mr-3 text-brand-500" />
                             Expense Tracker
                         </h1>
-                        <p className="text-slate-500 text-sm mt-1">Track and manage employee expenses by site/team</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Track and manage employee expenses by site/team</p>
                     </div>
                     
-                    <div className="bg-white px-5 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between min-w-[200px]">
+                    <div className="bg-white dark:bg-gray-900 px-5 py-3 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 flex items-center justify-between min-w-[200px]">
                         <div>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total (Filtered)</p>
-                            <p className="text-xl font-bold text-slate-800 flex items-center">
-                                <IndianRupee className="w-5 h-5 mr-1 text-primary" />
+                            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Total (Filtered)</p>
+                            <p className="text-xl font-bold text-gray-800 dark:text-white/90 flex items-center">
+                                <IndianRupee className="w-5 h-5 mr-1 text-brand-500" />
                                 {totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                             </p>
                         </div>
@@ -129,27 +129,27 @@ const AdminExpenses = () => {
                 {Object.keys(teamExpenses).length > 0 && (
                     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                         {Object.entries(teamExpenses).map(([team, amount]) => (
-                            <div key={team} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-primary/50 transition-colors">
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider truncate mb-1" title={team}>{team}</span>
-                                <span className="text-xl font-black text-primary">₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                            <div key={team} className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col justify-between hover:border-brand-500/50 transition-colors">
+                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate mb-1" title={team}>{team}</span>
+                                <span className="text-xl font-black text-brand-500">₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col lg:flex-row lg:items-center gap-4">
+            <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50/50 flex flex-col lg:flex-row lg:items-center gap-4">
                     
-                    <div className="flex flex-wrap gap-2 p-1 bg-slate-100 rounded-lg shrink-0">
+                    <div className="flex flex-wrap gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0">
                         {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setStatusFilter(tab)}
                                 className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${
                                     statusFilter === tab 
-                                        ? 'bg-white text-primary shadow-sm' 
-                                        : 'text-slate-500 hover:text-slate-700'
+                                        ? 'bg-white dark:bg-gray-900 text-brand-500 shadow-theme-xs' 
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300'
                                 }`}
                             >
                                 {tab}
@@ -159,19 +159,19 @@ const AdminExpenses = () => {
 
                     <div className="flex flex-1 flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
                             <input
                                 type="text"
                                 placeholder="Search employee..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                                className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none"
                             />
                         </div>
                         <select 
                             value={stateFilter} 
                             onChange={e => setStateFilter(e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none bg-white"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900"
                         >
                             <option value="">All States/Sites</option>
                             {states.map(s => <option key={s} value={s}>{s}</option>)}
@@ -179,7 +179,7 @@ const AdminExpenses = () => {
                         <select 
                             value={teamFilter} 
                             onChange={e => setTeamFilter(e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none bg-white"
+                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900"
                         >
                             <option value="">All Teams</option>
                             {teams.map(t => <option key={t} value={t}>{t}</option>)}
@@ -191,15 +191,15 @@ const AdminExpenses = () => {
                 <div className="hidden lg:block overflow-x-auto">
                     {loading ? (
                         <div className="p-12 text-center flex justify-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
                         </div>
                     ) : filteredExpenses.length === 0 ? (
-                        <div className="p-12 text-center text-slate-500">
+                        <div className="p-12 text-center text-gray-500 dark:text-gray-400">
                             No expenses found matching the criteria.
                         </div>
                     ) : (
-                        <table className="w-full text-left text-sm text-slate-600">
-                            <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
+                        <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
+                            <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800">
                                 <tr>
                                     <th className="px-6 py-4">Employee</th>
                                     <th className="px-6 py-4">Location & Team</th>
@@ -210,44 +210,44 @@ const AdminExpenses = () => {
                                     <th className="px-6 py-4 text-center">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                 {filteredExpenses.map((exp) => (
-                                    <tr key={exp.id} className="hover:bg-slate-50/50 transition-colors group">
+                                    <tr key={exp.id} className="hover:bg-gray-50 dark:bg-gray-800/50/50 transition-colors group">
                                         <td className="px-6 py-4">
-                                            <div className="font-bold text-slate-800">{exp.emp_name}</div>
-                                            <div className="text-xs text-slate-400">ID: {exp.emp_code}</div>
+                                            <div className="font-bold text-gray-800 dark:text-white/90">{exp.emp_name}</div>
+                                            <div className="text-xs text-gray-400 dark:text-gray-500">ID: {exp.emp_code}</div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="flex items-center text-slate-700">
-                                                <MapPin className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                                            <div className="flex items-center text-gray-700 dark:text-gray-300">
+                                                <MapPin className="w-3.5 h-3.5 mr-1.5 text-gray-400 dark:text-gray-500" />
                                                 {exp.state || 'N/A'}
                                             </div>
-                                            <div className="flex items-center text-slate-500 mt-1 text-xs">
-                                                <Users className="w-3.5 h-3.5 mr-1.5 text-slate-400" />
+                                            <div className="flex items-center text-gray-500 dark:text-gray-400 mt-1 text-xs">
+                                                <Users className="w-3.5 h-3.5 mr-1.5 text-gray-400 dark:text-gray-500" />
                                                 {exp.team_name || 'No Team'}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="font-semibold text-slate-700">{exp.category}</span>
+                                            <span className="font-semibold text-gray-700 dark:text-gray-300">{exp.category}</span>
                                             {exp.description && (
-                                                <div className="text-xs text-slate-500 truncate max-w-[150px]" title={exp.description}>
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]" title={exp.description}>
                                                     {exp.description}
                                                 </div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <span className="font-bold text-slate-800">
+                                            <span className="font-bold text-gray-800 dark:text-white/90">
                                                 {parseFloat(exp.amount).toFixed(2)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-slate-500">
+                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
                                             {new Date(exp.expense_date).toLocaleDateString('en-GB')}
                                         </td>
                                         <td className="px-6 py-4 text-center">
                                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${
-                                                exp.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-200' :
-                                                exp.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-200' :
-                                                'bg-amber-50 text-amber-700 border-amber-200'
+                                                exp.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
+                                                exp.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
+                                                'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
                                             }`}>
                                                 {getStatusIcon(exp.status)}
                                                 <span className="ml-1.5">{exp.status}</span>
@@ -256,7 +256,7 @@ const AdminExpenses = () => {
                                         <td className="px-6 py-4 text-center">
                                             <button 
                                                 onClick={() => setSelectedExpense(exp)}
-                                                className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition-colors"
+                                                className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg text-xs transition-colors"
                                             >
                                                 View Details
                                             </button>
@@ -270,45 +270,45 @@ const AdminExpenses = () => {
 
                 {/* Mobile Grid View */}
                 {!loading && (
-                    <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50">
+                    <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50">
                         {filteredExpenses.map((exp) => (
-                            <div key={exp.id} className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col space-y-4">
+                            <div key={exp.id} className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-theme-xs border border-gray-200 dark:border-gray-800 flex flex-col space-y-4">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h3 className="font-bold text-slate-800 leading-tight">{exp.emp_name}</h3>
-                                        <p className="text-xs text-slate-500 font-mono mt-0.5">ID: {exp.emp_code}</p>
+                                        <h3 className="font-bold text-gray-800 dark:text-white/90 leading-tight">{exp.emp_name}</h3>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">ID: {exp.emp_code}</p>
                                     </div>
                                     <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 border ${
-                                        exp.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-200' :
-                                        exp.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-200' :
-                                        'bg-amber-50 text-amber-700 border-amber-200'
+                                        exp.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
+                                        exp.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
+                                        'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
                                     }`}>
                                         {exp.status}
                                     </span>
                                 </div>
                                 
-                                <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-3 rounded-lg border border-slate-100">
-                                    <div className="col-span-2 flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                                <div className="grid grid-cols-2 gap-3 text-xs bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
+                                    <div className="col-span-2 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">
                                         <div>
-                                            <span className="text-slate-400 block mb-0.5">Category</span>
-                                            <span className="font-semibold text-slate-700">{exp.category}</span>
+                                            <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Category</span>
+                                            <span className="font-semibold text-gray-700 dark:text-gray-300">{exp.category}</span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="text-slate-400 block mb-0.5">Amount</span>
-                                            <span className="font-bold text-slate-800 text-sm">₹{parseFloat(exp.amount).toFixed(2)}</span>
+                                            <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Amount</span>
+                                            <span className="font-bold text-gray-800 dark:text-white/90 text-sm">₹{parseFloat(exp.amount).toFixed(2)}</span>
                                         </div>
                                     </div>
                                     <div>
-                                        <span className="text-slate-400 block mb-0.5">Location</span>
-                                        <span className="font-medium text-slate-700 flex items-center">
-                                            <MapPin className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                                        <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Location</span>
+                                        <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
+                                            <MapPin className="w-3.5 h-3.5 mr-1 text-gray-400 dark:text-gray-500" />
                                             {exp.state || 'N/A'}
                                         </span>
                                     </div>
                                     <div>
-                                        <span className="text-slate-400 block mb-0.5">Team</span>
-                                        <span className="font-medium text-slate-700 flex items-center truncate">
-                                            <Users className="w-3.5 h-3.5 mr-1 text-slate-400" />
+                                        <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Team</span>
+                                        <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center truncate">
+                                            <Users className="w-3.5 h-3.5 mr-1 text-gray-400 dark:text-gray-500" />
                                             {exp.team_name || 'No Team'}
                                         </span>
                                     </div>
@@ -317,7 +317,7 @@ const AdminExpenses = () => {
                                 <div className="pt-2">
                                     <button 
                                         onClick={() => setSelectedExpense(exp)}
-                                        className="w-full px-4 py-2 bg-primary/10 hover:bg-primary/20 text-primary font-semibold rounded-lg text-sm transition-colors border border-primary/20"
+                                        className="w-full px-4 py-2 bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 font-semibold rounded-lg text-sm transition-colors border border-brand-500/20"
                                     >
                                         View Details
                                     </button>
@@ -325,7 +325,7 @@ const AdminExpenses = () => {
                             </div>
                         ))}
                         {filteredExpenses.length === 0 && (
-                            <div className="col-span-full text-center py-8 text-slate-400 text-sm">No expenses found.</div>
+                            <div className="col-span-full text-center py-8 text-gray-400 dark:text-gray-500 text-sm">No expenses found.</div>
                         )}
                     </div>
                 )}
@@ -334,10 +334,10 @@ const AdminExpenses = () => {
             {/* View / Process Modal */}
             {selectedExpense && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h2 className="text-xl font-bold text-slate-800">Expense Details</h2>
-                            <button onClick={() => setSelectedExpense(null)} className="text-slate-400 hover:text-slate-600">
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-gray-800/50">
+                            <h2 className="text-xl font-bold text-gray-800 dark:text-white/90">Expense Details</h2>
+                            <button onClick={() => setSelectedExpense(null)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:text-gray-400">
                                 <XCircle className="w-6 h-6" />
                             </button>
                         </div>
@@ -345,45 +345,45 @@ const AdminExpenses = () => {
                         <div className="p-6 overflow-y-auto custom-scrollbar space-y-5">
                             <div className="flex justify-between items-start">
                                 <div>
-                                    <h3 className="font-bold text-lg text-slate-800">{selectedExpense.emp_name}</h3>
-                                    <p className="text-sm text-slate-500">ID: {selectedExpense.emp_code}</p>
+                                    <h3 className="font-bold text-lg text-gray-800 dark:text-white/90">{selectedExpense.emp_name}</h3>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">ID: {selectedExpense.emp_code}</p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-2xl font-bold text-primary flex items-center justify-end">
+                                    <p className="text-2xl font-bold text-brand-500 flex items-center justify-end">
                                         <IndianRupee className="w-5 h-5 mr-1" />
                                         {parseFloat(selectedExpense.amount).toFixed(2)}
                                     </p>
-                                    <p className="text-sm font-semibold text-slate-600">{selectedExpense.category}</p>
+                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">{selectedExpense.category}</p>
                                 </div>
                             </div>
                             
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
                                 <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">State / Site</p>
-                                    <p className="text-sm font-semibold text-slate-700 flex items-center">
-                                        <MapPin className="w-4 h-4 mr-1.5 text-slate-400" />
+                                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">State / Site</p>
+                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                                        <MapPin className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
                                         {selectedExpense.state || 'N/A'}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Team</p>
-                                    <p className="text-sm font-semibold text-slate-700 flex items-center">
-                                        <Users className="w-4 h-4 mr-1.5 text-slate-400" />
+                                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Team</p>
+                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
+                                        <Users className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
                                         {selectedExpense.team_name || 'N/A'}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Date</p>
-                                    <p className="text-sm font-semibold text-slate-700">
+                                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Date</p>
+                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                                         {new Date(selectedExpense.expense_date).toLocaleDateString('en-GB')}
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Status</p>
+                                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Status</p>
                                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                                        selectedExpense.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-200' :
-                                        selectedExpense.status === 'REJECTED' ? 'bg-red-50 text-red-700 border-red-200' :
-                                        'bg-amber-50 text-amber-700 border-amber-200'
+                                        selectedExpense.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
+                                        selectedExpense.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
+                                        'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
                                     }`}>
                                         {selectedExpense.status}
                                     </span>
@@ -391,16 +391,16 @@ const AdminExpenses = () => {
                             </div>
 
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Description</p>
-                                <p className="text-sm text-slate-700 bg-white border border-slate-200 p-3 rounded-xl min-h-[60px]">
-                                    {selectedExpense.description || <span className="text-slate-400 italic">No description provided</span>}
+                                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Description</p>
+                                <p className="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3 rounded-xl min-h-[60px]">
+                                    {selectedExpense.description || <span className="text-gray-400 dark:text-gray-500 italic">No description provided</span>}
                                 </p>
                             </div>
 
                             <div>
-                                <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Receipt / Bill Photo</p>
+                                <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Receipt / Bill Photo</p>
                                 {selectedExpense.receipt_photo ? (
-                                    <div className="border border-slate-200 rounded-xl overflow-hidden bg-slate-100 flex justify-center cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/expenses/${selectedExpense.receipt_photo}`)}>
+                                    <div className="border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800 flex justify-center cursor-pointer hover:opacity-90 transition-opacity" onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/expenses/${selectedExpense.receipt_photo}`)}>
                                         <img 
                                             src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/expenses/${selectedExpense.receipt_photo}`} 
                                             alt="Receipt" 
@@ -411,7 +411,7 @@ const AdminExpenses = () => {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="bg-slate-50 border border-dashed border-slate-200 p-6 rounded-xl text-center text-slate-400">
+                                    <div className="bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-200 dark:border-gray-800 p-6 rounded-xl text-center text-gray-400 dark:text-gray-500">
                                         No receipt attached
                                     </div>
                                 )}
@@ -419,10 +419,10 @@ const AdminExpenses = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3">
+                        <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex gap-3">
                             <button 
                                 onClick={() => handleDeleteExpense(selectedExpense.id)}
-                                className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 py-2.5 rounded-xl font-bold transition-colors shadow-sm flex items-center justify-center"
+                                className="w-full bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:bg-error-500/20 text-error-600 dark:text-error-500 border border-error-200 dark:border-error-800 py-2.5 rounded-xl font-bold transition-colors shadow-theme-xs flex items-center justify-center"
                             >
                                 <Trash2 className="w-4 h-4 mr-2" />
                                 Delete Expense
