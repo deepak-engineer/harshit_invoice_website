@@ -7,7 +7,7 @@ require_once 'attendance_helper.php';
 if (preg_match('/^admin\/employees$/', $route)) {
     checkAdminAuth();
     if ($method === 'GET') {
-        $stmt = $pdo->query("SELECT id, emp_id, name, phone, username, daily_salary, site_id, team_id, status, photo, state, created_at FROM employees ORDER BY created_at DESC");
+        $stmt = $pdo->query("SELECT id, emp_id, name, phone, username, daily_salary, site_id, team_id, status, photo, city as state, created_at FROM employees ORDER BY created_at DESC");
         echo json_encode($stmt->fetchAll());
         exit;
     }
@@ -15,7 +15,7 @@ if (preg_match('/^admin\/employees$/', $route)) {
         $data = json_decode(file_get_contents('php://input'), true);
         $hash = password_hash($data['password'], PASSWORD_DEFAULT);
         $photo_filename = processBase64Image($data['photo'] ?? null, '../uploads/employees/');
-        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, daily_salary, site_id, team_id, photo, status, state) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         try {
             $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $hash, $data['daily_salary'], $data['site_id'] ?: null, $data['team_id'] ?: null, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
             echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
@@ -31,7 +31,7 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];
     if ($method === 'GET') {
-        $stmt = $pdo->prepare("SELECT id, emp_id, name, phone, username, daily_salary, site_id, team_id, photo, status, state, created_at FROM employees WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, emp_id, name, phone, username, daily_salary, site_id, team_id, photo, status, city as state, created_at FROM employees WHERE id = ?");
         $stmt->execute([$id]);
         echo json_encode($stmt->fetch());
         exit;
@@ -41,10 +41,10 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
         $photo_filename = null;
         if (!empty($data['photo']) && strpos($data['photo'], 'data:image') === 0) {
             $photo_filename = processBase64Image($data['photo'], '../uploads/employees/');
-            $stmt = $pdo->prepare("UPDATE employees SET name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, photo=?, status=?, state=? WHERE id=?");
+            $stmt = $pdo->prepare("UPDATE employees SET name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, photo=?, status=?, city=? WHERE id=?");
             $stmt->execute([$data['name'], $data['phone'] ?? null, $data['username'], $data['daily_salary'], $data['site_id'] ?: null, $data['team_id'] ?: null, $photo_filename, $data['status'], $data['state'] ?? null, $id]);
         } else {
-            $stmt = $pdo->prepare("UPDATE employees SET name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, status=?, state=? WHERE id=?");
+            $stmt = $pdo->prepare("UPDATE employees SET name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, status=?, city=? WHERE id=?");
             $stmt->execute([$data['name'], $data['phone'] ?? null, $data['username'], $data['daily_salary'], $data['site_id'] ?: null, $data['team_id'] ?: null, $data['status'], $data['state'] ?? null, $id]);
         }
         echo json_encode(["success" => true]);
@@ -75,7 +75,7 @@ if (preg_match('/^admin\/employees\/(\d+)\/salary-report$/', $route, $matches)) 
         $end_date = date('Y-m-t', strtotime($start_date));
         
         $stmt = $pdo->prepare("
-            SELECT a.attendance_date, a.status, e.daily_salary, e.name, COALESCE(e.state, t.state, s.state) as site_state
+            SELECT a.attendance_date, a.status, e.daily_salary, e.name, COALESCE(e.city, s.city) as site_state
             FROM attendance a
             JOIN employees e ON a.employee_id = e.id
             LEFT JOIN teams t ON e.team_id = t.id
@@ -354,7 +354,7 @@ if (preg_match('/^admin\/attendance-report$/', $route)) {
         $end_date = date('Y-m-t', strtotime($start_date));
         
         $stmt = $pdo->prepare("
-            SELECT a.attendance_date, a.status, e.id as emp_id, e.name as emp_name, e.daily_salary, COALESCE(e.state, t.state, s.state) as site_state
+            SELECT a.attendance_date, a.status, e.id as emp_id, e.name as emp_name, e.daily_salary, COALESCE(e.city, s.city) as site_state
             FROM attendance a 
             JOIN employees e ON a.employee_id = e.id 
             LEFT JOIN teams t ON e.team_id = t.id
