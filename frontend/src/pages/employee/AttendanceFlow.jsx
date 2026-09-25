@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Camera, MapPin, CheckCircle, XCircle } from 'lucide-react'
-import { getFaceDescriptor, compareDescriptors } from '../../utils/faceApi'
+import React, { useState, useEffect } from 'react'
+import { MapPin, CheckCircle, Navigation } from 'lucide-react'
 import api from '../../utils/api'
 import toast from 'react-hot-toast'
 
 const AttendanceFlow = () => {
-  const videoRef = useRef(null)
-  const canvasRef = useRef(null)
-
   const [employee, setEmployee] = useState(null)
   const [attendance, setAttendance] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  const [stream, setStream] = useState(null)
-  const [status, setStatus] = useState('Initializing...')
+  const [status, setStatus] = useState('Ready to mark attendance')
   const [processing, setProcessing] = useState(false)
 
   const fetchMe = async () => {
@@ -35,44 +30,6 @@ const AttendanceFlow = () => {
     fetchMe()
   }, [])
 
-  const startCamera = async () => {
-    try {
-      const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user' },
-      })
-      setStream(mediaStream)
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream
-      }
-      setStatus('Camera ready. Please align your face.')
-    } catch (err) {
-      console.error(err)
-      setStatus('Camera access denied. Cannot mark attendance.')
-    }
-  }
-
-  useEffect(() => {
-    if (
-      !loading &&
-      employee &&
-      (!attendance || attendance.status === 'WORKING')
-    ) {
-      startCamera()
-    }
-    return () => {
-      if (stream) stream.getTracks().forEach((t) => t.stop())
-    }
-    // eslint-disable-next-line
-  }, [loading, attendance])
-
-  const captureImage = () => {
-    const canvas = document.createElement('canvas')
-    canvas.width = videoRef.current.videoWidth
-    canvas.height = videoRef.current.videoHeight
-    canvas.getContext('2d').drawImage(videoRef.current, 0, 0)
-    return canvas.toDataURL('image/jpeg')
-  }
-
   const getGPSLocation = () => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -88,30 +45,9 @@ const AttendanceFlow = () => {
   }
 
   const handleAction = async (type) => {
-    if (!videoRef.current || !employee.face_descriptor) {
-      toast.error('Please register your face first')
-      return
-    }
-
     setProcessing(true)
     try {
-      setStatus('Detecting face...')
-      const descriptor = await getFaceDescriptor(videoRef.current)
-      if (!descriptor) {
-        throw new Error('No face detected. Please try again.')
-      }
-
-      const registeredDescriptor = JSON.parse(employee.face_descriptor)
-      const { match, distance } = compareDescriptors(
-        descriptor,
-        registeredDescriptor,
-      )
-
-      if (!match) {
-        throw new Error('Face verification failed! You are not recognized.')
-      }
-
-      setStatus('Face verified! Getting location...')
+      setStatus('Getting location...')
 
       const position = await getGPSLocation()
 
@@ -120,8 +56,6 @@ const AttendanceFlow = () => {
         lat: position.coords.latitude,
         lng: position.coords.longitude,
         acc: position.coords.accuracy,
-        photo: captureImage(),
-        face_score: distance,
       }
 
       setStatus(`Marking ${type}...`)
@@ -137,6 +71,7 @@ const AttendanceFlow = () => {
       }
 
       fetchMe() // Refresh
+      setStatus('Success')
     } catch (error) {
       console.error(error)
       let msg = error.response?.data?.error || error.message || 'Operation failed'
@@ -210,31 +145,11 @@ const AttendanceFlow = () => {
             </p>
           </div>
         ) : (
-          <div className="p-4 flex flex-col items-center bg-slate-900 relative">
-            {!employee.face_registered ? (
-              <div className="h-64 w-full flex flex-col items-center justify-center text-red-300 px-4 text-center">
-                <XCircle className="w-12 h-12 mb-2" />
-                <p>Face not registered. Contact admin.</p>
-              </div>
-            ) : (
-              <>
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-72 object-cover rounded-xl bg-black"
-                />
-                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
-                  <div className="w-56 h-64 border-2 border-dashed border-white/50 rounded-[40px]"></div>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
-        {!isCompleted && (
-          <div className="p-6 text-center space-y-4">
+          <div className="p-10 text-center space-y-6">
+            <div className="w-32 h-32 mx-auto bg-slate-50 rounded-full flex items-center justify-center border-4 border-slate-100">
+                <Navigation className={`w-12 h-12 text-primary ${processing ? 'animate-pulse' : ''}`} />
+            </div>
+            
             <p
               className={`text-sm font-medium ${processing ? 'text-blue-600 animate-pulse' : 'text-slate-600'}`}
             >
@@ -245,7 +160,7 @@ const AttendanceFlow = () => {
               onClick={() =>
                 handleAction(isCheckedIn ? 'CHECK OUT' : 'CHECK IN')
               }
-              disabled={processing || !stream || !employee.face_registered}
+              disabled={processing}
               className={`flex items-center justify-center space-x-2 w-full py-4 rounded-xl font-bold text-lg shadow-lg transition-all disabled:opacity-50
                                 ${isCheckedIn ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-amber-500/30' : 'bg-primary hover:bg-primary/90 text-white shadow-primary/30'}
                             `}
@@ -253,7 +168,7 @@ const AttendanceFlow = () => {
               {processing ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                <Camera className="w-6 h-6" />
+                <MapPin className="w-6 h-6" />
               )}
               <span>
                 {processing

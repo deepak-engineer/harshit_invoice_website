@@ -89,7 +89,6 @@ const AdminAttendanceList = () => {
                                 <th className="px-6 py-4">Check-in</th>
                                 <th className="px-6 py-4">Check-out</th>
                                 <th className="px-6 py-4">Distance (m)</th>
-                                <th className="px-6 py-4">Selfie</th>
                                 <th className="px-6 py-4">Work Status</th>
                                 <th className="px-6 py-4">Status</th>
                             </tr>
@@ -150,13 +149,6 @@ const AdminAttendanceList = () => {
                                                     </a>
                                                 )}
                                             </div>
-                                        ) : '-'}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        {record.check_in_photo ? (
-                                            <a href={`${api.defaults.baseURL.replace('/api', '')}/uploads/attendance/${record.check_in_photo}`} target="_blank" rel="noreferrer" className="text-blue-500 hover:underline flex items-center">
-                                                <Camera className="w-4 h-4 mr-1" /> View
-                                            </a>
                                         ) : '-'}
                                     </td>
                                     <td className="px-6 py-4 font-bold text-slate-700">
