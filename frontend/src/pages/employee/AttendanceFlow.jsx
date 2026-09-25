@@ -42,10 +42,7 @@ const AttendanceFlow = () => {
     if (!webcamRef.current) return
     const imageSrc = webcamRef.current.getScreenshot()
     setPhotoPreview(imageSrc)
-    
-    // Remove the data:image/jpeg;base64, prefix for the backend
-    const base64Data = imageSrc.split(',')[1]
-    setPhotoBase64(base64Data)
+    setPhotoBase64(imageSrc)
   }, [webcamRef])
 
   const triggerCheckIn = () => {

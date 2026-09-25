@@ -169,9 +169,9 @@ const EmployeeExpenses = () => {
             {/* Add Expense Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl max-h-[90vh] flex flex-col">
-                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h2 className="text-xl font-bold text-slate-800">New Expense</h2>
+                    <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md overflow-hidden shadow-xl max-h-[90vh] flex flex-col">
+                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 dark:bg-gray-800/50">
+                            <h2 className="text-xl font-bold text-slate-800 dark:text-white/90">New Expense</h2>
                             <button 
                                 onClick={() => {
                                     setShowModal(false);
@@ -186,7 +186,7 @@ const EmployeeExpenses = () => {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Amount (₹)</label>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Amount (₹)</label>
                                         <input 
                                             type="number" 
                                             required 
@@ -194,15 +194,15 @@ const EmployeeExpenses = () => {
                                             step="0.01"
                                             value={formData.amount}
                                             onChange={e => setFormData({...formData, amount: e.target.value})}
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none font-bold text-slate-800"
+                                            className="w-full px-3 py-2 border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-primary outline-none font-bold text-slate-800 dark:text-white"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Category</label>
                                         <select 
                                             value={formData.category}
                                             onChange={e => setFormData({...formData, category: e.target.value})}
-                                            className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none"
+                                            className="w-full px-3 py-2 border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-primary outline-none text-slate-800 dark:text-white"
                                         >
                                             <option value="Travel">Travel</option>
                                             <option value="Food">Food & Meals</option>
@@ -214,18 +214,18 @@ const EmployeeExpenses = () => {
                                 </div>
                                 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Description</label>
                                     <textarea 
                                         rows="2"
                                         value={formData.description}
                                         onChange={e => setFormData({...formData, description: e.target.value})}
-                                        className="w-full px-3 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none"
+                                        className="w-full px-3 py-2 border border-slate-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl focus:ring-2 focus:ring-primary outline-none resize-none text-slate-800 dark:text-white"
                                         placeholder="Where or why was this spent?"
                                     ></textarea>
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Receipt / Bill Photo</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Receipt / Bill Photo</label>
                                     
                                     {!formData.receipt_photo && !useCamera && (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
