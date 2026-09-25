@@ -131,7 +131,17 @@ const SiteManagement = () => {
 
         lines.forEach(line => {
             const cols = line.split('\t');
-            if (cols.length >= 2) {
+            if (cols.length >= 7) {
+                // HDFC Format: Bank Name | ATM ID | Status | Location | State | city | Address | Zone
+                sitesToAdd.push({
+                    name: cols[0]?.trim() || '',
+                    code: cols[1]?.trim() || '',
+                    state: cols[4]?.trim() || '',
+                    city: cols[5]?.trim() || '',
+                    address: cols[6]?.trim() || ''
+                });
+            } else if (cols.length >= 2) {
+                // Standard Format: Name | Branch Code | State | Address
                 sitesToAdd.push({
                     name: cols[0]?.trim() || '',
                     code: cols[1]?.trim() || '',
@@ -429,7 +439,7 @@ const SiteManagement = () => {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl w-full max-w-2xl p-6 shadow-xl flex flex-col max-h-[90vh]">
                         <h2 className="text-xl font-bold text-slate-800 mb-2">Bulk Add Sites (Excel Paste)</h2>
-                        <p className="text-sm text-slate-500 mb-4">Paste data directly from Excel. Ensure columns are ordered: <strong>Name | Branch Code | State | Address</strong></p>
+                        <p className="text-sm text-slate-500 mb-4">Paste data directly from Excel. The system supports two formats: <br/>1. Standard: <strong>Name | Branch Code | State | Address</strong><br/>2. HDFC Format: <strong>Bank Name | ATM ID | Status | Location | State | City | Address | Zone</strong></p>
                         
                         <form onSubmit={handleBulkSubmit} className="space-y-4 flex flex-col flex-1 min-h-0">
                             <textarea 
