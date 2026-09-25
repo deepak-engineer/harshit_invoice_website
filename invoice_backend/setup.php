@@ -9,23 +9,14 @@ $charset = 'utf8mb4';
 
 echo "<h1>Database Setup</h1>";
 
-// 1. Connect to MySQL without specifying database first
+// 1. Connect to MySQL Database directly
 try {
-    $pdo = new PDO("mysql:host=$host;charset=$charset", $user, $pass, [
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=$charset", $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
     ]);
-    echo "Connected to MySQL successfully.<br>";
+    echo "Connected to database `$db` successfully.<br>";
 } catch (PDOException $e) {
     die("Connection failed: " . $e->getMessage());
-}
-
-// 2. Create Database
-try {
-    $pdo->exec("CREATE DATABASE IF NOT EXISTS `$db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-    echo "Database `$db` created or already exists.<br>";
-    $pdo->exec("USE `$db`");
-} catch (PDOException $e) {
-    die("Database creation failed: " . $e->getMessage());
 }
 
 // 3. Define Tables
