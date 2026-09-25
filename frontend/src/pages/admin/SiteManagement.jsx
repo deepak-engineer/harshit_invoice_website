@@ -302,7 +302,7 @@ const SiteManagement = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl">
+                    <div className="bg-white rounded-2xl w-full max-w-lg p-6 shadow-xl max-h-[95vh] overflow-y-auto custom-scrollbar">
                         <h2 className="text-xl font-bold text-slate-800 mb-4">{editId ? 'Edit Site' : 'New Site'}</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
