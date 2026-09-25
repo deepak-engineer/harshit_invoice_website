@@ -465,26 +465,26 @@ const EmployeeManagement = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center space-x-2">
+                                        <div className="flex items-center space-x-1.5">
                                             {emp.status === 'PENDING' && (
-                                                <button onClick={() => handleApprove(emp)} className="p-1.5 bg-success-50 dark:bg-success-500/10 hover:bg-success-100 dark:hover:bg-success-500/20 text-success-600 dark:text-success-500 rounded-lg transition-colors border border-green-100 dark:border-green-800/30" title="Approve Employee">
-                                                    <CheckCircle className="w-4 h-4" strokeWidth={1.75} />
+                                                <button onClick={() => handleApprove(emp)} className="p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all" title="Approve Employee">
+                                                    <CheckCircle className="w-4 h-4" strokeWidth={2} />
                                                 </button>
                                             )}
-                                            <button onClick={() => openEdit(emp)} className="p-1.5 bg-blue-light-50 dark:bg-blue-light-500/10 hover:bg-blue-100 dark:hover:bg-blue-light-500/20 text-blue-light-600 dark:text-blue-light-500 rounded-lg transition-colors border border-blue-100 dark:border-blue-800/30" title="Edit Profile">
-                                                <Edit2 className="w-4 h-4" strokeWidth={1.75} />
+                                            <button onClick={() => openEdit(emp)} className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all" title="Edit Profile">
+                                                <Edit2 className="w-4 h-4" strokeWidth={2} />
                                             </button>
-                                            <button onClick={() => openSalaryReport(emp)} className="p-1.5 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-500 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-800/30" title="Employee Salary Report">
-                                                <Wallet className="w-4 h-4" strokeWidth={1.75} />
+                                            <button onClick={() => openSalaryReport(emp)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all" title="Employee Salary Report">
+                                                <Wallet className="w-4 h-4" strokeWidth={2} />
                                             </button>
-                                            <button onClick={() => openPassword(emp)} className="p-1.5 bg-warning-50 dark:bg-warning-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-600 dark:text-amber-500 rounded-lg transition-colors border border-amber-100 dark:border-amber-800/30" title="Reset Password">
-                                                <Key className="w-4 h-4" strokeWidth={1.75} />
+                                            <button onClick={() => openPassword(emp)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all" title="Reset Password">
+                                                <Key className="w-4 h-4" strokeWidth={2} />
                                             </button>
-                                            <button onClick={() => openFace(emp)} className="p-1.5 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-500 rounded-lg transition-colors border border-purple-100 dark:border-purple-800/30" title="Register Face">
-                                                <Camera className="w-4 h-4" strokeWidth={1.75} />
+                                            <button onClick={() => openFace(emp)} className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all" title="Register Face">
+                                                <Camera className="w-4 h-4" strokeWidth={2} />
                                             </button>
-                                            <button onClick={() => handleDelete(emp.id)} className="p-1.5 bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:hover:bg-error-500/20 text-error-600 dark:text-error-500 rounded-lg transition-colors border border-red-100 dark:border-red-800/30" title="Delete/Reject Employee">
-                                                <Trash2 className="w-4 h-4" strokeWidth={1.75} />
+                                            <button onClick={() => handleDelete(emp.id)} className="p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all" title="Delete/Reject Employee">
+                                                <Trash2 className="w-4 h-4" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
@@ -556,27 +556,27 @@ const EmployeeManagement = () => {
                                 </div>
                             </div>
                             <div className="flex justify-between items-center pt-2">
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap gap-1">
                                     {emp.status === 'PENDING' && (
-                                        <button onClick={() => handleApprove(emp)} className="p-2 bg-success-50 dark:bg-success-500/10 hover:bg-success-100 dark:hover:bg-success-500/20 text-success-600 dark:text-success-500 rounded-lg transition-colors border border-green-100 dark:border-green-800/30">
-                                            <CheckCircle className="w-4 h-4" strokeWidth={1.75} />
+                                        <button onClick={() => handleApprove(emp)} className="p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all" title="Approve Employee">
+                                            <CheckCircle className="w-4 h-4" strokeWidth={2} />
                                         </button>
                                     )}
-                                    <button onClick={() => openEdit(emp)} className="p-2 bg-blue-light-50 dark:bg-blue-light-500/10 hover:bg-blue-100 dark:hover:bg-blue-light-500/20 text-blue-light-600 dark:text-blue-light-500 rounded-lg transition-colors border border-blue-100 dark:border-blue-800/30">
-                                        <Edit2 className="w-4 h-4" strokeWidth={1.75} />
+                                    <button onClick={() => openEdit(emp)} className="p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all" title="Edit Profile">
+                                        <Edit2 className="w-4 h-4" strokeWidth={2} />
                                     </button>
-                                    <button onClick={() => openSalaryReport(emp)} className="p-2 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-500 rounded-lg transition-colors border border-emerald-100 dark:border-emerald-800/30">
-                                        <Wallet className="w-4 h-4" strokeWidth={1.75} />
+                                    <button onClick={() => openSalaryReport(emp)} className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all" title="Employee Salary Report">
+                                        <Wallet className="w-4 h-4" strokeWidth={2} />
                                     </button>
-                                    <button onClick={() => openPassword(emp)} className="p-2 bg-warning-50 dark:bg-warning-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-600 dark:text-amber-500 rounded-lg transition-colors border border-amber-100 dark:border-amber-800/30">
-                                        <Key className="w-4 h-4" strokeWidth={1.75} />
+                                    <button onClick={() => openPassword(emp)} className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all" title="Reset Password">
+                                        <Key className="w-4 h-4" strokeWidth={2} />
                                     </button>
-                                    <button onClick={() => openFace(emp)} className="p-2 bg-purple-50 dark:bg-purple-500/10 hover:bg-purple-100 dark:hover:bg-purple-500/20 text-purple-600 dark:text-purple-500 rounded-lg transition-colors border border-purple-100 dark:border-purple-800/30">
-                                        <Camera className="w-4 h-4" strokeWidth={1.75} />
+                                    <button onClick={() => openFace(emp)} className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all" title="Register Face">
+                                        <Camera className="w-4 h-4" strokeWidth={2} />
                                     </button>
                                 </div>
-                                <button onClick={() => handleDelete(emp.id)} className="p-2 bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:hover:bg-error-500/20 text-error-600 dark:text-error-500 rounded-lg transition-colors border border-red-100 dark:border-red-800/30">
-                                    <Trash2 className="w-4 h-4" strokeWidth={1.75} />
+                                <button onClick={() => handleDelete(emp.id)} className="p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all" title="Delete/Reject Employee">
+                                    <Trash2 className="w-4 h-4" strokeWidth={2} />
                                 </button>
                             </div>
                         </div>

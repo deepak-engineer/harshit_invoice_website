@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck } from 'lucide-react';
+import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck, Sun, Moon } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-light copy.svg';
 
 
 const Layout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark' || 
+      (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  });
   const navigate = useNavigate();
   const location = useLocation();
   const isAdmin = location.pathname.startsWith('/admin');
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
 
   const handleLogout = async () => {
     try {
@@ -80,6 +96,13 @@ const Layout = () => {
         </nav>
         <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex flex-col space-y-2">
           <button
+            onClick={toggleDarkMode}
+            className="flex items-center space-x-3 px-3 py-2.5 w-full rounded-lg text-theme-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 transition-colors"
+          >
+            {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+          </button>
+          <button
             onClick={handleLogout}
             className="flex items-center space-x-3 px-3 py-2.5 w-full rounded-lg text-theme-sm font-medium text-error-600 hover:bg-error-50 dark:text-error-500 dark:hover:bg-error-500/10 transition-colors"
           >
@@ -93,9 +116,14 @@ const Layout = () => {
       <div className="md:hidden fixed top-0 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50">
         <div className="flex items-center justify-between p-4 h-16">
           <img src={logo} alt="Logo" className="h-8 max-w-[200px] object-contain" />
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <div className="flex items-center space-x-2">
+            <button onClick={toggleDarkMode} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
         {isMobileMenuOpen && (
           <div className="absolute w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-xl max-h-[calc(100vh-4rem)] overflow-y-auto">
