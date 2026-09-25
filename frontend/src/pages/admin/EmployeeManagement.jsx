@@ -555,7 +555,7 @@ const EmployeeManagement = () => {
                                     </span>
                                 </div>
                             </div>
-                            
+                            <div className="flex justify-between items-center pt-2">
                                 <div className="flex flex-wrap gap-2">
                                     {emp.status === 'PENDING' && (
                                         <button onClick={() => handleApprove(emp)} className="p-2 bg-success-50 dark:bg-success-500/10 hover:bg-success-100 dark:hover:bg-success-500/20 text-success-600 dark:text-success-500 rounded-lg transition-colors border border-green-100 dark:border-green-800/30">
