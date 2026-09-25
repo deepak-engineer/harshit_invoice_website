@@ -25,7 +25,7 @@ const AdminAttendanceList = () => {
     const filteredRecords = records.filter(r => filterState === 'ALL' || (r.state || 'N/A') === filterState);
 
     const exportCSV = () => {
-        const headers = ["Employee", "Emp Code", "Team", "State", "Site", "Check-in", "Check-out", "Distance (m)", "Work Status", "Status"];
+        const headers = ["Employee", "Emp Code", "Team", "State", "Site", "Check-in", "Check-out", "Distance (m)", "Status"];
         const rows = filteredRecords.map(r => [
             `"${r.emp_name}"`, 
             `"${r.emp_code}"`, 
@@ -35,7 +35,6 @@ const AdminAttendanceList = () => {
             `"${r.check_in_time ? new Date(r.check_in_time).toLocaleTimeString() : ''}"`,
             `"${r.check_out_time ? new Date(r.check_out_time).toLocaleTimeString() : ''}"`,
             r.check_in_distance || '',
-            `"${r.work_status || 'NOT_STARTED'}"`,
             `"${r.status}"`
         ]);
         
@@ -103,7 +102,6 @@ const AdminAttendanceList = () => {
                                 <th className="px-6 py-4">Check-in</th>
                                 <th className="px-6 py-4">Check-out</th>
                                 <th className="px-6 py-4">Distance (m)</th>
-                                <th className="px-6 py-4">Work Status</th>
                                 <th className="px-6 py-4">Status</th>
                             </tr>
                         </thead>
@@ -164,9 +162,6 @@ const AdminAttendanceList = () => {
                                                 )}
                                             </div>
                                         ) : '-'}
-                                    </td>
-                                    <td className="px-6 py-4 font-bold text-slate-700">
-                                        {record.work_status || 'NOT_STARTED'}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2.5 py-1 text-xs font-bold rounded-md border ${
