@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Camera, Key, UserX, CheckCircle, Trash2, X, Wallet, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
-import FaceRegistrationModal from './FaceRegistrationModal';
+import PhotoUploadModal from './PhotoUploadModal';
 import { holidays2026 } from '../../utils/holidays2026';
 
 const EmployeeManagement = () => {
@@ -486,7 +486,7 @@ const EmployeeManagement = () => {
                                             </button>
                                             <button onClick={() => openFace(emp)} className="group relative p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
                                                 <Camera className="w-4 h-4" strokeWidth={2} />
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Register Face</span>
+                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Upload Photo</span>
                                             </button>
                                             <button onClick={() => handleDelete(emp.id)} className="group relative p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
                                                 <Trash2 className="w-4 h-4" strokeWidth={2} />
@@ -578,7 +578,7 @@ const EmployeeManagement = () => {
                                         <Key className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Password
                                     </button>
                                     <button onClick={() => openFace(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 dark:text-purple-400 rounded-lg transition-colors whitespace-nowrap">
-                                        <Camera className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Face
+                                        <Camera className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Photo
                                     </button>
                                 </div>
                                 <button onClick={() => handleDelete(emp.id)} className="p-2 text-error-600 bg-error-50 hover:bg-error-100 dark:bg-error-500/10 dark:hover:bg-error-500/20 dark:text-error-400 rounded-lg shrink-0 ml-2 transition-colors">
@@ -797,9 +797,9 @@ const EmployeeManagement = () => {
                 </div>
             )}
 
-            {/* Face Registration Modal */}
+            {/* Photo Upload Modal */}
             {isFaceOpen && selectedEmp && (
-                <FaceRegistrationModal 
+                <PhotoUploadModal 
                     employee={selectedEmp} 
                     onClose={() => setIsFaceOpen(false)} 
                     onComplete={() => { setIsFaceOpen(false); fetchData(); }} 

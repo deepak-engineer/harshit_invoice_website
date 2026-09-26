@@ -94,7 +94,6 @@ if ($route === 'employee-signup' && $method === 'POST') {
     $phone = trim($data['phone'] ?? '');
     $password = $data['password'] ?? '';
     $photo = $data['photo'] ?? null;
-    $faceDescriptor = $data['face_descriptor'] ?? null;
     
     if (empty($name) || empty($phone) || empty($password) || empty($photo)) {
         http_response_code(400);
@@ -120,10 +119,9 @@ if ($route === 'employee-signup' && $method === 'POST') {
     
     try {
         $photo_filename = processBase64Image($photo, '../uploads/employees/');
-        $faceJson = $faceDescriptor ? json_encode($faceDescriptor) : null;
         
-        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, photo, face_descriptor, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING')");
-        $stmt->execute([$generatedId, $name, $phone, $generatedId, $hash, $photo_filename, $faceJson]);
+        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, photo, status) VALUES (?, ?, ?, ?, ?, ?, 'PENDING')");
+        $stmt->execute([$generatedId, $name, $phone, $generatedId, $hash, $photo_filename]);
         echo json_encode([
             "success" => true, 
             "username" => $generatedId,

@@ -16,6 +16,11 @@ const EmployeeDashboard = () => {
     const [availableSites, setAvailableSites] = useState([]);
     const [isAssigning, setIsAssigning] = useState(false);
     
+    // Create Site State
+    const [isCreatingSite, setIsCreatingSite] = useState(false);
+    const [newSiteData, setNewSiteData] = useState({ name: '', code: '', address: '', state: '', city: '' });
+    const [isSubmittingSite, setIsSubmittingSite] = useState(false);
+    
     // Salary Modal State
     const [salaryReportModal, setSalaryReportModal] = useState({ isOpen: false, month: new Date().getMonth() + 1, year: new Date().getFullYear(), data: null, loading: false });
 
@@ -76,6 +81,27 @@ const EmployeeDashboard = () => {
             alert('Failed to assign site.');
         } finally {
             setIsAssigning(false);
+        }
+    };
+
+    const handleCreateSite = async (e) => {
+        e.preventDefault();
+        setIsSubmittingSite(true);
+        try {
+            const res = await api.post('/me/sites', newSiteData);
+            if (res.data.success) {
+                // Assign newly created site to employee
+                await api.post('/me/assign-site', { site_id: res.data.id });
+                await fetchStats();
+                setIsCreatingSite(false);
+                setNewSiteData({ name: '', code: '', address: '', state: '', city: '' });
+                alert('Site created and assigned successfully!');
+            }
+        } catch (error) {
+            console.error('Error creating site:', error);
+            alert(error.response?.data?.error || 'Failed to create site.');
+        } finally {
+            setIsSubmittingSite(false);
         }
     };
 
@@ -263,36 +289,89 @@ const EmployeeDashboard = () => {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <p className="text-sm text-slate-500">No site assigned yet. Search and assign yourself a site below:</p>
-                        <div>
-                            <input 
-                                type="text" 
-                                placeholder="Search site by Name or Branch Code..." 
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                            />
+                        <div className="flex justify-between items-center">
+                            <p className="text-sm text-slate-500">No site assigned yet. Search or create a site:</p>
+                            <button 
+                                onClick={() => setIsCreatingSite(!isCreatingSite)}
+                                className="px-3 py-1.5 bg-blue-50 text-primary text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                                {isCreatingSite ? 'Cancel' : '+ Create New Site'}
+                            </button>
                         </div>
-                        {availableSites.length > 0 ? (
-                            <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
-                                {availableSites.map(site => (
-                                    <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                        
+                        {isCreatingSite ? (
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                                <h3 className="font-bold text-slate-700 mb-3">Create New Site</h3>
+                                <form onSubmit={handleCreateSite} className="space-y-3">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         <div>
-                                            <p className="font-bold text-slate-700 text-sm">{site.name}</p>
-                                            <p className="text-xs text-slate-500">{site.code} - {site.city || site.address}</p>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Site Name*</label>
+                                            <input type="text" required value={newSiteData.name} onChange={e => setNewSiteData({...newSiteData, name: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. Alpha Tower" />
                                         </div>
-                                        <button 
-                                            onClick={() => handleAssignSite(site.id)}
-                                            disabled={isAssigning}
-                                            className="px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                        >
-                                            Assign
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Branch Code*</label>
+                                            <input type="text" required value={newSiteData.code} onChange={e => setNewSiteData({...newSiteData, code: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. ALPHA1" />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">State (For Holidays)*</label>
+                                            <select required value={newSiteData.state} onChange={e => setNewSiteData({...newSiteData, state: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
+                                                <option value="">Select State</option>
+                                                {Object.keys(holidays2026).map(st => (
+                                                    <option key={st} value={st}>{st}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">City</label>
+                                            <input type="text" value={newSiteData.city} onChange={e => setNewSiteData({...newSiteData, city: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. Mumbai" />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 mb-1">Address</label>
+                                            <input type="text" value={newSiteData.address} onChange={e => setNewSiteData({...newSiteData, address: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="Full address" />
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end pt-2">
+                                        <button type="submit" disabled={isSubmittingSite} className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50">
+                                            {isSubmittingSite ? 'Creating...' : 'Create & Assign Site'}
                                         </button>
                                     </div>
-                                ))}
+                                </form>
                             </div>
                         ) : (
-                            <p className="text-xs text-slate-400 p-2 text-center">No sites found matching "{searchTerm}"</p>
+                            <>
+                                <div>
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search site by Name or Branch Code..." 
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    />
+                                </div>
+                                {availableSites.length > 0 ? (
+                                    <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
+                                        {availableSites.map(site => (
+                                            <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                                <div>
+                                                    <p className="font-bold text-slate-700 text-sm">{site.name}</p>
+                                                    <p className="text-xs text-slate-500">{site.code} - {site.city || site.address}</p>
+                                                </div>
+                                                <button 
+                                                    onClick={() => handleAssignSite(site.id)}
+                                                    disabled={isAssigning}
+                                                    className="px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                                >
+                                                    Assign
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-slate-400 p-2 text-center">No sites found matching "{searchTerm}"</p>
+                                )}
+                            </>
                         )}
                     </div>
                 )}

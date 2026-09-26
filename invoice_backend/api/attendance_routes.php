@@ -172,23 +172,6 @@ if (preg_match('/^admin\/employees\/(\d+)\/reset-password$/', $route, $matches))
     }
 }
 
-if (preg_match('/^admin\/employees\/(\d+)\/face$/', $route, $matches)) {
-    checkAdminAuth();
-    $id = $matches[1];
-    if ($method === 'POST') {
-        $data = json_decode(file_get_contents('php://input'), true);
-        $descriptor = json_encode($data['descriptor']);
-        $stmt = $pdo->prepare("UPDATE employees SET face_descriptor=? WHERE id=?");
-        $stmt->execute([$descriptor, $id]);
-        
-        $log = $pdo->prepare("INSERT INTO audit_logs (admin_id, action, target_type, target_id) VALUES (?, ?, ?, ?)");
-        $log->execute([$_SESSION['user_id'], 'FACE_REGISTER', 'EMPLOYEE', $id]);
-        
-        echo json_encode(["success" => true]);
-        exit;
-    }
-}
-
 // Team Management
 if (preg_match('/^admin\/teams$/', $route)) {
     checkAdminAuth();
@@ -501,11 +484,10 @@ if (preg_match('/^admin\/attendance\/update-status$/', $route)) {
 if (preg_match('/^me$/', $route)) {
     checkEmployeeAuth();
     if ($method === 'GET') {
-        $stmt = $pdo->prepare("SELECT id, emp_id, name, username, daily_salary, site_id, team_id, face_descriptor FROM employees WHERE id = ?");
+        $stmt = $pdo->prepare("SELECT id, emp_id, name, username, daily_salary, site_id, team_id FROM employees WHERE id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         $emp = $stmt->fetch();
         if ($emp) {
-            $emp['face_registered'] = !empty($emp['face_descriptor']);
             
             $team_stmt = $pdo->prepare("SELECT * FROM teams WHERE id = ?");
             $team_stmt->execute([$emp['team_id']]);
@@ -634,6 +616,21 @@ if (preg_match('/^me\/sites$/', $route)) {
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit;
+    }
+    if ($method === 'POST') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (empty($data['name']) || empty($data['code'])) {
+            http_response_code(400);
+            echo json_encode(["error" => "Site name and code are required."]);
+            exit;
+        }
+        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, city, location, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([
+            $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
+            $data['city'] ?? null, $data['location'] ?? null, 'ACTIVE'
+        ]);
+        echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         exit;
     }
 }
@@ -765,11 +762,11 @@ if (preg_match('/^attendance\/check-out$/', $route)) {
         
         $photo_filename = processBase64Image($data['photo'] ?? null);
         
-        $stmt = $pdo->prepare("UPDATE attendance SET status=?, check_out_time=?, check_out_lat=?, check_out_lng=?, check_out_acc=?, check_out_photo=?, check_out_face_score=?, check_out_distance=?, working_minutes=?, earned_salary=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE attendance SET status=?, check_out_time=?, check_out_lat=?, check_out_lng=?, check_out_acc=?, check_out_photo=?, check_out_distance=?, working_minutes=?, earned_salary=? WHERE id=?");
         $stmt->execute([
             $status, $time, 
             $data['lat'], $data['lng'], $data['acc'], 
-            $photo_filename, $data['face_score'] ?? null, 
+            $photo_filename, 
             $distance ? round($distance, 2) : null,
             $minutes, $earned, $record['id']
         ]);

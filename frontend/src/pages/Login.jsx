@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, User, Camera, X, RefreshCcw } from 'lucide-react';
 import api from '../utils/api';
 import logo from '../assets/crons-logo-light copy.svg';
-import { getFaceDescriptor, hasFace } from '../utils/faceApi';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -12,7 +11,7 @@ const Login = () => {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [photo, setPhoto] = useState(null);
-  const [faceDescriptor, setFaceDescriptor] = useState(null);
+
   const [role, setRole] = useState('employee');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -28,8 +27,7 @@ const Login = () => {
   const [stream, setStream] = useState(null);
   const [cameraStatus, setCameraStatus] = useState('');
   const [isProcessingFace, setIsProcessingFace] = useState(false);
-  const [isFaceDetected, setIsFaceDetected] = useState(false);
-  const faceCheckInterval = useRef(null);
+
 
   const navigate = useNavigate();
 
@@ -66,7 +64,6 @@ const Login = () => {
           const reader = new FileReader();
           reader.onloadend = () => {
               setPhoto(reader.result);
-              setFaceDescriptor(null); // Not captured via live camera
               setShowPhotoModal(false);
           };
           reader.readAsDataURL(file);
@@ -83,20 +80,8 @@ const Login = () => {
           setStream(mediaStream);
           if (videoRef.current) {
               videoRef.current.srcObject = mediaStream;
-              
-              // Start checking for face continuously
-              if (!faceCheckInterval.current) {
-                  faceCheckInterval.current = setInterval(async () => {
-                      if (videoRef.current && videoRef.current.readyState === 4 && !isProcessingFace) {
-                          try {
-                              const detected = await hasFace(videoRef.current);
-                              setIsFaceDetected(detected);
-                          } catch(e) {}
-                      }
-                  }, 500);
-              }
           }
-          setCameraStatus('Position your face clearly in the frame');
+          setCameraStatus('Position yourself clearly in the frame');
       } catch (err) {
           console.error(err);
           setCameraStatus('Failed to access camera.');
@@ -118,7 +103,7 @@ const Login = () => {
           if (videoRef.current) {
               videoRef.current.srcObject = mediaStream;
           }
-          setCameraStatus('Position your face clearly in the frame');
+          setCameraStatus('Position yourself clearly in the frame');
       } catch (err) {
           console.error(err);
           setCameraStatus('Failed to switch camera.');
@@ -126,11 +111,7 @@ const Login = () => {
   };
 
   const stopCamera = () => {
-      if (faceCheckInterval.current) {
-          clearInterval(faceCheckInterval.current);
-          faceCheckInterval.current = null;
-      }
-      setIsFaceDetected(false);
+
       
       if (stream) {
           stream.getTracks().forEach(track => track.stop());
@@ -142,19 +123,9 @@ const Login = () => {
   const captureFace = async () => {
       if (!videoRef.current) return;
       setIsProcessingFace(true);
-      setCameraStatus('Detecting face...');
+      setCameraStatus('Capturing photo...');
       
       try {
-          const descriptor = await getFaceDescriptor(videoRef.current);
-          if (!descriptor) {
-              setCameraStatus('No face detected. Please try again.');
-              setIsProcessingFace(false);
-              return;
-          }
-          
-          setCameraStatus('Face detected! Saving...');
-          
-          // capture photo from video
           const canvas = document.createElement('canvas');
           canvas.width = videoRef.current.videoWidth;
           canvas.height = videoRef.current.videoHeight;
@@ -163,12 +134,11 @@ const Login = () => {
           ctx.drawImage(videoRef.current, 0, 0);
           
           setPhoto(canvas.toDataURL('image/jpeg'));
-          setFaceDescriptor(Array.from(descriptor));
           
           stopCamera();
       } catch (error) {
           console.error(error);
-          setCameraStatus('Error occurred during detection.');
+          setCameraStatus('Error occurred during capture.');
       } finally {
           setIsProcessingFace(false);
       }
@@ -185,13 +155,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, password, photo, face_descriptor: faceDescriptor });
+        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, password, photo });
         setSuccess(res.data.message);
         setIsSignUp(false);
         setUsername(res.data.username);
         setPassword('');
         setPhoto(null);
-        setFaceDescriptor(null);
         setFirstName('');
         setLastName('');
         setPhone('');
