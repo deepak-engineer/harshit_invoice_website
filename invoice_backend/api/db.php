@@ -3,7 +3,7 @@
 $host = '127.0.0.1';
 $db   = 'u698707169_harshit';
 $user = 'u698707169_harshit';
-$pass = 'c~5XDl;AEwO';
+$pass = '9=8GhB~8XqF';
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

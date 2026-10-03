@@ -1148,10 +1148,10 @@ pre[class*="language-"].line-numbers {
   body * {
     visibility: hidden;
   }
-  #printable-invoice, #printable-invoice * {
+  #printable-invoice, #printable-invoice *, #printable-security-form, #printable-security-form * {
     visibility: visible;
   }
-  #printable-invoice {
+  #printable-invoice, #printable-security-form {
     position: absolute;
     left: 0;
     top: 0;
@@ -1159,5 +1159,12 @@ pre[class*="language-"].line-numbers {
   }
   .no-print {
     display: none !important;
+  }
+  @page {
+    margin: 0;
+    size: A4;
+  }
+  body {
+    padding: 10mm;
   }
 }

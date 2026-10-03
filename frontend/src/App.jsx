@@ -15,6 +15,8 @@ import TeamManagement from './pages/admin/TeamManagement';
 import AttendanceReport from './pages/admin/AttendanceReport';
 import AdminAttendanceList from './pages/admin/AdminAttendanceList';
 import AdminExpenses from './pages/admin/AdminExpenses';
+import SecurityFormsList from './pages/admin/SecurityFormsList';
+import SecurityFormEdit from './pages/admin/SecurityFormEdit';
 
 // Employee Pages
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
@@ -80,6 +82,9 @@ function App() {
             <Route path="teams" element={<TeamManagement />} />
             <Route path="sites" element={<SiteManagement />} />
             <Route path="expenses" element={<AdminExpenses />} />
+            <Route path="security-requirements" element={<SecurityFormsList />} />
+            <Route path="security-requirements/new" element={<SecurityFormEdit />} />
+            <Route path="security-requirements/:id/edit" element={<SecurityFormEdit />} />
             
             {/* Existing Admin Features */}
             <Route path="invoices" element={<Dashboard />} />
@@ -97,6 +102,9 @@ function App() {
             <Route path="work" element={<WorkChecklist />} />
             <Route path="expenses" element={<EmployeeExpenses />} />
             <Route path="sites" element={<SiteManagement />} />
+            <Route path="security-requirements" element={<SecurityFormsList />} />
+            <Route path="security-requirements/new" element={<SecurityFormEdit />} />
+            <Route path="security-requirements/:id/edit" element={<SecurityFormEdit />} />
           </Route>
         </Route>
         

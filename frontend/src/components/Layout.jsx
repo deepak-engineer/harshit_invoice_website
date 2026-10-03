@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck, Sun, Moon } from 'lucide-react';
+import { Menu, X, LayoutDashboard, FileText, Settings, LogOut, Users, MapPin, Camera, Calendar, Receipt, CheckSquare, ClipboardCheck, Sun, Moon, Shield } from 'lucide-react';
 import api from '../utils/api';
 import lightLogo from '../assets/crons-logo-light copy.svg';
 import darkLogo from '../assets/crons-logo-darkcopy.svg';
@@ -46,6 +46,7 @@ const Layout = () => {
     { name: 'Teams', path: '/admin/teams', icon: Users },
     { name: 'Sites', path: '/admin/sites', icon: MapPin },
     { name: 'Expenses', path: '/admin/expenses', icon: Receipt },
+    { name: 'Security Forms', path: '/admin/security-requirements', icon: Shield },
     { name: 'Invoices', path: '/admin/invoices', icon: FileText },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
@@ -56,6 +57,7 @@ const Layout = () => {
     { name: 'Site Work', path: '/employee/work', icon: CheckSquare },
     { name: 'My Expenses', path: '/employee/expenses', icon: Receipt },
     { name: 'Sites', path: '/employee/sites', icon: MapPin },
+    { name: 'Security Forms', path: '/employee/security-requirements', icon: Shield },
   ];
 
   const navItems = isAdmin ? adminNavItems : employeeNavItems;
