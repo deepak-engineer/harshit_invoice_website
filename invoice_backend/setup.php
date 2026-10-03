@@ -1,10 +1,10 @@
 <?php
 // c:\xampp\htdocs\harshit_invoice_website\invoice_backend\api\setup.php
 
-$host = '127.0.0.1';
-$db   = 'harshit_invoice';
-$user = 'root';
-$pass = '';
+$host = 'localhost';
+$db   = 'u698707169_harshit';
+$user = 'u698707169_harshit';
+$pass = '9=8GhB~8XqF';
 $charset = 'utf8mb4';
 
 echo "<h1>Database Setup</h1>";
