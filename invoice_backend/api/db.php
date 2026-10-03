@@ -1,6 +1,6 @@
 <?php
 // c:\Users\Morningstar\Desktop\harshit_invoice_website\backend\api\db.php
-$host = '127.0.0.1';
+$host = 'localhost';
 $db   = 'u698707169_harshit';
 $user = 'u698707169_harshit';
 $pass = '9=8GhB~8XqF';
