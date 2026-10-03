@@ -24,6 +24,22 @@ const SecurityFormEdit = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     
+    // Auto-focus helper for mobile UX
+    const handleQtyInputAndNext = (e, callback) => {
+        const val = e.target.value;
+        callback(val);
+        
+        // Auto jump if a single digit is entered (since most quantities are 1-9)
+        if (val !== '' && val.length === 1) {
+            const inputs = Array.from(document.querySelectorAll('.qty-input'));
+            const index = inputs.indexOf(e.target);
+            if (index > -1 && index < inputs.length - 1) {
+                // small timeout ensures the current render cycle finishes
+                setTimeout(() => inputs[index + 1].focus(), 10);
+            }
+        }
+    };
+    
     const [equipmentMaster, setEquipmentMaster] = useState([]);
     
     const [formData, setFormData] = useState({
@@ -336,9 +352,9 @@ const SecurityFormEdit = () => {
                                     type="number" 
                                     min="0"
                                     value={item.quantity === 0 ? '' : item.quantity}
-                                    onChange={(e) => handleSectionQtyChange(title, item.equipment_name, e.target.value)}
+                                    onChange={(e) => handleQtyInputAndNext(e, (val) => handleSectionQtyChange(title, item.equipment_name, val))}
                                     placeholder="0"
-                                    className="w-14 h-7 text-center rounded border border-gray-300 bg-transparent text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
+                                    className="qty-input w-14 h-7 text-center rounded border border-gray-300 bg-transparent text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
                                 />
                                 <button 
                                     onClick={() => handleRemoveFromFixed(item.equipment_name)}
@@ -458,8 +474,8 @@ const SecurityFormEdit = () => {
                                             type="number" 
                                             min="0"
                                             value={item.quantity === 0 ? '' : item.quantity}
-                                            onChange={(e) => handleDynamicQtyChange(type, item.equipment_id, e.target.value)}
-                                            className="w-14 h-7 text-center rounded border border-gray-300 bg-white text-sm text-gray-800 outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
+                                            onChange={(e) => handleQtyInputAndNext(e, (val) => handleDynamicQtyChange(type, item.equipment_id, val))}
+                                            className="qty-input w-14 h-7 text-center rounded border border-gray-300 bg-white text-sm text-gray-800 outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
                                         />
                                         <button 
                                             onClick={() => handleRemoveDynamic(type, item.equipment_id)}
@@ -599,7 +615,7 @@ const SecurityFormEdit = () => {
             </div>
 
             {/* Summary Card - Forced to Page 2 on Print */}
-            <div className="mt-8 print:break-before-page print:mt-0">
+            <div className="mt-8 print:break-before-page print:mt-0" style={{ pageBreakBefore: 'always', breakBefore: 'page' }}>
                 <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 shadow-sm dark:border-gray-800 dark:bg-gray-800/30 print:border-2 print:border-gray-800 print:bg-white print:p-6 print:rounded-xl">
                     <h4 className="text-base font-bold text-gray-800 dark:text-gray-200 mb-4 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700 pb-2 print:text-2xl print:text-black print:font-extrabold print:border-b-4 print:border-black print:mb-8 print:pb-4">Summary / Totals</h4>
                     <div className="space-y-6 text-sm print:text-sm">
