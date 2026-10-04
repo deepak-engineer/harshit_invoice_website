@@ -342,32 +342,34 @@ const SecurityFormEdit = () => {
                 <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-800 font-semibold text-gray-800 dark:text-white/90 text-sm tracking-wide print:py-1.5 print:px-3 print:text-[13px] print:font-bold print:uppercase print:border-b-[1.5px] print:border-black print:bg-gray-100 print:text-black">
                     {title}
                 </div>
-                <div className="p-3 space-y-2 print:p-2.5 print:space-y-1">
+                <div className="p-3 grid grid-cols-2 gap-2 print:p-2.5 print:flex print:flex-col print:space-y-1 print:gap-0">
                     {items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center text-sm print:text-[13px] print:leading-tight">
-                            <span className="text-gray-600 dark:text-gray-300 truncate pr-2 print:text-[13px] print:font-bold print:text-gray-900" title={item.equipment_name}>{item.equipment_name}</span>
-                            <div className="flex items-center space-x-2 shrink-0 print:space-x-1">
-                                <span className="text-gray-400 text-xs print:hidden">Qty</span>
-                                <input 
-                                    type="number" 
-                                    min="0"
-                                    value={item.quantity === 0 ? '' : item.quantity}
-                                    onChange={(e) => handleQtyInputAndNext(e, (val) => handleSectionQtyChange(title, item.equipment_name, val))}
-                                    placeholder="0"
-                                    className="qty-input w-14 h-7 text-center rounded border border-gray-300 bg-transparent text-sm text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
-                                />
-                                <button 
-                                    onClick={() => handleRemoveFromFixed(item.equipment_name)}
-                                    className="text-gray-400 hover:text-error-500 transition-colors p-1 print:hidden"
-                                >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                        <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:bg-transparent print:border-none print:p-0 print:text-[13px] print:leading-tight">
+                            <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[13px] print:font-bold print:text-gray-900 print:mb-0 print:line-clamp-none" title={item.equipment_name}>{item.equipment_name}</span>
+                            <div className="flex items-center justify-between shrink-0 print:justify-end print:space-x-1">
+                                <span className="text-gray-400 text-[10px] uppercase font-bold print:hidden">Qty</span>
+                                <div className="flex items-center space-x-1">
+                                    <input 
+                                        type="number" 
+                                        min="0"
+                                        value={item.quantity === 0 ? '' : item.quantity}
+                                        onChange={(e) => handleQtyInputAndNext(e, (val) => handleSectionQtyChange(title, item.equipment_name, val))}
+                                        placeholder="0"
+                                        className="qty-input w-full max-w-[3.5rem] h-8 text-center rounded border border-gray-300 bg-white text-sm font-bold text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
+                                    />
+                                    <button 
+                                        onClick={() => handleRemoveFromFixed(item.equipment_name)}
+                                        className="text-gray-400 hover:text-error-500 transition-colors p-1 print:hidden"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
                     
                     {/* Add New Item UI - Hidden in Print */}
-                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-1 print:hidden">
+                    <div className="col-span-2 mt-1 pt-3 border-t border-gray-100 dark:border-gray-800 flex flex-col gap-1 print:hidden">
                         <div className="flex flex-col sm:flex-row gap-2">
                             <select 
                                 value={addState.selectedEq}
@@ -464,25 +466,27 @@ const SecurityFormEdit = () => {
                     </div>
                     
                     {list.length > 0 && (
-                        <div className="space-y-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 print:mt-0 print:pt-0 print:border-none print:space-y-1">
+                        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 print:mt-0 print:pt-0 print:border-none print:flex print:flex-col print:space-y-1 print:gap-0">
                             {list.map((item, idx) => (
-                                <div key={idx} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg border border-gray-100 dark:border-gray-800 print:bg-transparent print:border-none print:p-0 print:text-[13px] print:leading-tight">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex-1 print:text-[13px] print:font-bold print:text-gray-900">{item.equipment_name}</span>
-                                    <div className="flex items-center space-x-3 print:space-x-1">
-                                        <span className="text-gray-400 text-xs print:hidden">Qty</span>
-                                        <input 
-                                            type="number" 
-                                            min="0"
-                                            value={item.quantity === 0 ? '' : item.quantity}
-                                            onChange={(e) => handleQtyInputAndNext(e, (val) => handleDynamicQtyChange(type, item.equipment_id, val))}
-                                            className="qty-input w-14 h-7 text-center rounded border border-gray-300 bg-white text-sm text-gray-800 outline-none focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
-                                        />
-                                        <button 
-                                            onClick={() => handleRemoveDynamic(type, item.equipment_id)}
-                                            className="text-gray-400 hover:text-error-500 transition-colors p-1 print:hidden"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:bg-transparent print:border-none print:p-0 print:text-[13px] print:leading-tight">
+                                    <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[13px] print:font-bold print:text-gray-900 print:mb-0 print:line-clamp-none">{item.equipment_name}</span>
+                                    <div className="flex items-center justify-between shrink-0 print:justify-end print:space-x-1">
+                                        <span className="text-gray-400 text-[10px] uppercase font-bold print:hidden">Qty</span>
+                                        <div className="flex items-center space-x-1">
+                                            <input 
+                                                type="number" 
+                                                min="0"
+                                                value={item.quantity === 0 ? '' : item.quantity}
+                                                onChange={(e) => handleQtyInputAndNext(e, (val) => handleDynamicQtyChange(type, item.equipment_id, val))}
+                                                className="qty-input w-full max-w-[3.5rem] h-8 text-center rounded border border-gray-300 bg-white text-sm font-bold text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[13px] print:font-bold print:text-black print:border-none print:p-0 print:text-right print:bg-transparent"
+                                            />
+                                            <button 
+                                                onClick={() => handleRemoveDynamic(type, item.equipment_id)}
+                                                className="text-gray-400 hover:text-error-500 transition-colors p-1 print:hidden"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
