@@ -346,7 +346,6 @@ const AttendanceReport = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
 
                     {/* Salary Calculation Summary */}
                     {salarySummary.length > 0 && (
