@@ -380,7 +380,7 @@ const SecurityFormEdit = () => {
                 <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-800 font-semibold text-gray-800 dark:text-white/90 text-sm tracking-wide flex justify-between items-center print:py-0.5 print:px-1.5 print:text-[11px] print:font-bold print:uppercase print:border-b-[1px] print:border-black print:bg-gray-100 print:!text-black">
                     <span>
                         {displayTitle} 
-                        {config.status === 'NOT_AVAILABLE' && <span className="text-gray-500 dark:text-gray-400 ml-2">(Not Available)</span>}
+                        {config.status === 'NOT_AVAILABLE' && <span className="text-black dark:text-white print:!text-black ml-2">(Not Available)</span>}
                         {config.status === 'MERGED' && <span className="text-brand-500 ml-2">(Merged {config.mergedWith ? `with ${config.mergedWith}` : ''})</span>}
                     </span>
                     <div className="flex space-x-2 print:hidden">
@@ -477,7 +477,7 @@ const SecurityFormEdit = () => {
                     </div>
                 </div>
                 ) : (
-                    <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/50 print:hidden border-t border-dashed border-gray-200 dark:border-gray-700">
+                    <div className="p-4 text-center text-sm text-black dark:text-white bg-gray-50/50 dark:bg-gray-900/50 print:hidden border-t border-dashed border-gray-200 dark:border-gray-700 font-medium">
                         {config.status === 'NOT_AVAILABLE' 
                             ? "This section has been marked as Not Available (N/A)."
                             : `This section is merged into ${config.mergedWith || 'another section'}.`}
