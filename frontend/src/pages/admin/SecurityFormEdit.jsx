@@ -349,13 +349,13 @@ const SecurityFormEdit = () => {
 
         return (
             <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3 overflow-hidden print:border-[1.5px] print:border-black print:rounded print:shadow-none print:break-inside-avoid">
-                <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-800 font-semibold text-gray-800 dark:text-white/90 text-sm tracking-wide print:py-1.5 print:px-3 print:text-[13px] print:font-bold print:uppercase print:border-b-[1.5px] print:border-black print:bg-gray-100 print:!text-black">
+                <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-800 font-semibold text-gray-800 dark:text-white/90 text-sm tracking-wide print:py-0.5 print:px-1.5 print:text-[11px] print:font-bold print:uppercase print:border-b-[1px] print:border-black print:bg-gray-100 print:!text-black">
                     {title}
                 </div>
-                <div className="p-3 grid grid-cols-2 gap-2 print:p-2.5 print:flex print:flex-col print:space-y-1 print:gap-0">
+                <div className="p-3 grid grid-cols-2 gap-2 print:p-1 print:flex print:flex-col print:space-y-[1px] print:gap-0">
                     {items.map((item, idx) => (
-                        <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:!bg-gray-200 print:!border-none print:p-1 print:text-[13px] print:leading-tight print:!rounded-sm print:items-center">
-                            <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[13px] print:font-bold print:!text-black print:mb-0 print:line-clamp-none print:px-1" title={item.equipment_name}>{item.equipment_name}</span>
+                        <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:!bg-gray-200 print:!border-none print:px-1 print:py-[1px] print:text-[11px] print:leading-tight print:!rounded-[2px] print:items-center">
+                            <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[11px] print:font-bold print:!text-black print:mb-0 print:line-clamp-none print:px-1" title={item.equipment_name}>{item.equipment_name}</span>
                             <div className="flex items-center justify-between shrink-0 print:justify-end print:space-x-1">
                                 <span className="text-gray-400 text-[10px] uppercase font-bold print:hidden">Qty</span>
                                 <div className="flex items-center space-x-1">
@@ -365,7 +365,7 @@ const SecurityFormEdit = () => {
                                         value={item.quantity === 0 ? '' : item.quantity}
                                         onChange={(e) => handleQtyInputAndNext(e, (val) => handleSectionQtyChange(title, item.equipment_name, val))}
                                         placeholder="0"
-                                        className="qty-input w-full max-w-[3.5rem] h-8 text-center rounded border border-gray-300 bg-white text-sm font-bold text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 print:w-8 print:h-5 print:text-[13px] print:font-bold print:!text-black print:border-none print:p-0 print:text-center print:!bg-white print:!rounded-sm print:shadow-sm"
+                                        className="qty-input w-full max-w-[3.5rem] h-8 text-center rounded border border-gray-300 bg-white text-sm font-bold text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[11px] print:font-bold print:!text-black print:border-none print:p-0 print:text-center print:!bg-white print:!rounded-[2px] print:shadow-sm"
                                     />
                                     <button 
                                         onClick={() => handleRemoveFromFixed(item.equipment_name)}
@@ -432,10 +432,10 @@ const SecurityFormEdit = () => {
 
         return (
             <div className={`rounded-xl border border-brand-200 bg-white dark:border-brand-900/30 dark:bg-white/3 overflow-hidden shadow-sm print:border-[1.5px] print:border-black print:rounded print:shadow-none print:break-inside-avoid ${list.length === 0 ? 'print:hidden' : ''}`}>
-                <div className="bg-brand-50 dark:bg-brand-500/10 px-4 py-3 border-b border-brand-100 dark:border-brand-900/30 print:py-1.5 print:px-3 print:border-b-[1.5px] print:border-black print:bg-gray-100">
-                    <h3 className="font-bold text-brand-700 dark:text-brand-400 print:!text-black print:text-[13px] print:uppercase">{title}</h3>
+                <div className="bg-brand-50 dark:bg-brand-500/10 px-4 py-3 border-b border-brand-100 dark:border-brand-900/30 print:py-0.5 print:px-1.5 print:border-b-[1px] print:border-black print:bg-gray-100">
+                    <h3 className="font-bold text-brand-700 dark:text-brand-400 print:!text-black print:text-[11px] print:uppercase">{title}</h3>
                 </div>
-                <div className="p-4 space-y-4 print:p-2.5 print:space-y-1">
+                <div className="p-4 space-y-4 print:p-1 print:space-y-[1px]">
                     <div className="flex flex-col gap-2 print:hidden">
                         <div className="flex flex-col sm:flex-row gap-2">
                             <select 
@@ -476,10 +476,10 @@ const SecurityFormEdit = () => {
                     </div>
                     
                     {list.length > 0 && (
-                        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 print:mt-0 print:pt-0 print:border-none print:flex print:flex-col print:space-y-1 print:gap-0">
+                        <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 print:mt-0 print:pt-0 print:border-none print:flex print:flex-col print:space-y-[1px] print:gap-0">
                             {list.map((item, idx) => (
-                                <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:!bg-gray-200 print:!border-none print:p-1 print:text-[13px] print:leading-tight print:!rounded-sm print:items-center">
-                                    <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[13px] print:font-bold print:!text-black print:mb-0 print:line-clamp-none print:px-1">{item.equipment_name}</span>
+                                <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:!bg-gray-200 print:!border-none print:px-1 print:py-[1px] print:text-[11px] print:leading-tight print:!rounded-[2px] print:items-center">
+                                    <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[11px] print:font-bold print:!text-black print:mb-0 print:line-clamp-none print:px-1">{item.equipment_name}</span>
                                     <div className="flex items-center justify-between shrink-0 print:justify-end print:space-x-1">
                                         <span className="text-gray-400 text-[10px] uppercase font-bold print:hidden">Qty</span>
                                         <div className="flex items-center space-x-1">
@@ -488,7 +488,7 @@ const SecurityFormEdit = () => {
                                                 min="0"
                                                 value={item.quantity === 0 ? '' : item.quantity}
                                                 onChange={(e) => handleQtyInputAndNext(e, (val) => handleDynamicQtyChange(type, item.equipment_id, val))}
-                                                className="qty-input w-full max-w-[3.5rem] h-8 text-center rounded border border-gray-300 bg-white text-sm font-bold text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 print:w-8 print:h-5 print:text-[13px] print:font-bold print:!text-black print:border-none print:p-0 print:text-center print:!bg-white print:!rounded-sm print:shadow-sm"
+                                                className="qty-input w-full max-w-[3.5rem] h-8 text-center rounded border border-gray-300 bg-white text-sm font-bold text-gray-800 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white/90 print:w-6 print:h-4 print:text-[11px] print:font-bold print:!text-black print:border-none print:p-0 print:text-center print:!bg-white print:!rounded-[2px] print:shadow-sm"
                                             />
                                             <button 
                                                 onClick={() => handleRemoveDynamic(type, item.equipment_id)}
@@ -572,8 +572,8 @@ const SecurityFormEdit = () => {
             </div>
 
             {/* Print Only Heading */}
-            <h1 className="hidden print:block text-center text-xl font-extrabold text-black uppercase tracking-widest mb-3 border-b-[2px] border-black pb-1">
-                Equipment Checklist
+            <h1 className="hidden print:block text-center text-lg font-extrabold text-black uppercase tracking-widest mb-1.5 border-b-[1.5px] border-black pb-1">
+                Equipment Checklist {formData.branch_code && `- ${formData.branch_code}`}
             </h1>
 
             {/* Top Branch Info */}
@@ -616,7 +616,7 @@ const SecurityFormEdit = () => {
             </div>
 
             {/* 3-Column Layout matching Reference Image */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:grid-cols-3 print:gap-4 print:text-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:grid-cols-3 print:gap-1.5 print:text-xs">
                 
                 {/* Column 1: Outside, ATM, Lobby */}
                 <div className="space-y-6 print:space-y-1.5">

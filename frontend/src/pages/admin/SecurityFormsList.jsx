@@ -111,7 +111,7 @@ const SecurityFormsList = () => {
                                     <td className="py-3 px-2 text-sm font-medium text-gray-800 dark:text-white/90">{form.branch_code}</td>
                                     <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{form.address}</td>
                                     <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">
-                                        {new Date(form.created_at).toLocaleString()}
+                                        {new Date(form.created_at.replace(' ', 'T') + 'Z').toLocaleString()}
                                     </td>
                                     <td className="py-3 px-2">
                                         <div className="flex space-x-3">
