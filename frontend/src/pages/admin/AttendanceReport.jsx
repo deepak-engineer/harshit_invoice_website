@@ -273,7 +273,56 @@ const AttendanceReport = () => {
             ) : (
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
-                        <div className="overflow-x-auto">
+                        
+                        {/* Mobile List View (Visible only on small screens) */}
+                        <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
+                            {calendarDays.filter(d => d.isCurrentMonth).map((dayObj, index) => {
+                                let m = month;
+                                let y = year;
+                                const dateStr = `${y}-${m.toString().padStart(2, '0')}-${dayObj.day.toString().padStart(2, '0')}`;
+                                let dayRecords = reportData[dateStr] || [];
+                                
+                                if (debouncedSearch) {
+                                    dayRecords = dayRecords.filter(r => r.name?.toLowerCase().includes(debouncedSearch.toLowerCase()));
+                                }
+                                
+                                const isSun = isSunday(dayObj);
+                                const isHol = isHoliday(dayObj);
+                                const isOff = isSun || isHol;
+                                const isToday = new Date().toDateString() === new Date(y, m-1, dayObj.day).toDateString();
+                                const dateDisplay = new Date(y, m-1, dayObj.day).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+                                return (
+                                    <div key={index} className={`p-4 flex flex-col ${isOff ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-white dark:bg-gray-900'}`}>
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className={`text-base font-bold ${isToday ? 'text-brand-500' : (isSun ? 'text-error-500' : 'text-gray-700 dark:text-gray-300')}`}>
+                                                {dateDisplay}
+                                            </span>
+                                            {isHol && <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded">HOLIDAY</span>}
+                                        </div>
+                                        {dayRecords.length > 0 ? (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                                {dayRecords.map((record, i) => (
+                                                    <div 
+                                                        key={i} 
+                                                        onClick={() => setEditModal({ isOpen: true, record, dateStr, newStatus: record.status })}
+                                                        className={`text-sm px-3 py-2 rounded-lg border flex items-center justify-between cursor-pointer shadow-theme-xs ${getStatusColor(record.status)}`}
+                                                    >
+                                                        <span className="font-semibold truncate pr-2">{record.name}</span>
+                                                        <span className="font-bold shrink-0">{getStatusShort(record.status)}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            !isOff && <div className="text-sm text-gray-400 dark:text-gray-500 italic">No records</div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {/* Desktop Grid View */}
+                        <div className="hidden md:block overflow-x-auto">
                             <div className="min-w-[800px]">
                                 {/* Days of Week Header */}
                         <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
