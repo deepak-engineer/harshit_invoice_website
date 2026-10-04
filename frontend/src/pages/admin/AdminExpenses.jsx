@@ -187,8 +187,7 @@ const AdminExpenses = () => {
                     </div>
                 </div>
 
-                {/* Desktop Table View */}
-                <div className="hidden lg:block overflow-x-auto">
+                <div className="w-full">
                     {loading ? (
                         <div className="p-12 text-center flex justify-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-500"></div>
@@ -199,66 +198,61 @@ const AdminExpenses = () => {
                         </div>
                     ) : (
                         <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
-                            <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800">
+                            <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800 text-[10px] md:text-sm">
                                 <tr>
-                                    <th className="px-6 py-4">Employee</th>
-                                    <th className="px-6 py-4">Location & Team</th>
-                                    <th className="px-6 py-4">Category</th>
-                                    <th className="px-6 py-4 text-right">Amount (₹)</th>
-                                    <th className="px-6 py-4">Date</th>
-                                    <th className="px-6 py-4 text-center">Status</th>
-                                    <th className="px-6 py-4 text-center">Action</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4">Employee</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">Location & Team</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4">Category</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 text-right">Amount (₹)</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 hidden md:table-cell">Date</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 text-center">Status</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                 {filteredExpenses.map((exp) => (
                                     <tr key={exp.id} className="hover:bg-gray-50 dark:bg-gray-800/50/50 transition-colors group">
-                                        <td className="px-6 py-4">
-                                            <div className="font-bold text-gray-800 dark:text-white/90">{exp.emp_name}</div>
-                                            <div className="text-xs text-gray-400 dark:text-gray-500">ID: {exp.emp_code}</div>
+                                        <td className="px-2 py-2 md:px-6 md:py-4">
+                                            <div className="font-bold text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{exp.emp_name}</div>
+                                            <div className="text-[8px] md:text-xs text-gray-400 dark:text-gray-500 hidden sm:block">ID: {exp.emp_code}</div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex items-center text-gray-700 dark:text-gray-300">
-                                                <MapPin className="w-3.5 h-3.5 mr-1.5 text-gray-400 dark:text-gray-500" />
-                                                {exp.state || 'N/A'}
+                                        <td className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">
+                                            <div className="flex items-center text-[10px] md:text-sm text-gray-700 dark:text-gray-300 truncate max-w-[80px] md:max-w-none">
+                                                <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5 text-gray-400 dark:text-gray-500 shrink-0" />
+                                                <span className="truncate">{exp.state || 'N/A'}</span>
                                             </div>
-                                            <div className="flex items-center text-gray-500 dark:text-gray-400 mt-1 text-xs">
-                                                <Users className="w-3.5 h-3.5 mr-1.5 text-gray-400 dark:text-gray-500" />
-                                                {exp.team_name || 'No Team'}
+                                            <div className="flex items-center text-gray-500 dark:text-gray-400 mt-1 text-[8px] md:text-xs truncate max-w-[80px] md:max-w-none">
+                                                <Users className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5 text-gray-400 dark:text-gray-500 shrink-0" />
+                                                <span className="truncate">{exp.team_name || 'No Team'}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <span className="font-semibold text-gray-700 dark:text-gray-300">{exp.category}</span>
-                                            {exp.description && (
-                                                <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]" title={exp.description}>
-                                                    {exp.description}
-                                                </div>
-                                            )}
+                                        <td className="px-2 py-2 md:px-6 md:py-4">
+                                            <span className="font-semibold text-[10px] md:text-sm text-gray-700 dark:text-gray-300">{exp.category}</span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <span className="font-bold text-gray-800 dark:text-white/90">
+                                        <td className="px-2 py-2 md:px-6 md:py-4 text-right">
+                                            <span className="font-bold text-[10px] md:text-sm text-gray-800 dark:text-white/90">
                                                 {parseFloat(exp.amount).toFixed(2)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500 dark:text-gray-400">
+                                        <td className="px-2 py-2 md:px-6 md:py-4 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
                                             {new Date(exp.expense_date).toLocaleDateString('en-GB')}
                                         </td>
-                                        <td className="px-6 py-4 text-center">
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${
+                                        <td className="px-2 py-2 md:px-6 md:py-4 text-center">
+                                            <span className={`inline-flex items-center px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-full text-[8px] md:text-xs font-bold border ${
                                                 exp.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
                                                 exp.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
                                                 'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
                                             }`}>
-                                                {getStatusIcon(exp.status)}
-                                                <span className="ml-1.5">{exp.status}</span>
+                                                <span className="hidden sm:inline-block">{getStatusIcon(exp.status)}</span>
+                                                <span className="sm:ml-1.5">{exp.status === 'PENDING' ? 'PEN' : exp.status === 'APPROVED' ? 'APP' : 'REJ'}</span>
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-center">
+                                        <td className="px-2 py-2 md:px-6 md:py-4 text-center">
                                             <button 
                                                 onClick={() => setSelectedExpense(exp)}
-                                                className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg text-xs transition-colors"
+                                                className="px-1.5 py-1 md:px-3 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded md:rounded-lg text-[10px] md:text-xs transition-colors"
                                             >
-                                                View Details
+                                                View
                                             </button>
                                         </td>
                                     </tr>
@@ -268,67 +262,6 @@ const AdminExpenses = () => {
                     )}
                 </div>
 
-                {/* Mobile Grid View */}
-                {!loading && (
-                    <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50">
-                        {filteredExpenses.map((exp) => (
-                            <div key={exp.id} className="bg-white dark:bg-gray-900 p-4 rounded-xl shadow-theme-xs border border-gray-200 dark:border-gray-800 flex flex-col space-y-4">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="font-bold text-gray-800 dark:text-white/90 leading-tight">{exp.emp_name}</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">ID: {exp.emp_code}</p>
-                                    </div>
-                                    <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 border ${
-                                        exp.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
-                                        exp.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
-                                        'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
-                                    }`}>
-                                        {exp.status}
-                                    </span>
-                                </div>
-                                
-                                <div className="grid grid-cols-2 gap-3 text-xs bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
-                                    <div className="col-span-2 flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-2 mb-2">
-                                        <div>
-                                            <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Category</span>
-                                            <span className="font-semibold text-gray-700 dark:text-gray-300">{exp.category}</span>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Amount</span>
-                                            <span className="font-bold text-gray-800 dark:text-white/90 text-sm">₹{parseFloat(exp.amount).toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Location</span>
-                                        <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                                            <MapPin className="w-3.5 h-3.5 mr-1 text-gray-400 dark:text-gray-500" />
-                                            {exp.state || 'N/A'}
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Team</span>
-                                        <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center truncate">
-                                            <Users className="w-3.5 h-3.5 mr-1 text-gray-400 dark:text-gray-500" />
-                                            {exp.team_name || 'No Team'}
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div className="pt-2">
-                                    <button 
-                                        onClick={() => setSelectedExpense(exp)}
-                                        className="w-full px-4 py-2 bg-brand-500/10 hover:bg-brand-500/20 text-brand-500 font-semibold rounded-lg text-sm transition-colors border border-brand-500/20"
-                                    >
-                                        View Details
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                        {filteredExpenses.length === 0 && (
-                            <div className="col-span-full text-center py-8 text-gray-400 dark:text-gray-500 text-sm">No expenses found.</div>
-                        )}
-                    </div>
-                )}
             </div>
 
             {/* View / Process Modal */}

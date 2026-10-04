@@ -144,37 +144,37 @@ const TeamManagement = () => {
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 dark:border-gray-800 dark:bg-white/3">
-                <div className="hidden lg:block max-w-full overflow-x-auto">
+                <div className="w-full">
                     <table className="w-full">
                         <thead className="border-y border-gray-100 dark:border-gray-800">
                             <tr>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">ID</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Team Name</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Assigned Site</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Members</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Actions</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">ID</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Team Name</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">Assigned Site</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Members</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {filteredTeams.map(team => (
                                 <tr key={team.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <td className="py-3 px-2 text-sm font-mono text-gray-500 dark:text-gray-400">{team.id}</td>
-                                    <td className="py-3 px-2 text-sm font-medium text-gray-800 dark:text-white/90">{team.name}</td>
-                                    <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400">{team.id}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{team.name}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
                                         {team.site_id ? sites.find(s => s.id === team.site_id)?.code || 'Unknown' : <span className="text-gray-400 italic">None</span>}
                                     </td>
-                                    <td className="py-3 px-2">
-                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
+                                    <td className="py-2 md:py-3 px-1 md:px-2">
+                                        <span className="inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full text-[8px] md:text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
                                             {team.employee_ids?.length || 0}
                                         </span>
                                     </td>
-                                    <td className="py-3 px-2">
-                                        <div className="flex space-x-3">
-                                            <button onClick={() => openEdit(team)} className="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors">
-                                                <Edit2 className="w-4 h-4" />
+                                    <td className="py-2 md:py-3 px-1 md:px-2">
+                                        <div className="flex space-x-1.5 md:space-x-3">
+                                            <button onClick={() => openEdit(team)} className="p-1 md:p-0 text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors">
+                                                <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                                             </button>
-                                            <button onClick={() => handleDelete(team.id)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors">
-                                                <Trash2 className="w-4 h-4" />
+                                            <button onClick={() => handleDelete(team.id)} className="p-1 md:p-0 text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors">
+                                                <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                                             </button>
                                         </div>
                                     </td>
@@ -191,43 +191,6 @@ const TeamManagement = () => {
                     </table>
                 </div>
 
-                {/* Mobile Grid View */}
-                <div className="lg:hidden mt-4 space-y-4">
-                    {filteredTeams.map(team => (
-                        <div key={team.id} className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3 flex flex-col space-y-3">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="font-medium text-gray-800 dark:text-white/90 leading-tight">{team.name}</h3>
-                                    <p className="text-xs text-gray-500 font-mono mt-0.5">ID: {team.id}</p>
-                                </div>
-                                <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300 shrink-0">
-                                    <Users className="w-3 h-3 mr-1" />
-                                    {team.employee_ids?.length || 0} Members
-                                </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 gap-2 text-xs bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Assigned Site</span>
-                                    <span className="font-medium text-gray-800 dark:text-white/90">
-                                        {team.site_id ? sites.find(s => s.id === team.site_id)?.code || 'Unknown' : <span className="text-gray-400 italic">None</span>}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div className="flex justify-end items-center pt-2 gap-2">
-                                <button onClick={() => openEdit(team)} className="p-2 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-brand-500 hover:border-brand-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-brand-800 dark:hover:text-brand-500 transition-colors">
-                                    <Edit2 className="w-4 h-4" />
-                                </button>
-                                <button onClick={() => handleDelete(team.id)} className="p-2 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-error-500 hover:border-error-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-error-800 dark:hover:text-error-500 transition-colors">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {filteredTeams.length === 0 && (
-                        <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">No teams found. Create one above!</div>
-                    )}
                 </div>
             </div>
 

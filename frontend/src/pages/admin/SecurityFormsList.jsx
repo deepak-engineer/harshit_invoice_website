@@ -91,38 +91,38 @@ const SecurityFormsList = () => {
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 dark:border-gray-800 dark:bg-white/3">
-                <div className="max-w-full overflow-x-auto">
+                <div className="w-full">
                     <table className="w-full text-left">
                         <thead className="border-y border-gray-100 dark:border-gray-800">
                             <tr>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">ID</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Branch Code</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Address</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Created At</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Actions</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">ID</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Branch Code</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">Address</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden md:table-cell">Created At</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {filteredForms.map(form => (
                                 <tr key={form.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <td className="py-3 px-2 text-sm font-mono text-gray-500 dark:text-gray-400" title={form.uuid || form.id}>
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400" title={form.uuid || form.id}>
                                         {form.uuid ? form.uuid.split('-')[0].toUpperCase() : form.id}
                                     </td>
-                                    <td className="py-3 px-2 text-sm font-medium text-gray-800 dark:text-white/90">{form.branch_code}</td>
-                                    <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{form.address}</td>
-                                    <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">
-                                        {new Date(form.created_at.replace(' ', 'T') + 'Z').toLocaleString()}
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{form.branch_code}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 max-w-[100px] md:max-w-xs truncate hidden sm:table-cell">{form.address}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                                        {new Date(form.created_at.replace(' ', 'T') + 'Z').toLocaleString([], {hour: '2-digit', minute:'2-digit', day: '2-digit', month: 'short'})}
                                     </td>
-                                    <td className="py-3 px-2">
-                                        <div className="flex space-x-3">
-                                            <button onClick={() => navigate(`${basePath}/security-requirements/${form.id}/edit`)} className="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Edit Form">
-                                                <Edit2 className="w-4 h-4" />
+                                    <td className="py-2 md:py-3 px-1 md:px-2">
+                                        <div className="flex space-x-1.5 md:space-x-3">
+                                            <button onClick={() => navigate(`${basePath}/security-requirements/${form.id}/edit`)} className="p-1 md:p-0 text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Edit Form">
+                                                <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                                             </button>
-                                            <button onClick={() => window.open(`${basePath}/security-requirements/${form.id}/edit?print=true`, '_blank')} className="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Download PDF">
-                                                <Printer className="w-4 h-4" />
+                                            <button onClick={() => window.open(`${basePath}/security-requirements/${form.id}/edit?print=true`, '_blank')} className="p-1 md:p-0 text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Download PDF">
+                                                <Printer className="w-3 h-3 md:w-4 md:h-4" />
                                             </button>
-                                            <button onClick={() => handleDelete(form.id)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors" title="Delete Form">
-                                                <Trash2 className="w-4 h-4" />
+                                            <button onClick={() => handleDelete(form.id)} className="p-1 md:p-0 text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors" title="Delete Form">
+                                                <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                                             </button>
                                         </div>
                                     </td>

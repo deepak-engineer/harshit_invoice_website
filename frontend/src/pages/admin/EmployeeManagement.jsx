@@ -382,116 +382,117 @@ const EmployeeManagement = () => {
 
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden sm:p-2">
                 {/* Desktop Table View */}
-                <div className="hidden lg:block overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="w-full">
                     <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
                         <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800">
                             <tr>
-                                <th className="px-4 py-3 w-10">
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 w-6 md:w-10">
                                     <input 
                                         type="checkbox" 
-                                        className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer"
+                                        className="w-3 h-3 md:w-4 md:h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer"
                                         checked={filteredEmployees.length > 0 && selectedIds.length === filteredEmployees.length}
                                         onChange={handleSelectAll}
                                     />
                                 </th>
-                                <th className="px-4 py-3">ID</th>
-                                <th className="px-4 py-3">Photo</th>
-                                <th className="px-4 py-3">Name</th>
-                                <th className="px-4 py-3">Phone</th>
-                                <th className="px-4 py-3">Username</th>
-                                <th className="px-4 py-3">Assigned Team</th>
-                                <th className="px-4 py-3">Assigned Site</th>
-                                <th className="px-4 py-3">Salary/Day</th>
-                                <th className="px-4 py-3">Status</th>
-                                <th className="px-4 py-3">Actions</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">ID</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden md:table-cell">Photo</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Name</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Phone</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">Username</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Team</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Site</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden xl:table-cell">Salary/Day</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Status</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {filteredEmployees.map(emp => (
                                 <tr key={emp.id} className={`hover:bg-gray-50 dark:bg-gray-800/50 ${selectedIds.includes(emp.id) ? 'bg-brand-500/5' : ''}`}>
-                                    <td className="px-4 py-3">
+                                    <td className="py-2 md:py-3 px-1 md:px-4">
                                         <input 
                                             type="checkbox" 
-                                            className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer"
+                                            className="w-3 h-3 md:w-4 md:h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer"
                                             checked={selectedIds.includes(emp.id)}
                                             onChange={() => handleSelect(emp.id)}
                                         />
                                     </td>
-                                    <td className="px-4 py-3 font-mono text-xs">{emp.emp_id}</td>
-                                    <td className="px-4 py-3">
+                                    <td className="py-2 md:py-3 px-1 md:px-4 font-mono text-[10px] md:text-xs hidden sm:table-cell">{emp.emp_id}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-4 hidden md:table-cell">
                                         {emp.photo ? (
                                             <button 
                                                 onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
                                                 className="focus:outline-none hover:opacity-80 transition-opacity rounded-md shadow-theme-xs ring-2 ring-transparent hover:ring-brand-500/50 overflow-hidden block"
                                                 title="View enlarged photo"
                                             >
-                                                <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-16 h-20 object-cover border border-gray-200 dark:border-gray-800" />
+                                                <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-10 h-12 md:w-16 md:h-20 object-cover border border-gray-200 dark:border-gray-800" />
                                             </button>
                                         ) : (
-                                            <div className="w-16 h-20 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800">
-                                                <Camera className="w-6 h-6" />
+                                            <div className="w-10 h-12 md:w-16 md:h-20 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800">
+                                                <Camera className="w-4 h-4 md:w-6 md:h-6" />
                                             </div>
                                         )}
                                     </td>
-                                    <td className="px-4 py-3 font-medium text-gray-800 dark:text-white/90">{emp.name}</td>
-                                    <td className="px-4 py-3">{emp.phone || '-'}</td>
-                                    <td className="px-4 py-3">{emp.username}</td>
-                                    <td className="px-4 py-3 text-xs">
-                                        <div className="flex items-center space-x-2">
-                                            <span>{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
-                                                <Edit2 className="w-3 h-3" strokeWidth={2} />
+                                    <td className="py-2 md:py-3 px-1 md:px-4 font-medium text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[60px] md:max-w-[120px]">{emp.name}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell">{emp.phone || '-'}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm truncate max-w-[60px] md:max-w-[100px] hidden sm:table-cell">{emp.username}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-xs">
+                                        <div className="flex items-center space-x-1 md:space-x-2">
+                                            <span className="truncate max-w-[60px] md:max-w-none">{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
+                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 md:p-1.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
+                                                <Edit2 className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3 text-xs">
-                                        <div className="flex items-center space-x-2">
-                                            <span>{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
-                                                <Edit2 className="w-3 h-3" strokeWidth={2} />
+                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-xs">
+                                        <div className="flex items-center space-x-1 md:space-x-2">
+                                            <span className="truncate max-w-[60px] md:max-w-none">{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
+                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 md:p-1.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
+                                                <Edit2 className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center space-x-2">
+                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden xl:table-cell">
+                                        <div className="flex items-center space-x-1 md:space-x-2">
                                             <span>₹{emp.daily_salary}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
-                                                <Edit2 className="w-3 h-3" strokeWidth={2} />
+                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 md:p-1.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
+                                                <Edit2 className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={2} />
                                             </button>
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-success-100 dark:bg-success-500/20 text-success-800 dark:text-success-400' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-error-100 dark:bg-error-500/20 text-error-800 dark:text-error-400'}`}>
-                                            {emp.status}
+                                    <td className="py-2 md:py-3 px-1 md:px-4">
+                                        <span className={`px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[8px] md:text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-success-100 dark:bg-success-500/20 text-success-800 dark:text-success-400' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-error-100 dark:bg-error-500/20 text-error-800 dark:text-error-400'}`}>
+                                            <span className="hidden md:inline">{emp.status}</span>
+                                            <span className="md:hidden">{emp.status === 'ACTIVE' ? 'ACT' : emp.status === 'PENDING' ? 'PEN' : 'INA'}</span>
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex items-center space-x-3">
+                                    <td className="py-2 md:py-3 px-1 md:px-4">
+                                        <div className="flex items-center space-x-1 md:space-x-3 flex-wrap max-w-[80px] md:max-w-none">
                                             {emp.status === 'PENDING' && (
-                                                <button onClick={() => handleApprove(emp)} className="group relative p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all">
-                                                    <CheckCircle className="w-4 h-4" strokeWidth={2} />
-                                                    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Approve</span>
+                                                <button onClick={() => handleApprove(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10 rounded-lg transition-all">
+                                                    <CheckCircle className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                    <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Approve</span>
                                                 </button>
                                             )}
-                                            <button onClick={() => openEdit(emp)} className="group relative p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all">
-                                                <Edit2 className="w-4 h-4" strokeWidth={2} />
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Edit Profile</span>
+                                            <button onClick={() => openEdit(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all">
+                                                <Edit2 className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Edit Profile</span>
                                             </button>
-                                            <button onClick={() => openSalaryReport(emp)} className="group relative p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all">
-                                                <Wallet className="w-4 h-4" strokeWidth={2} />
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Salary Report</span>
+                                            <button onClick={() => openSalaryReport(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all">
+                                                <Wallet className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Salary Report</span>
                                             </button>
-                                            <button onClick={() => openPassword(emp)} className="group relative p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all">
-                                                <Key className="w-4 h-4" strokeWidth={2} />
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Reset Password</span>
+                                            <button onClick={() => openPassword(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all">
+                                                <Key className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Reset Password</span>
                                             </button>
-                                            <button onClick={() => openFace(emp)} className="group relative p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
-                                                <Camera className="w-4 h-4" strokeWidth={2} />
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Upload Photo</span>
+                                            <button onClick={() => openFace(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
+                                                <Camera className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Upload Photo</span>
                                             </button>
-                                            <button onClick={() => handleDelete(emp.id)} className="group relative p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
-                                                <Trash2 className="w-4 h-4" strokeWidth={2} />
-                                                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Delete</span>
+                                            <button onClick={() => handleDelete(emp.id)} className="group relative p-1 md:p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
+                                                <Trash2 className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Delete</span>
                                             </button>
                                         </div>
                                     </td>
@@ -501,96 +502,6 @@ const EmployeeManagement = () => {
                     </table>
                 </div>
 
-                {/* Mobile Grid View */}
-                <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
-                    {filteredEmployees.map(emp => (
-                        <div key={emp.id} className={`bg-white dark:bg-gray-900 p-4 rounded-xl shadow-theme-xs border ${selectedIds.includes(emp.id) ? 'border-brand-500 ring-1 ring-brand-500' : 'border-gray-200 dark:border-gray-800'} flex flex-col space-y-4`}>
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center space-x-3">
-                                    <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4 rounded border-gray-300 dark:border-gray-700 text-brand-500 focus:ring-brand-500 cursor-pointer mt-1"
-                                        checked={selectedIds.includes(emp.id)}
-                                        onChange={() => handleSelect(emp.id)}
-                                    />
-                                    {emp.photo ? (
-                                        <button 
-                                            onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
-                                            className="focus:outline-none rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 shrink-0"
-                                        >
-                                            <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-12 h-12 object-cover" />
-                                        </button>
-                                    ) : (
-                                        <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800 shrink-0">
-                                            <Camera className="w-5 h-5" />
-                                        </div>
-                                    )}
-                                    <div>
-                                        <h3 className="font-bold text-gray-800 dark:text-white/90 leading-tight">{emp.name}</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{emp.emp_id} | {emp.username}</p>
-                                    </div>
-                                </div>
-                                <span className={`px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 ${emp.status === 'ACTIVE' ? 'bg-success-100 dark:bg-success-500/20 text-success-700 dark:text-success-400' : emp.status === 'PENDING' ? 'bg-amber-100 text-warning-700 dark:text-warning-400' : 'bg-error-100 dark:bg-error-500/20 text-red-700'}`}>
-                                    {emp.status}
-                                </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-3 text-xs bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Phone</span>
-                                    <span className="font-medium text-gray-700 dark:text-gray-300">{emp.phone || '-'}</span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Salary/Day</span>
-                                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                                        ₹{emp.daily_salary}
-                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 p-0.5 rounded-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm"><Edit2 className="w-3 h-3" strokeWidth={2} /></button>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Team</span>
-                                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                                        <span className="truncate max-w-[80px] block">{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 p-0.5 rounded-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm shrink-0"><Edit2 className="w-3 h-3" strokeWidth={2} /></button>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Site</span>
-                                    <span className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                                        <span className="truncate max-w-[80px] block">{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                        <button onClick={() => handleUpdateSalary(emp)} className="ml-1 p-0.5 rounded-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm shrink-0"><Edit2 className="w-3 h-3" strokeWidth={2} /></button>
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-800 mt-2">
-                                <div className="flex flex-wrap gap-2 pt-2">
-                                    {emp.status === 'PENDING' && (
-                                        <button onClick={() => handleApprove(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-success-700 bg-success-50 hover:bg-success-100 dark:bg-success-500/10 dark:hover:bg-success-500/20 dark:text-success-400 rounded-lg transition-colors whitespace-nowrap">
-                                            <CheckCircle className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Approve
-                                        </button>
-                                    )}
-                                    <button onClick={() => openEdit(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-brand-700 bg-brand-50 hover:bg-brand-100 dark:bg-brand-500/10 dark:hover:bg-brand-500/20 dark:text-brand-400 rounded-lg transition-colors whitespace-nowrap">
-                                        <Edit2 className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Edit
-                                    </button>
-                                    <button onClick={() => openSalaryReport(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 dark:text-emerald-400 rounded-lg transition-colors whitespace-nowrap">
-                                        <Wallet className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Salary
-                                    </button>
-                                    <button onClick={() => openPassword(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 dark:text-amber-400 rounded-lg transition-colors whitespace-nowrap">
-                                        <Key className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Password
-                                    </button>
-                                    <button onClick={() => openFace(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-purple-700 bg-purple-50 hover:bg-purple-100 dark:bg-purple-500/10 dark:hover:bg-purple-500/20 dark:text-purple-400 rounded-lg transition-colors whitespace-nowrap">
-                                        <Camera className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Photo
-                                    </button>
-                                </div>
-                                <button onClick={() => handleDelete(emp.id)} className="p-2 text-error-600 bg-error-50 hover:bg-error-100 dark:bg-error-500/10 dark:hover:bg-error-500/20 dark:text-error-400 rounded-lg shrink-0 ml-2 transition-colors">
-                                    <Trash2 className="w-4 h-4" strokeWidth={2} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {filteredEmployees.length === 0 && (
-                        <div className="col-span-full text-center py-8 text-gray-400 dark:text-gray-500 text-sm">No employees found.</div>
-                    )}
                 </div>
             </div>
 

@@ -356,53 +356,35 @@ const AttendanceReport = () => {
                                 </h3>
                             </div>
                             {/* Desktop Table View */}
-                            <div className="hidden lg:block overflow-x-auto">
+                            <div className="w-full">
                                 <table className="w-full text-left text-sm text-gray-600 dark:text-gray-400">
                                     <thead className="bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800">
                                         <tr>
-                                            <th className="px-6 py-4">Employee</th>
-                                            <th className="px-6 py-4 text-center">Daily Salary</th>
-                                            <th className="px-6 py-4 text-center text-success-600 dark:text-success-500">Full Days</th>
-                                            <th className="px-6 py-4 text-center text-amber-600">Half Days</th>
-                                            <th className="px-6 py-4 text-center text-blue-light-600 dark:text-blue-light-500">Paid Holidays</th>
-                                            <th className="px-6 py-4 text-center text-error-600 dark:text-error-500">Absent</th>
-                                            <th className="px-6 py-4 text-right font-bold">Total Earned</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-[10px] md:text-sm">Employee</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-center text-[10px] md:text-sm hidden sm:table-cell">Daily Salary</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-center text-[10px] md:text-sm text-success-600 dark:text-success-500">Full Days</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-center text-[10px] md:text-sm text-amber-600">Half Days</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-center text-[10px] md:text-sm text-blue-light-600 dark:text-blue-light-500 hidden md:table-cell">Paid Holidays</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-center text-[10px] md:text-sm text-error-600 dark:text-error-500">Absent</th>
+                                            <th className="px-2 py-3 md:px-6 md:py-4 text-right font-bold text-[10px] md:text-sm">Total Earned</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                         {filteredSalarySummary.map((sum) => (
                                             <tr key={sum.id} className="hover:bg-gray-50 dark:bg-gray-800/50">
-                                                <td className="px-6 py-4 font-medium text-gray-800 dark:text-white/90">{sum.name}</td>
-                                                <td className="px-6 py-4 text-center">₹{sum.daily_salary.toFixed(2)}</td>
-                                                <td className="px-6 py-4 text-center font-medium text-success-700 dark:text-success-400">{sum.present_days}</td>
-                                                <td className="px-6 py-4 text-center font-medium text-warning-700 dark:text-warning-400">{sum.half_days}</td>
-                                                <td className="px-6 py-4 text-center font-medium text-blue-light-700 dark:text-blue-light-400">{sum.holiday_days}</td>
-                                                <td className="px-6 py-4 text-center font-medium text-red-700">{sum.absent_days}</td>
-                                                <td className="px-6 py-4 text-right font-bold text-brand-500 text-base">₹{sum.total_salary.toFixed(2)}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 font-medium text-gray-800 dark:text-white/90 text-[10px] md:text-sm truncate max-w-[80px] md:max-w-none">{sum.name}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center text-[10px] md:text-sm hidden sm:table-cell">₹{sum.daily_salary.toFixed(2)}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center font-medium text-success-700 dark:text-success-400 text-[10px] md:text-sm">{sum.present_days}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center font-medium text-warning-700 dark:text-warning-400 text-[10px] md:text-sm">{sum.half_days}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center font-medium text-blue-light-700 dark:text-blue-light-400 text-[10px] md:text-sm hidden md:table-cell">{sum.holiday_days}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center font-medium text-red-700 text-[10px] md:text-sm">{sum.absent_days}</td>
+                                                <td className="px-2 py-2 md:px-6 md:py-4 text-right font-bold text-brand-500 text-[10px] md:text-base">₹{sum.total_salary.toFixed(2)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
                                 </table>
                             </div>
 
-                            {/* Mobile Grid View */}
-                            <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50">
-                                {filteredSalarySummary.map(sum => (
-                                    <div key={sum.id} className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col">
-                                        <h4 className="font-bold text-gray-800 dark:text-white/90 text-lg mb-3 border-b border-gray-100 dark:border-gray-800 pb-2">{sum.name}</h4>
-                                        <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-                                            <div><span className="text-gray-400 dark:text-gray-500 text-xs block mb-0.5">Daily Salary</span><span className="font-medium text-gray-700 dark:text-gray-300">₹{sum.daily_salary.toFixed(2)}</span></div>
-                                            <div><span className="text-gray-400 dark:text-gray-500 text-xs block mb-0.5">Full Days</span><span className="font-bold text-success-600 dark:text-success-500">{sum.present_days}</span></div>
-                                            <div><span className="text-gray-400 dark:text-gray-500 text-xs block mb-0.5">Half Days</span><span className="font-bold text-amber-600">{sum.half_days}</span></div>
-                                            <div><span className="text-gray-400 dark:text-gray-500 text-xs block mb-0.5">Paid Holidays</span><span className="font-bold text-blue-light-600 dark:text-blue-light-500">{sum.holiday_days}</span></div>
-                                            <div><span className="text-gray-400 dark:text-gray-500 text-xs block mb-0.5">Absent</span><span className="font-bold text-error-600 dark:text-error-500">{sum.absent_days}</span></div>
-                                        </div>
-                                        <div className="mt-auto pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center bg-brand-500/5 -mx-4 -mb-4 p-4 rounded-b-xl">
-                                            <span className="text-gray-600 dark:text-gray-400 font-semibold">Total Earned</span>
-                                            <span className="text-brand-500 font-black text-xl">₹{sum.total_salary.toFixed(2)}</span>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                     )}

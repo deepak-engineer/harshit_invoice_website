@@ -202,7 +202,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="w-full">
           {loading ? (
             <div className="p-12 text-center text-gray-400 dark:text-gray-500">Loading invoices...</div>
           ) : filteredInvoices.length === 0 ? (
@@ -213,41 +213,41 @@ const Dashboard = () => {
             </div>
           ) : (
             <>
-              {/* Desktop Table View */}
-              <table className="hidden md:table w-full text-left border-collapse min-w-[800px]">
+              <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-sm border-b border-gray-100 dark:border-gray-800">
-                    <th className="px-6 py-4 font-semibold">Invoice Details</th>
-                    <th className="px-6 py-4 font-semibold">Client & Site</th>
-                    <th className="px-6 py-4 font-semibold text-right">Amount</th>
-                    <th className="px-6 py-4 font-semibold text-center">Status</th>
-                    <th className="px-6 py-4 font-semibold text-right">Actions</th>
+                  <tr className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 text-[10px] md:text-sm border-b border-gray-100 dark:border-gray-800">
+                    <th className="px-2 py-2 md:px-6 md:py-4 font-semibold">Invoice Details</th>
+                    <th className="px-2 py-2 md:px-6 md:py-4 font-semibold hidden sm:table-cell">Client & Site</th>
+                    <th className="px-2 py-2 md:px-6 md:py-4 font-semibold text-right">Amount</th>
+                    <th className="px-2 py-2 md:px-6 md:py-4 font-semibold text-center">Status</th>
+                    <th className="px-2 py-2 md:px-6 md:py-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                   {filteredInvoices.map((inv) => (
                     <tr key={inv.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-800 dark:text-white/90">{inv.invoice_no}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
-                          <Calendar className="w-3.5 h-3.5 mr-1.5" />
+                      <td className="px-2 py-2 md:px-6 md:py-4">
+                        <div className="font-medium text-xs md:text-sm text-gray-800 dark:text-white/90">{inv.invoice_no}</div>
+                        <div className="text-[10px] md:text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
+                          <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5" />
                           {new Date(inv.invoice_date).toLocaleDateString('en-GB')}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                          <Building className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-                          {inv.client_name || 'N/A'}
+                      <td className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">
+                        <div className="font-medium text-xs md:text-sm text-gray-700 dark:text-gray-300 flex items-center truncate max-w-[120px] md:max-w-none">
+                          <Building className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-gray-400 dark:text-gray-500 shrink-0" />
+                          <span className="truncate">{inv.client_name || 'N/A'}</span>
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
-                          <MapPin className="w-3.5 h-3.5 mr-1.5" />
-                          Site ID: {inv.site_id || 'N/A'}
+                        <div className="text-[10px] md:text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
+                          <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5" />
+                          <span className="truncate">Site ID: {inv.site_id || 'N/A'}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right font-semibold text-gray-800 dark:text-white/90">
+                      <td className="px-2 py-2 md:px-6 md:py-4 text-right font-semibold text-xs md:text-sm text-gray-800 dark:text-white/90">
                         ₹{parseFloat(inv.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      </td>
+                      <td className="px-2 py-2 md:px-6 md:py-4 text-center">
                         <select
                           value={inv.status.toUpperCase()}
                           onChange={(e) => handleStatusChange(inv.id, e.target.value)}
@@ -264,23 +264,24 @@ const Dashboard = () => {
                           {inv.status === 'draft' && <option value="DRAFT" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Draft</option>}
                         </select>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
+                      </td>
+                      <td className="px-2 py-2 md:px-6 md:py-4 text-right">
+                        <div className="flex items-center justify-end space-x-1 md:space-x-2">
                           <button
                             onClick={() => handleDownload(inv.id, 'pdf')}
                             className="flex items-center space-x-1 px-2 py-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-100 dark:border-red-500/20 rounded-md transition-colors"
                             title="Download PDF"
                           >
-                            <FileText className="w-4 h-4" />
-                            <span className="text-xs font-semibold">PDF</span>
+                            <FileText className="w-3 h-3 md:w-4 md:h-4" />
+                            <span className="text-[10px] md:text-xs font-semibold hidden lg:inline">PDF</span>
                           </button>
                           <button
                             onClick={() => handleDownload(inv.id, 'excel')}
-                            className="flex items-center space-x-1 px-2 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20 rounded-md transition-colors"
+                            className="flex items-center space-x-1 px-1.5 py-1 md:px-2 md:py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20 rounded-md transition-colors"
                             title="Download Excel"
                           >
-                            <FileSpreadsheet className="w-4 h-4" />
-                            <span className="text-xs font-semibold">Excel</span>
+                            <FileSpreadsheet className="w-3 h-3 md:w-4 md:h-4" />
+                            <span className="text-[10px] md:text-xs font-semibold hidden lg:inline">Excel</span>
                           </button>
                           <button
                             onClick={() => navigate(`/admin/invoice/${inv.id}/edit`)}
@@ -302,87 +303,6 @@ const Dashboard = () => {
                   ))}
                 </tbody>
               </table>
-
-              {/* Mobile Card View */}
-              <div className="md:hidden flex flex-col gap-4 p-4 bg-gray-50 dark:bg-transparent">
-                {filteredInvoices.map((inv) => (
-                  <div key={inv.id} className="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col gap-4 relative">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-bold text-gray-800 dark:text-white/90 text-lg">{inv.invoice_no}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
-                          <Calendar className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
-                          {new Date(inv.invoice_date).toLocaleDateString('en-GB')}
-                        </div>
-                      </div>
-                      <select
-                        value={inv.status.toUpperCase()}
-                        onChange={(e) => handleStatusChange(inv.id, e.target.value)}
-                        className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold cursor-pointer outline-none border focus:ring-2 focus:ring-offset-1 transition-colors ${
-                          inv.status.toUpperCase() === 'PENDING' ? 'bg-accent/20 text-yellow-700 dark:text-yellow-500 border-accent/40 focus:ring-accent/50' :
-                          inv.status.toUpperCase() === 'ONGOING' ? 'bg-secondary/10 text-secondary border-secondary/30 focus:ring-secondary/50' :
-                          inv.status.toUpperCase() === 'COMPLETED' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 focus:ring-emerald-500/30' :
-                          'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 focus:ring-gray-500/30'
-                        }`}
-                      >
-                        <option value="PENDING" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Pending</option>
-                        <option value="ONGOING" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Ongoing</option>
-                        <option value="COMPLETED" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Completed</option>
-                        {inv.status === 'draft' && <option value="DRAFT" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Draft</option>}
-                      </select>
-                    </div>
-
-                    <div className="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-xl border border-gray-100 dark:border-gray-800">
-                      <div className="font-medium text-gray-700 dark:text-gray-300 flex items-center">
-                        <Building className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-                        {inv.client_name || 'N/A'}
-                      </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mt-2">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400 dark:text-gray-500" />
-                        Site ID: {inv.site_id || 'N/A'}
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center border-t border-gray-100 dark:border-gray-700 pt-4">
-                      <div className="text-lg font-bold text-primary">
-                        ₹{parseFloat(inv.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => handleDownload(inv.id, 'pdf')}
-                          className="flex items-center space-x-1 px-2 py-1.5 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 border border-red-100 dark:border-red-500/20 rounded-md transition-colors"
-                          title="Download PDF"
-                        >
-                          <FileText className="w-4 h-4" />
-                          <span className="text-xs font-semibold hidden sm:inline">PDF</span>
-                        </button>
-                        <button
-                          onClick={() => handleDownload(inv.id, 'excel')}
-                          className="flex items-center space-x-1 px-2 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 border border-emerald-100 dark:border-emerald-500/20 rounded-md transition-colors"
-                          title="Download Excel"
-                        >
-                          <FileSpreadsheet className="w-4 h-4" />
-                          <span className="text-xs font-semibold hidden sm:inline">Excel</span>
-                        </button>
-                        <button
-                          onClick={() => navigate(`/admin/invoice/${inv.id}/edit`)}
-                          className="p-1.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors"
-                          title="Edit"
-                        >
-                          <Edit className="w-5 h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(inv.id)}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </>
           )}
         </div>

@@ -138,7 +138,7 @@ const InvoiceForm = () => {
     if (id) {
       fetchInvoice();
     } else {
-      if (!invoice.invoice_no) generateInvoiceNumber();
+      generateInvoiceNumber();
     }
   }, [id]);
 

@@ -232,71 +232,72 @@ const SiteManagement = () => {
                 </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 dark:border-gray-800 dark:bg-white/3">
-                <div className="hidden lg:block max-w-full overflow-x-auto">
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-2 pt-4 pb-3 sm:px-6 dark:border-gray-800 dark:bg-white/3">
+                <div className="w-full">
                     <table className="w-full text-left">
                         <thead className="border-y border-gray-100 dark:border-gray-800">
                         <tr>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2 w-10">
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 w-6 md:w-10">
                                 <input 
                                     type="checkbox" 
-                                    className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                                    className="w-3 h-3 md:w-4 md:h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
                                     checked={filteredSites.length > 0 && selectedIds.length === filteredSites.length}
                                     onChange={handleSelectAll}
                                 />
                             </th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">ID</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Site Name</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Branch Code</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">State</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Address</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Operational Status</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Requirements</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Status</th>
-                            <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Actions</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">ID</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Site Name</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Branch Code</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden md:table-cell">State</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">Address</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Op. Status</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden md:table-cell">Requirements</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Status</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Actions</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                         {filteredSites.map(site => (
                             <tr key={site.id} className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${selectedIds.includes(site.id) ? 'bg-brand-50/50 dark:bg-brand-500/5' : ''}`}>
-                                <td className="py-3 px-2">
+                                <td className="py-2 md:py-3 px-1 md:px-2">
                                     <input 
                                         type="checkbox" 
-                                        className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
+                                        className="w-3 h-3 md:w-4 md:h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer"
                                         checked={selectedIds.includes(site.id)}
                                         onChange={() => handleSelect(site.id)}
                                     />
                                 </td>
-                                <td className="py-3 px-2 text-sm font-mono text-gray-500 dark:text-gray-400">{site.id}</td>
-                                <td className="py-3 px-2 text-sm font-medium text-gray-800 dark:text-white/90">{site.name}</td>
-                                <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">{site.code}</td>
-                                <td className="py-3 px-2 text-sm font-medium text-brand-500">{site.state || '-'}</td>
-                                <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{site.address}</td>
-                                <td className="py-3 px-2">
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400 hidden sm:table-cell">{site.id}</td>
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[60px] md:max-w-none">{site.name}</td>
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400">{site.code}</td>
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-brand-500 hidden md:table-cell">{site.state || '-'}</td>
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 max-w-[80px] md:max-w-xs truncate hidden sm:table-cell">{site.address}</td>
+                                <td className="py-2 md:py-3 px-1 md:px-2">
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full text-[8px] md:text-xs font-medium truncate max-w-[50px] md:max-w-none
                                         ${site.operational_status === 'Requirements' ? 'bg-warning-50 text-warning-700 dark:bg-warning-500/10 dark:text-warning-400' : 
                                           site.operational_status === 'Panel Fault' ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' :
                                           site.operational_status === 'Pending' ? 'bg-blue-light-50 text-blue-light-700 dark:bg-blue-light-500/10 dark:text-blue-light-400' :
                                           'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}
                                     `}>
-                                        {site.operational_status || 'N/A'}
+                                        <span className="truncate">{site.operational_status === 'Requirements' ? 'Req' : site.operational_status === 'Panel Fault' ? 'Fault' : site.operational_status === 'Pending' ? 'Pend' : site.operational_status || 'N/A'}</span>
                                     </span>
                                 </td>
-                                <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" title={site.requirements_note}>
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 max-w-[60px] md:max-w-xs truncate hidden md:table-cell" title={site.requirements_note}>
                                     {site.requirements_note || '-'}
                                 </td>
-                                <td className="py-3 px-2">
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${site.status === 'ACTIVE' ? 'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400' : 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400'}`}>
-                                        {site.status}
+                                <td className="py-2 md:py-3 px-1 md:px-2">
+                                    <span className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full text-[8px] md:text-xs font-medium ${site.status === 'ACTIVE' ? 'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400' : 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400'}`}>
+                                        <span className="hidden md:inline">{site.status}</span>
+                                        <span className="md:hidden">{site.status === 'ACTIVE' ? 'ACT' : 'INACT'}</span>
                                     </span>
                                 </td>
-                                <td className="py-3 px-2">
-                                    <div className="flex space-x-3">
-                                        <button onClick={() => openEdit(site)} className="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Edit Site">
-                                            <Edit2 className="w-4 h-4" />
+                                <td className="py-2 md:py-3 px-1 md:px-2">
+                                    <div className="flex space-x-1.5 md:space-x-3">
+                                        <button onClick={() => openEdit(site)} className="p-1 md:p-0 text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Edit Site">
+                                            <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
                                         </button>
-                                        <button onClick={() => handleDelete(site.id)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors" title="Delete Site">
-                                            <Trash2 className="w-4 h-4" />
+                                        <button onClick={() => handleDelete(site.id)} className="p-1 md:p-0 text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors" title="Delete Site">
+                                            <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                                         </button>
                                     </div>
                                 </td>
@@ -307,65 +308,6 @@ const SiteManagement = () => {
                         )}
                     </tbody>
                 </table>
-                </div>
-
-                {/* Mobile Grid View */}
-                <div className="lg:hidden mt-4 space-y-4">
-                    {filteredSites.map(site => (
-                        <div key={site.id} className={`rounded-xl border bg-white p-4 dark:bg-white/3 flex flex-col space-y-3 ${selectedIds.includes(site.id) ? 'border-brand-500 ring-1 ring-brand-500' : 'border-gray-200 dark:border-gray-800'}`}>
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center space-x-3">
-                                    <input 
-                                        type="checkbox" 
-                                        className="w-4 h-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500 dark:border-gray-600 dark:bg-gray-700 cursor-pointer mt-1"
-                                        checked={selectedIds.includes(site.id)}
-                                        onChange={() => handleSelect(site.id)}
-                                    />
-                                    <div>
-                                        <h3 className="font-medium text-gray-800 dark:text-white/90 leading-tight">{site.name}</h3>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 font-mono mt-0.5">{site.code} | ID: {site.id}</p>
-                                    </div>
-                                </div>
-                                <span className={`inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider shrink-0 ${site.status === 'ACTIVE' ? 'bg-success-100 text-success-700 dark:bg-success-500/10 dark:text-success-400' : 'bg-error-100 text-error-700 dark:bg-error-500/10 dark:text-error-400'}`}>
-                                    {site.status}
-                                </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-3 text-xs bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
-                                <div className="col-span-2">
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Address</span>
-                                    <span className="font-medium text-gray-800 dark:text-white/90 block truncate">{site.address}</span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">State</span>
-                                    <span className="font-medium text-brand-500">{site.state || '-'}</span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Op. Status</span>
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium
-                                        ${site.operational_status === 'Requirements' ? 'bg-warning-50 text-warning-700 dark:bg-warning-500/10 dark:text-warning-400' : 
-                                          site.operational_status === 'Panel Fault' ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' :
-                                          site.operational_status === 'Pending' ? 'bg-blue-light-50 text-blue-light-700 dark:bg-blue-light-500/10 dark:text-blue-light-400' :
-                                          'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}
-                                    `}>
-                                        {site.operational_status || 'N/A'}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div className="flex justify-end items-center pt-2 gap-2">
-                                <button onClick={() => openEdit(site)} className="p-2 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-brand-500 hover:border-brand-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-brand-800 dark:hover:text-brand-500 transition-colors">
-                                    <Edit2 className="w-4 h-4" />
-                                </button>
-                                <button onClick={() => handleDelete(site.id)} className="p-2 rounded-lg border border-gray-200 bg-white text-gray-500 hover:text-error-500 hover:border-error-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-error-800 dark:hover:text-error-500 transition-colors">
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {filteredSites.length === 0 && (
-                        <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400 text-sm">No sites found.</div>
-                    )}
                 </div>
             </div>
 

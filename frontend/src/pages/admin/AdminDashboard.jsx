@@ -92,15 +92,15 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                <div className="hidden lg:block max-w-full overflow-x-auto">
+                <div className="w-full">
                     <table className="w-full">
                         <thead className="border-y border-gray-100 dark:border-gray-800">
                             <tr>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Employee</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Site</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Check In</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Check Out</th>
-                                <th className="py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 px-2">Status</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Employee</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Site</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Check In</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">Check Out</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -113,13 +113,13 @@ const AdminDashboard = () => {
                             ) : (
                                 stats.live_attendance.map((record) => (
                                     <tr key={record.id}>
-                                        <td className="py-3 px-2 text-sm font-medium text-gray-800 dark:text-white/90">{record.emp_name}</td>
-                                        <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">{record.site_name || 'N/A'}</td>
-                                        <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">{new Date(record.check_in_time).toLocaleTimeString()}</td>
-                                        <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">
-                                            {record.check_out_time ? new Date(record.check_out_time).toLocaleTimeString() : '-'}
+                                        <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{record.emp_name}</td>
+                                        <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 truncate max-w-[60px] md:max-w-none">{record.site_name || 'N/A'}</td>
+                                        <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400">{new Date(record.check_in_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                                        <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
+                                            {record.check_out_time ? new Date(record.check_out_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-'}
                                         </td>
-                                        <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">
+                                        <td className="py-2 md:py-3 px-1 md:px-2 text-right">
                                             {record.status === 'WORKING' ? (
                                                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-400 dark:ring-amber-400/20">
                                                     Working
@@ -135,48 +135,6 @@ const AdminDashboard = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Mobile Grid View */}
-                <div className="lg:hidden mt-4 space-y-4">
-                    {stats.live_attendance.map((record) => (
-                        <div key={record.id} className="rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-white/3 flex flex-col space-y-3">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="font-medium text-gray-800 dark:text-white/90 leading-tight">{record.emp_name}</h3>
-                                </div>
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ring-1 ring-inset ${
-                                    record.status === 'WORKING' 
-                                        ? 'bg-amber-50 text-amber-700 ring-amber-600/20 dark:bg-amber-400/10 dark:text-amber-400 dark:ring-amber-400/20' 
-                                        : 'bg-green-50 text-green-700 ring-green-600/20 dark:bg-green-500/10 dark:text-green-400 dark:ring-green-500/20'
-                                }`}>
-                                    {record.status}
-                                </span>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 gap-3 text-xs bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-100 dark:border-gray-800">
-                                <div className="col-span-2">
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Site</span>
-                                    <span className="font-medium text-gray-700 dark:text-gray-300 block truncate">{record.site_name || 'N/A'}</span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Check In</span>
-                                    <span className="font-medium text-blue-600 dark:text-blue-400">
-                                        {new Date(record.check_in_time).toLocaleTimeString()}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="text-gray-400 dark:text-gray-500 block mb-0.5">Check Out</span>
-                                    <span className="font-medium text-blue-600 dark:text-blue-400">
-                                        {record.check_out_time ? new Date(record.check_out_time).toLocaleTimeString() : '-'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                    {stats.live_attendance.length === 0 && (
-                        <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">No attendance recorded today</div>
-                    )}
                 </div>
             </div>
         </div>

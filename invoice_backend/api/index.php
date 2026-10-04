@@ -248,9 +248,33 @@ if (preg_match('/^invoices$/', $route)) {
 
         try {
             $pdo->beginTransaction();
+            
+            // Auto-generate unique invoice_no on backend to prevent duplicates
+            $currentMonth = (int)date('m');
+            $currentYear = (int)date('Y');
+            if ($currentMonth >= 4) {
+                $finYearStart = $currentYear;
+                $finYearEnd = $currentYear + 1;
+            } else {
+                $finYearStart = $currentYear - 1;
+                $finYearEnd = $currentYear;
+            }
+            $prefix = $finYearStart . "-" . $finYearEnd;
+            $stmtLast = $pdo->prepare("SELECT invoice_no FROM invoices WHERE invoice_no LIKE ? ORDER BY id DESC LIMIT 1");
+            $stmtLast->execute([$prefix . '-%']);
+            $lastInvoice = $stmtLast->fetchColumn();
+            $nextNum = 1;
+            if ($lastInvoice) {
+                $parts = explode('-', $lastInvoice);
+                if (count($parts) >= 3) {
+                    $nextNum = (int)end($parts) + 1;
+                }
+            }
+            $final_invoice_no = sprintf("%s-%03d", $prefix, $nextNum);
+
             $ins = $pdo->prepare("INSERT INTO invoices (invoice_no, invoice_date, payment_terms, vendor_id, client_id, project_site_details, client_project, site_id, location, amount_in_words, total_amount, status, terms_conditions, signature_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $ins->execute([
-                $data['invoice_no'], $data['invoice_date'], $data['payment_terms'], $vendor_id, $client_id,
+                $final_invoice_no, $data['invoice_date'], $data['payment_terms'], $vendor_id, $client_id,
                 $data['project_site_details'], $data['client_project'], $data['site_id'], $data['location'],
                 $data['amount_in_words'], $data['total_amount'], $data['status'], $data['terms_conditions'], $data['signature_image'] ?? null
             ]);

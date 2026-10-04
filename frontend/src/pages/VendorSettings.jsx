@@ -81,35 +81,35 @@ const VendorSettings = () => {
   if (!isSuperAdmin) {
       return (
           <div className="p-8 text-center mt-20">
-              <h2 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h2>
-              <p className="text-slate-500">Only Super Admins can access the Settings page.</p>
+              <h2 className="text-2xl font-bold text-error-600 dark:text-error-500 mb-2">Access Denied</h2>
+              <p className="text-gray-500 dark:text-gray-400">Only Super Admins can access the Settings page.</p>
           </div>
       );
   }
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Loading...</div>;
+  if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading...</div>;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Vendor Settings</h1>
-        <p className="text-slate-500 text-sm mt-1">Default details that will appear on your invoices</p>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Vendor Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Default details that will appear on your invoices</p>
       </div>
 
       {/* Admin Login Credentials */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-        <h2 className="text-lg font-bold text-primary mb-4 flex items-center border-b border-slate-100 pb-2">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 p-6">
+        <h2 className="text-lg font-bold text-brand-500 mb-4 flex items-center border-b border-gray-100 dark:border-gray-800 pb-2">
           <Lock className="w-5 h-5 mr-2" />
           Admin Login Credentials
         </h2>
         <form onSubmit={handleAdminSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">New Username</label>
-            <input type="text" value={adminCreds.username} onChange={(e) => setAdminCreds({...adminCreds, username: e.target.value})} placeholder="Leave blank to keep current" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Username</label>
+            <input type="text" value={adminCreds.username} onChange={(e) => setAdminCreds({...adminCreds, username: e.target.value})} placeholder="Leave blank to keep current" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">New Password</label>
-            <input type="password" value={adminCreds.password} onChange={(e) => setAdminCreds({...adminCreds, password: e.target.value})} placeholder="Leave blank to keep current" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+            <input type="password" value={adminCreds.password} onChange={(e) => setAdminCreds({...adminCreds, password: e.target.value})} placeholder="Leave blank to keep current" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
           </div>
           <div className="md:col-span-2 flex justify-end">
             <button type="submit" disabled={savingCreds} className="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-white px-5 py-2 rounded-xl font-medium transition-all disabled:opacity-70">
@@ -122,64 +122,64 @@ const VendorSettings = () => {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Company Details */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-bold text-primary mb-4 flex items-center border-b border-slate-100 pb-2">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 p-6">
+          <h2 className="text-lg font-bold text-brand-500 mb-4 flex items-center border-b border-gray-100 dark:border-gray-800 pb-2">
             <Building className="w-5 h-5 mr-2" />
             Company Details
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Company / Vendor Name</label>
-              <input type="text" name="name" value={vendor.name} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" required />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Company / Vendor Name</label>
+              <input type="text" name="name" value={vendor.name} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" required />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-              <input type="email" name="email" value={vendor.email} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+              <input type="email" name="email" value={vendor.email} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">PAN No.</label>
-              <input type="text" name="pan_no" value={vendor.pan_no} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">PAN No.</label>
+              <input type="text" name="pan_no" value={vendor.pan_no} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Address</label>
-              <textarea name="address" value={vendor.address} onChange={handleChange} rows="3" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"></textarea>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Address</label>
+              <textarea name="address" value={vendor.address} onChange={handleChange} rows="3" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
             </div>
           </div>
         </div>
 
         {/* Bank Details */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-bold text-primary mb-4 flex items-center border-b border-slate-100 pb-2">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 p-6">
+          <h2 className="text-lg font-bold text-brand-500 mb-4 flex items-center border-b border-gray-100 dark:border-gray-800 pb-2">
             <CreditCard className="w-5 h-5 mr-2" />
             Bank & Payment Details
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Account Holder Name</label>
-              <input type="text" name="bank_holder_name" value={vendor.bank_holder_name} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account Holder Name</label>
+              <input type="text" name="bank_holder_name" value={vendor.bank_holder_name} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Bank Name</label>
-              <input type="text" name="bank_name" value={vendor.bank_name} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Name</label>
+              <input type="text" name="bank_name" value={vendor.bank_name} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Account No.</label>
-              <input type="text" name="account_no" value={vendor.account_no} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Account No.</label>
+              <input type="text" name="account_no" value={vendor.account_no} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">IFSC Code</label>
-              <input type="text" name="ifsc_code" value={vendor.ifsc_code} onChange={handleChange} className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none" />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">IFSC Code</label>
+              <input type="text" name="ifsc_code" value={vendor.ifsc_code} onChange={handleChange} className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-1">Bank Address</label>
-              <textarea name="bank_address" value={vendor.bank_address} onChange={handleChange} rows="2" className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-primary outline-none"></textarea>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Bank Address</label>
+              <textarea name="bank_address" value={vendor.bank_address} onChange={handleChange} rows="2" className="w-full px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"></textarea>
             </div>
           </div>
         </div>
 
         {/* Signature Details */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-          <h2 className="text-lg font-bold text-primary mb-4 flex items-center border-b border-slate-100 pb-2">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 p-6">
+          <h2 className="text-lg font-bold text-brand-500 mb-4 flex items-center border-b border-gray-100 dark:border-gray-800 pb-2">
             Authorized Signatory
           </h2>
           <div>
@@ -195,7 +195,7 @@ const VendorSettings = () => {
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center space-x-2 bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-medium shadow-lg shadow-primary/30 transition-all disabled:opacity-70"
+            className="flex items-center space-x-2 bg-brand-500 hover:bg-brand-500/90 text-white px-6 py-3 rounded-xl font-medium shadow-lg shadow-primary/30 transition-all disabled:opacity-70"
           >
             <Save className="w-5 h-5" />
             <span>{saving ? 'Saving...' : 'Save Settings'}</span>

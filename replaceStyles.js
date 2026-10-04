@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const dir = 'frontend/src/pages/admin';
-const files = fs.readdirSync(dir).filter(f => f.endsWith('.jsx'));
+const dir = 'frontend/src/pages';
+
+const files = fs.readdirSync(dir).filter(f => f === 'VendorSettings.jsx');
 
 const mappings = [
     { from: /text-slate-800/g, to: 'text-gray-800 dark:text-white/90' },

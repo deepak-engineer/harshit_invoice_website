@@ -184,7 +184,7 @@ const WorkChecklist = () => {
                                 </div>
 
                                 {itemPhotos.length > 0 && (
-                                    <div className="flex space-x-2 overflow-x-auto py-2">
+                                    <div className="flex flex-wrap gap-2 py-2">
                                         {itemPhotos.map(photo => (
                                             <img key={photo.id} src={`${api.defaults.baseURL.replace('/api', '')}/uploads/work/${photo.photo_url}`} alt="proof" className="w-16 h-16 object-cover rounded-lg border border-slate-200" />
                                         ))}
