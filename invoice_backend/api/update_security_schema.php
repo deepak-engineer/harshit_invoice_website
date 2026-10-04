@@ -16,8 +16,12 @@ CREATE TABLE IF NOT EXISTS `security_forms` (
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Ensure state column exists if table was already created
+-- Ensure state and uuid columns exist if table was already created
 ALTER TABLE `security_forms` ADD COLUMN IF NOT EXISTS `state` VARCHAR(100) DEFAULT NULL AFTER `address`;
+ALTER TABLE `security_forms` ADD COLUMN IF NOT EXISTS `uuid` VARCHAR(36) UNIQUE AFTER `id`;
+
+-- Populate uuid for existing rows
+UPDATE `security_forms` SET `uuid` = UUID() WHERE `uuid` IS NULL;
 
 CREATE TABLE IF NOT EXISTS `security_form_items` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,

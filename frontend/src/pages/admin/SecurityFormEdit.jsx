@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Trash2, Plus, Save, ArrowLeft, Printer } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ const FIXED_SECTIONS = {
 const SecurityFormEdit = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const isEdit = Boolean(id);
 
     const [loading, setLoading] = useState(true);
@@ -159,11 +160,14 @@ const SecurityFormEdit = () => {
                 console.error(error);
             } finally {
                 setLoading(false);
+                if (new URLSearchParams(location.search).get('print') === 'true') {
+                    setTimeout(() => window.print(), 500);
+                }
             }
         };
         initData();
         
-    }, [id, isEdit]);
+    }, [id, isEdit, location.search]);
 
     useEffect(() => {
         // Update document title for print header and file download name

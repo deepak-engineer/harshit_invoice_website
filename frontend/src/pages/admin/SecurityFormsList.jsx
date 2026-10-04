@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Eye, Search } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, Search, Printer } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -105,7 +105,9 @@ const SecurityFormsList = () => {
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {filteredForms.map(form => (
                                 <tr key={form.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <td className="py-3 px-2 text-sm font-mono text-gray-500 dark:text-gray-400">{form.id}</td>
+                                    <td className="py-3 px-2 text-sm font-mono text-gray-500 dark:text-gray-400" title={form.uuid || form.id}>
+                                        {form.uuid ? form.uuid.split('-')[0].toUpperCase() : form.id}
+                                    </td>
                                     <td className="py-3 px-2 text-sm font-medium text-gray-800 dark:text-white/90">{form.branch_code}</td>
                                     <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">{form.address}</td>
                                     <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400">
@@ -115,6 +117,9 @@ const SecurityFormsList = () => {
                                         <div className="flex space-x-3">
                                             <button onClick={() => navigate(`${basePath}/security-requirements/${form.id}/edit`)} className="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Edit Form">
                                                 <Edit2 className="w-4 h-4" />
+                                            </button>
+                                            <button onClick={() => window.open(`${basePath}/security-requirements/${form.id}/edit?print=true`, '_blank')} className="text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors" title="Download PDF">
+                                                <Printer className="w-4 h-4" />
                                             </button>
                                             <button onClick={() => handleDelete(form.id)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors" title="Delete Form">
                                                 <Trash2 className="w-4 h-4" />

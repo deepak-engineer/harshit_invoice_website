@@ -45,7 +45,7 @@ if (preg_match('/^security-equipment$/', $route)) {
 if (preg_match('/^security-forms$/', $route)) {
     if ($method === 'GET') {
         try {
-            $stmt = $pdo->query("SELECT id, branch_code, address, state, created_at FROM security_forms ORDER BY created_at DESC");
+            $stmt = $pdo->query("SELECT id, uuid, branch_code, address, state, created_at FROM security_forms ORDER BY created_at DESC");
             echo json_encode($stmt->fetchAll());
         } catch (Exception $e) {
             http_response_code(500);
@@ -60,7 +60,7 @@ if (preg_match('/^security-forms$/', $route)) {
         try {
             $pdo->beginTransaction();
             
-            $ins = $pdo->prepare("INSERT INTO security_forms (branch_code, address, state) VALUES (?, ?, ?)");
+            $ins = $pdo->prepare("INSERT INTO security_forms (uuid, branch_code, address, state) VALUES (UUID(), ?, ?, ?)");
             $ins->execute([$data['branch_code'], $data['address'], $data['state']]);
             $form_id = $pdo->lastInsertId();
             
