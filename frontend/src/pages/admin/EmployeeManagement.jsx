@@ -356,6 +356,7 @@ const EmployeeManagement = () => {
     if (loading) return <div>Loading...</div>;
 
     return (
+        <>
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Employee Management</h1>
@@ -959,7 +960,7 @@ const EmployeeManagement = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

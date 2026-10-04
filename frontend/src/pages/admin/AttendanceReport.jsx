@@ -384,8 +384,6 @@ const AttendanceReport = () => {
                                     </tbody>
                                 </table>
                             </div>
-
-                            </div>
                         </div>
                     )}
                 </div>

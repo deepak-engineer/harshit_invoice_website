@@ -125,6 +125,7 @@ const TeamManagement = () => {
     if (loading) return <div>Loading...</div>;
 
     return (
+        <>
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Team Management</h1>
@@ -258,7 +259,7 @@ const TeamManagement = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

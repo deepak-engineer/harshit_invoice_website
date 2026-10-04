@@ -246,7 +246,6 @@ const Dashboard = () => {
                       <td className="px-2 py-2 md:px-6 md:py-4 text-right font-semibold text-xs md:text-sm text-gray-800 dark:text-white/90">
                         ₹{parseFloat(inv.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </td>
-                      </td>
                       <td className="px-2 py-2 md:px-6 md:py-4 text-center">
                         <select
                           value={inv.status.toUpperCase()}
@@ -263,7 +262,6 @@ const Dashboard = () => {
                           <option value="COMPLETED" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Completed</option>
                           {inv.status === 'draft' && <option value="DRAFT" className="bg-white dark:bg-gray-800 text-gray-800 dark:text-white">Draft</option>}
                         </select>
-                      </td>
                       </td>
                       <td className="px-2 py-2 md:px-6 md:py-4 text-right">
                         <div className="flex items-center justify-end space-x-1 md:space-x-2">
