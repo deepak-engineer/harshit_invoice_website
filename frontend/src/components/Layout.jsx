@@ -48,8 +48,12 @@ const Layout = () => {
     { name: 'Expenses', path: '/admin/expenses', icon: Receipt },
     { name: 'Security Forms', path: '/admin/security-requirements', icon: Shield },
     { name: 'Invoices', path: '/admin/invoices', icon: FileText },
-    { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
+
+  const isSuperAdmin = localStorage.getItem('is_super_admin') === 'true';
+  if (isSuperAdmin) {
+      adminNavItems.push({ name: 'Settings', path: '/admin/settings', icon: Settings });
+  }
 
   const employeeNavItems = [
     { name: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },

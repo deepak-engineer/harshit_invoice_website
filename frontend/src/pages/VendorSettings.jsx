@@ -6,6 +6,7 @@ import api from '../utils/api';
 import SignatureUploader from '../components/SignatureUploader';
 
 const VendorSettings = () => {
+  const isSuperAdmin = localStorage.getItem('is_super_admin') === 'true';
   const [vendor, setVendor] = useState({
     name: '',
     address: '',
@@ -76,6 +77,15 @@ const VendorSettings = () => {
       setSaving(false);
     }
   };
+
+  if (!isSuperAdmin) {
+      return (
+          <div className="p-8 text-center mt-20">
+              <h2 className="text-2xl font-bold text-red-600 mb-2">Access Denied</h2>
+              <p className="text-gray-500 dark:text-gray-400">Only Super Admins can access the Settings page.</p>
+          </div>
+      );
+  }
 
   if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading...</div>;
 

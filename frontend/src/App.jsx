@@ -33,6 +33,9 @@ const RoleProtectedRoute = ({ allowedRole }) => {
     const checkAuth = async () => {
       try {
         const res = await api.get('/check-auth');
+        if (res.data.is_super_admin) localStorage.setItem('is_super_admin', 'true');
+        else localStorage.setItem('is_super_admin', 'false');
+        
         setAuthStatus({
           loading: false,
           authenticated: res.data.authenticated,

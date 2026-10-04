@@ -41,7 +41,16 @@ if ($route === 'login' && $method === 'POST') {
     
     $user = null;
     if ($role === 'admin') {
-        $stmt = $pdo->prepare("SELECT id, password_hash FROM admin_users WHERE username = ?");
+        try {
+            $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_super_admin TINYINT(1) DEFAULT 0");
+            $stmt = $pdo->query("SELECT id FROM admin_users WHERE is_super_admin = 1");
+            if (!$stmt->fetch()) {
+                $hash = password_hash('superadmin123', PASSWORD_DEFAULT);
+                $pdo->prepare("INSERT INTO admin_users (username, password_hash, is_super_admin) VALUES (?, ?, 1)")->execute(['superadmin', $hash]);
+            }
+        } catch (Exception $e) {}
+        
+        $stmt = $pdo->prepare("SELECT id, password_hash, is_super_admin FROM admin_users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
     } else {
@@ -70,9 +79,10 @@ if ($route === 'login' && $method === 'POST') {
 
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $role;
+        $_SESSION['is_super_admin'] = $user['is_super_admin'] ?? 0;
         $_SESSION['login_attempts'] = 0;
         $_SESSION['last_activity'] = time();
-        echo json_encode(["success" => true, "role" => $role]);
+        echo json_encode(["success" => true, "role" => $role, "is_super_admin" => $_SESSION['is_super_admin']]);
     } else {
         recordFailedLogin();
         http_response_code(401);
@@ -139,7 +149,8 @@ checkAuth();
 if ($route === 'check-auth' && $method === 'GET') {
     echo json_encode([
         "authenticated" => true,
-        "role" => $_SESSION['role'] ?? 'employee'
+        "role" => $_SESSION['role'] ?? 'employee',
+        "is_super_admin" => $_SESSION['is_super_admin'] ?? 0
     ]);
     exit;
 }

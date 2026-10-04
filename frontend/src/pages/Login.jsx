@@ -41,6 +41,8 @@ const Login = () => {
       const res = await api.post('/login', { username, password, role });
       // Redirect based on role
       if (res.data.role === 'admin') {
+          if (res.data.is_super_admin) localStorage.setItem('is_super_admin', 'true');
+          else localStorage.setItem('is_super_admin', 'false');
           navigate('/admin/dashboard');
       } else {
           navigate('/employee/dashboard');
