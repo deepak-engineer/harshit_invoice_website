@@ -273,68 +273,27 @@ const AttendanceReport = () => {
             ) : (
                 <div className="space-y-6">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
-                        
-                        {/* Mobile List View (Visible only on small screens) */}
-                        <div className="md:hidden flex flex-col divide-y divide-gray-100 dark:divide-gray-800">
-                            {calendarDays.filter(d => d.isCurrentMonth).map((dayObj, index) => {
-                                let m = month;
-                                let y = year;
-                                const dateStr = `${y}-${m.toString().padStart(2, '0')}-${dayObj.day.toString().padStart(2, '0')}`;
-                                let dayRecords = reportData[dateStr] || [];
-                                
-                                if (debouncedSearch) {
-                                    dayRecords = dayRecords.filter(r => r.name?.toLowerCase().includes(debouncedSearch.toLowerCase()));
-                                }
-                                
-                                const isSun = isSunday(dayObj);
-                                const isHol = isHoliday(dayObj);
-                                const isOff = isSun || isHol;
-                                const isToday = new Date().toDateString() === new Date(y, m-1, dayObj.day).toDateString();
-                                const dateDisplay = new Date(y, m-1, dayObj.day).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-
-                                return (
-                                    <div key={index} className={`p-4 flex flex-col ${isOff ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-white dark:bg-gray-900'}`}>
-                                        <div className="flex justify-between items-center mb-3">
-                                            <span className={`text-base font-bold ${isToday ? 'text-brand-500' : (isSun ? 'text-error-500' : 'text-gray-700 dark:text-gray-300')}`}>
-                                                {dateDisplay}
-                                            </span>
-                                            {isHol && <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded">HOLIDAY</span>}
-                                        </div>
-                                        {dayRecords.length > 0 ? (
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                                {dayRecords.map((record, i) => (
-                                                    <div 
-                                                        key={i} 
-                                                        onClick={() => setEditModal({ isOpen: true, record, dateStr, newStatus: record.status })}
-                                                        className={`text-sm px-3 py-2 rounded-lg border flex items-center justify-between cursor-pointer shadow-theme-xs ${getStatusColor(record.status)}`}
-                                                    >
-                                                        <span className="font-semibold truncate pr-2">{record.name}</span>
-                                                        <span className="font-bold shrink-0">{getStatusShort(record.status)}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            !isOff && <div className="text-sm text-gray-400 dark:text-gray-500 italic">No records</div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-
-                        {/* Desktop Grid View */}
-                        <div className="hidden md:block overflow-x-auto">
-                            <div className="min-w-[800px]">
+                        <div className="w-full">
                                 {/* Days of Week Header */}
                         <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50">
-                            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
-                                <div key={day} className="py-3 text-center text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    {day}
+                            {[
+                                {full: 'Mon', short: 'M'}, 
+                                {full: 'Tue', short: 'T'}, 
+                                {full: 'Wed', short: 'W'}, 
+                                {full: 'Thu', short: 'T'}, 
+                                {full: 'Fri', short: 'F'}, 
+                                {full: 'Sat', short: 'S'}, 
+                                {full: 'Sun', short: 'S'}
+                            ].map(day => (
+                                <div key={day.full} className="py-2 md:py-3 text-center text-xs md:text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    <span className="hidden md:inline">{day.full}</span>
+                                    <span className="md:hidden">{day.short}</span>
                                 </div>
                             ))}
                         </div>
                         
                         {/* Calendar Grid */}
-                        <div className="grid grid-cols-7 auto-rows-[minmax(120px,_1fr)]">
+                        <div className="grid grid-cols-7 auto-rows-[minmax(80px,_1fr)] md:auto-rows-[minmax(120px,_1fr)]">
                             {calendarDays.map((dayObj, index) => {
                                 let m = month + dayObj.monthOffset;
                                 let y = year;
@@ -355,12 +314,12 @@ const AttendanceReport = () => {
                                 const isToday = new Date().toDateString() === new Date(y, m-1, dayObj.day).toDateString();
                                 
                                 return (
-                                    <div key={index} className={`border-b border-r border-gray-100 dark:border-gray-800 p-2 flex flex-col hover:bg-gray-50 dark:bg-gray-800/50 transition-colors relative group ${!dayObj.isCurrentMonth ? 'bg-gray-50 dark:bg-gray-800/50/50' : isOff ? 'bg-gray-50 dark:bg-gray-800/50/70' : 'bg-white dark:bg-gray-900'}`}>
-                                        <div className="flex justify-start items-center space-x-2 mb-2">
-                                            <span className={`text-sm font-semibold flex-shrink-0 ${isToday ? 'bg-brand-500 text-white w-6 h-6 rounded-full flex items-center justify-center' : (isSun ? 'text-error-500 dark:text-error-400' : (!dayObj.isCurrentMonth ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300'))}`}>
+                                    <div key={index} className={`border-b border-r border-gray-100 dark:border-gray-800 p-1 md:p-2 flex flex-col hover:bg-gray-50 dark:bg-gray-800/50 transition-colors relative group ${!dayObj.isCurrentMonth ? 'bg-gray-50 dark:bg-gray-800/50/50' : isOff ? 'bg-gray-50 dark:bg-gray-800/50/70' : 'bg-white dark:bg-gray-900'}`}>
+                                        <div className="flex flex-col md:flex-row justify-start md:items-center space-y-1 md:space-y-0 md:space-x-2 mb-1 md:mb-2">
+                                            <span className={`text-xs md:text-sm font-semibold flex-shrink-0 ${isToday ? 'bg-brand-500 text-white w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center mx-auto md:mx-0' : (isSun ? 'text-error-500 dark:text-error-400 text-center md:text-left' : (!dayObj.isCurrentMonth ? 'text-gray-400 dark:text-gray-500 text-center md:text-left' : 'text-gray-700 dark:text-gray-300 text-center md:text-left'))}`}>
                                                 {dayObj.day}
                                             </span>
-                                            {isHol && <span className="text-[10px] font-bold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded flex-shrink-0">HOLIDAY</span>}
+                                            {isHol && <span className="text-[8px] md:text-[10px] font-bold text-amber-600 bg-amber-100 px-1 py-0.5 rounded flex-shrink-0 text-center md:text-left">HOL</span>}
                                         </div>
                                         
                                         <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
@@ -368,16 +327,16 @@ const AttendanceReport = () => {
                                                 <div 
                                                     key={i} 
                                                     onClick={() => setEditModal({ isOpen: true, record, dateStr, newStatus: record.status })}
-                                                    className={`text-xs px-1.5 py-1 rounded border flex items-center truncate cursor-pointer hover:shadow-md transition-shadow ${getStatusColor(record.status)}`}
+                                                    className={`text-[10px] md:text-xs px-1 md:px-1.5 py-0.5 md:py-1 rounded border flex justify-center md:justify-start items-center truncate cursor-pointer hover:shadow-md transition-shadow ${getStatusColor(record.status)}`}
                                                     title={`Click to edit ${record.name} - ${record.status}`}
                                                 >
-                                                    <span className="font-bold mr-1 shrink-0">[{getStatusShort(record.status)}]</span>
-                                                    <span className="truncate">{record.name}</span>
+                                                    <span className="font-bold shrink-0 md:mr-1">[{getStatusShort(record.status)}]</span>
+                                                    <span className="truncate hidden md:inline">{record.name}</span>
                                                 </div>
                                             ))}
                                             {dayRecords.length === 0 && dayObj.isCurrentMonth && !isOff && (
-                                                <div className="text-xs text-gray-400 dark:text-gray-500 italic text-center mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    No records
+                                                <div className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 italic text-center mt-1 md:mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    None
                                                 </div>
                                             )}
                                         </div>
