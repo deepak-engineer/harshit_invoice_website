@@ -144,6 +144,39 @@ if ($route === 'check-auth' && $method === 'GET') {
     exit;
 }
 
+if ($route === 'admin/update-credentials' && $method === 'POST') {
+    checkAdminAuth();
+    $data = json_decode(file_get_contents('php://input'), true);
+    $new_username = trim($data['username'] ?? '');
+    $new_password = $data['password'] ?? '';
+    
+    if (empty($new_username) && empty($new_password)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Nothing to update"]);
+        exit;
+    }
+    
+    try {
+        if (!empty($new_username) && !empty($new_password)) {
+            $hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE admin_users SET username = ?, password_hash = ? WHERE id = ?");
+            $stmt->execute([$new_username, $hash, $_SESSION['user_id']]);
+        } elseif (!empty($new_username)) {
+            $stmt = $pdo->prepare("UPDATE admin_users SET username = ? WHERE id = ?");
+            $stmt->execute([$new_username, $_SESSION['user_id']]);
+        } elseif (!empty($new_password)) {
+            $hash = password_hash($new_password, PASSWORD_DEFAULT);
+            $stmt = $pdo->prepare("UPDATE admin_users SET password_hash = ? WHERE id = ?");
+            $stmt->execute([$hash, $_SESSION['user_id']]);
+        }
+        echo json_encode(["success" => true, "message" => "Credentials updated successfully. You will need to use these next time you login."]);
+    } catch(PDOException $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Failed to update credentials. " . $e->getMessage()]);
+    }
+    exit;
+}
+
 // --- INVOICES ---
 if (preg_match('/^invoices$/', $route)) {
     if ($method === 'GET') {

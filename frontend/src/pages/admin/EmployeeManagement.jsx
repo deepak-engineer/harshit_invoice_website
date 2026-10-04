@@ -304,7 +304,8 @@ const EmployeeManagement = () => {
     };
 
     const openNew = () => {
-        setFormData({ emp_id: '', first_name: '', last_name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
+        const autoEmpId = 'EMP' + Math.floor(10000 + Math.random() * 90000);
+        setFormData({ emp_id: autoEmpId, first_name: '', last_name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
         setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(null);
@@ -562,7 +563,7 @@ const EmployeeManagement = () => {
                                 </div>
                             </div>
                             <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-800 mt-2">
-                                <div className="flex space-x-2 overflow-x-auto pb-1 pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                                <div className="flex flex-wrap gap-2 pt-2">
                                     {emp.status === 'PENDING' && (
                                         <button onClick={() => handleApprove(emp)} className="flex items-center px-3 py-1.5 text-xs font-medium text-success-700 bg-success-50 hover:bg-success-100 dark:bg-success-500/10 dark:hover:bg-success-500/20 dark:text-success-400 rounded-lg transition-colors whitespace-nowrap">
                                             <CheckCircle className="w-3.5 h-3.5 mr-1.5" strokeWidth={2} /> Approve
@@ -601,8 +602,8 @@ const EmployeeManagement = () => {
                         <form onSubmit={handleFormSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Employee ID</label>
-                                    <input type="text" required value={formData.emp_id} onChange={e => setFormData({...formData, emp_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Employee ID (Auto-generated)</label>
+                                    <input type="text" required disabled value={formData.emp_id} className="w-full px-3 py-2 border rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 outline-none cursor-not-allowed" />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State (For Holidays)</label>
