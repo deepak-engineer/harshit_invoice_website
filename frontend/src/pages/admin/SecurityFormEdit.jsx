@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Trash2, Plus, Save, ArrowLeft, Printer } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
+import { holidays2026 } from '../../utils/holidays2026';
 
 // Fixed Sections Configuration
 const FIXED_SECTIONS = {
@@ -593,13 +594,16 @@ const SecurityFormEdit = () => {
                     </div>
                     <div className="print:flex print:items-start print:pt-1">
                         <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider print:text-[13px] print:font-bold print:text-black print:mb-0 print:w-28 print:pt-0">State:</label>
-                        <input 
-                            type="text" 
+                        <select 
                             value={formData.state}
                             onChange={e => setFormData({...formData, state: e.target.value})}
-                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:flex-1"
-                            placeholder="Enter State"
-                        />
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:flex-1 appearance-none"
+                        >
+                            <option value="">Select State</option>
+                            {Object.keys(holidays2026).map(st => (
+                                <option key={st} value={st}>{st}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>
