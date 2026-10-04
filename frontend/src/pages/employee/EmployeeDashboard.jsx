@@ -180,7 +180,12 @@ const EmployeeDashboard = () => {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <h1 className="text-2xl font-bold text-slate-800">Welcome, {employee.name}</h1>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">
+                    Welcome, {employee.name} 
+                    <span className="text-lg text-gray-500 dark:text-gray-400 font-normal ml-2">
+                        (ID: {employee.emp_id})
+                    </span>
+                </h1>
                 <button 
                     onClick={openSalaryReport} 
                     className="flex items-center justify-center space-x-2 bg-primary text-white px-5 py-2.5 rounded-xl font-medium hover:bg-primary/90 transition-all shadow-sm hover:shadow-md"

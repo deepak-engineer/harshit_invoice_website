@@ -24,6 +24,14 @@ if (preg_match('/^admin\/employees$/', $route)) {
             $site_id = empty($data['site_id']) ? null : $data['site_id'];
             $team_id = empty($data['team_id']) ? null : $data['team_id'];
             
+            $chk = $pdo->prepare("SELECT id FROM employees WHERE emp_id = ?");
+            $chk->execute([$data['emp_id']]);
+            if ($chk->fetch()) {
+                http_response_code(400);
+                echo json_encode(["error" => "Employee ID already exists. Please use a unique ID."]);
+                exit;
+            }
+            
             $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $hash, $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
             echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
@@ -51,14 +59,22 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
             $site_id = empty($data['site_id']) ? null : $data['site_id'];
             $team_id = empty($data['team_id']) ? null : $data['team_id'];
             
+            $chk = $pdo->prepare("SELECT id FROM employees WHERE emp_id = ? AND id != ?");
+            $chk->execute([$data['emp_id'], $id]);
+            if ($chk->fetch()) {
+                http_response_code(400);
+                echo json_encode(["error" => "Employee ID already exists. Please use a unique ID."]);
+                exit;
+            }
+
             $photo_filename = null;
             if (!empty($data['photo']) && strpos($data['photo'], 'data:image') === 0) {
                 $photo_filename = processBase64Image($data['photo'], '../uploads/employees/');
-                $stmt = $pdo->prepare("UPDATE employees SET name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, photo=?, status=?, city=? WHERE id=?");
-                $stmt->execute([$data['name'], $data['phone'] ?? null, $data['username'], $daily_salary, $site_id, $team_id, $photo_filename, $data['status'], $data['state'] ?? null, $id]);
+                $stmt = $pdo->prepare("UPDATE employees SET emp_id=?, name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, photo=?, status=?, city=? WHERE id=?");
+                $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $daily_salary, $site_id, $team_id, $photo_filename, $data['status'], $data['state'] ?? null, $id]);
             } else {
-                $stmt = $pdo->prepare("UPDATE employees SET name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, status=?, city=? WHERE id=?");
-                $stmt->execute([$data['name'], $data['phone'] ?? null, $data['username'], $daily_salary, $site_id, $team_id, $data['status'], $data['state'] ?? null, $id]);
+                $stmt = $pdo->prepare("UPDATE employees SET emp_id=?, name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, status=?, city=? WHERE id=?");
+                $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $daily_salary, $site_id, $team_id, $data['status'], $data['state'] ?? null, $id]);
             }
             echo json_encode(["success" => true]);
         } catch (\Exception $e) {
