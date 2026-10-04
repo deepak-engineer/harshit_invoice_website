@@ -31,6 +31,8 @@ const EmployeeManagement = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [selectedIds, setSelectedIds] = useState([]);
     const [filteredEmployees, setFilteredEmployees] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 10;
     
     const [selectedEmp, setSelectedEmp] = useState(null);
     const [formData, setFormData] = useState({
@@ -79,6 +81,7 @@ const EmployeeManagement = () => {
                 (emp.name && emp.name.toLowerCase().includes(lowerSearch))
             ));
         }
+        setCurrentPage(1);
     }, [debouncedSearch, employees]);
 
     const handleSelectAll = (e) => {
@@ -353,6 +356,14 @@ const EmployeeManagement = () => {
         (t.name && t.name.toLowerCase().includes(teamSearch.toLowerCase()))
     );
 
+    const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
+    const paginatedEmployees = filteredEmployees.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+    const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1)
+        .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1);
+
     if (loading) return <div>Loading...</div>;
 
     return (
@@ -396,7 +407,7 @@ const EmployeeManagement = () => {
                                     />
                                 </th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">ID</th>
-                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden md:table-cell">Photo</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Photo</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Name</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Phone</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">Username</th>
@@ -408,7 +419,7 @@ const EmployeeManagement = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                            {filteredEmployees.map(emp => (
+                            {paginatedEmployees.map(emp => (
                                 <tr key={emp.id} className={`hover:bg-gray-50 dark:bg-gray-800/50 ${selectedIds.includes(emp.id) ? 'bg-brand-500/5' : ''}`}>
                                     <td className="py-2 md:py-3 px-1 md:px-4">
                                         <input 
@@ -419,17 +430,17 @@ const EmployeeManagement = () => {
                                         />
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 font-mono text-[10px] md:text-xs hidden sm:table-cell">{emp.emp_id}</td>
-                                    <td className="py-2 md:py-3 px-1 md:px-4 hidden md:table-cell">
+                                    <td className="py-2 md:py-3 px-1 md:px-4">
                                         {emp.photo ? (
                                             <button 
                                                 onClick={() => setViewingPhoto(`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`)}
                                                 className="focus:outline-none hover:opacity-80 transition-opacity rounded-md shadow-theme-xs ring-2 ring-transparent hover:ring-brand-500/50 overflow-hidden block"
                                                 title="View enlarged photo"
                                             >
-                                                <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-10 h-12 md:w-16 md:h-20 object-cover border border-gray-200 dark:border-gray-800" />
+                                                <img src={`${api.defaults.baseURL.replace(/\/api$/, '')}/uploads/employees/${emp.photo}`} alt="Profile" className="w-8 h-10 md:w-12 md:h-16 object-cover border border-gray-200 dark:border-gray-800 rounded" />
                                             </button>
                                         ) : (
-                                            <div className="w-10 h-12 md:w-16 md:h-20 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800">
+                                            <div className="w-8 h-10 md:w-12 md:h-16 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-800">
                                                 <Camera className="w-4 h-4 md:w-6 md:h-6" />
                                             </div>
                                         )}
@@ -502,6 +513,21 @@ const EmployeeManagement = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {totalPages > 1 && (
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100 dark:border-gray-800">
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                            Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1}-{Math.min(currentPage * ITEMS_PER_PAGE, filteredEmployees.length)} of {filteredEmployees.length}
+                        </div>
+                        <div className="flex items-center space-x-1">
+                            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"><ChevronLeft className="w-4 h-4" /></button>
+                            {pageNumbers.map(item => (
+                                <button key={item} onClick={() => setCurrentPage(item)} className={currentPage === item ? 'min-w-[30px] h-[30px] text-xs rounded-lg bg-brand-500 text-white' : 'min-w-[30px] h-[30px] text-xs rounded-lg border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}>{item}</button>
+                            ))}
+                            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"><ChevronRight className="w-4 h-4" /></button>
+                        </div>
+                    </div>
+                )}
 
                 </div>
             </div>
