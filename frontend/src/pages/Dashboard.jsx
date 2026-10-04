@@ -174,12 +174,12 @@ const Dashboard = () => {
 
       <div className="bg-white dark:bg-white/3 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
         <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex flex-wrap gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg w-full sm:w-auto sm:self-start">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg w-full sm:w-auto sm:self-start">
             {['ALL', 'PENDING', 'ONGOING', 'COMPLETED'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all text-center w-full ${
                   filter === tab 
                     ? 'bg-white dark:bg-gray-900 text-primary shadow-sm' 
                     : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'

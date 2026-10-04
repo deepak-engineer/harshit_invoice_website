@@ -141,12 +141,12 @@ const AdminExpenses = () => {
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50/50 flex flex-col lg:flex-row lg:items-center gap-4">
                     
-                    <div className="flex flex-wrap gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0">
+                    <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0 w-full sm:w-auto">
                         {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setStatusFilter(tab)}
-                                className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${
+                                className={`px-4 py-2 rounded-md text-sm font-bold transition-all text-center w-full ${
                                     statusFilter === tab 
                                         ? 'bg-white dark:bg-gray-900 text-brand-500 shadow-theme-xs' 
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300'
