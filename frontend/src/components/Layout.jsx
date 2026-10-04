@@ -78,7 +78,7 @@ const Layout = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 font-sans text-gray-800 dark:text-white/90">
+    <div className="flex h-[100dvh] bg-gray-50 dark:bg-gray-900 font-sans text-gray-800 dark:text-white/90">
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
         <div className="p-6 flex items-center justify-center h-24 border-b border-gray-100 dark:border-gray-800">

@@ -213,7 +213,7 @@ const AttendanceReport = () => {
                     <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Attendance Report</h1>
                 </div>
                 
-                <div className="flex items-center space-x-4">
+                <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                     <button 
                         onClick={() => setAddModal({ ...addModal, isOpen: true })}
                         className="hidden md:flex items-center space-x-2 bg-brand-500 text-white px-4 py-2 rounded-lg hover:bg-brand-500/90 transition-colors shadow-theme-xs"
@@ -225,7 +225,7 @@ const AttendanceReport = () => {
                     <select 
                         value={selectedState} 
                         onChange={(e) => setSelectedState(e.target.value)}
-                        className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50"
+                        className="px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 w-full sm:w-auto"
                     >
                         <option value="">Select State (for holidays)</option>
                         {Object.keys(holidays2026).map(state => (
@@ -233,7 +233,7 @@ const AttendanceReport = () => {
                         ))}
                     </select>
                     
-                    <div className="flex items-center space-x-2 border-l border-gray-200 dark:border-gray-800 pl-4">
+                    <div className="flex items-center justify-between space-x-2 sm:border-l sm:border-gray-200 dark:sm:border-gray-800 sm:pl-4 w-full sm:w-auto">
                         <button onClick={prevMonth} className="p-2 rounded-lg hover:bg-gray-100 dark:bg-gray-800 transition-colors">
                             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                         </button>
@@ -293,7 +293,7 @@ const AttendanceReport = () => {
                         </div>
                         
                         {/* Calendar Grid */}
-                        <div className="grid grid-cols-7 auto-rows-[minmax(80px,_1fr)] md:auto-rows-[minmax(120px,_1fr)]">
+                        <div className="grid grid-cols-7 auto-rows-[minmax(50px,_1fr)] md:auto-rows-[minmax(120px,_1fr)]">
                             {calendarDays.map((dayObj, index) => {
                                 let m = month + dayObj.monthOffset;
                                 let y = year;
