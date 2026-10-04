@@ -11,9 +11,13 @@ CREATE TABLE IF NOT EXISTS `security_forms` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `branch_code` VARCHAR(100) NOT NULL,
     `address` TEXT,
+    `state` VARCHAR(100) DEFAULT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Ensure state column exists if table was already created
+ALTER TABLE `security_forms` ADD COLUMN IF NOT EXISTS `state` VARCHAR(100) DEFAULT NULL AFTER `address`;
 
 CREATE TABLE IF NOT EXISTS `security_form_items` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,

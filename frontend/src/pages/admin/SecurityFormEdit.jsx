@@ -44,7 +44,8 @@ const SecurityFormEdit = () => {
     
     const [formData, setFormData] = useState({
         branch_code: '',
-        address: ''
+        address: '',
+        state: ''
     });
 
     // State for fixed sections
@@ -134,7 +135,7 @@ const SecurityFormEdit = () => {
                     const formRes = await api.get(`/security-forms/${id}`);
                     const data = formRes.data;
                     
-                    setFormData({ branch_code: data.branch_code, address: data.address });
+                    setFormData({ branch_code: data.branch_code, address: data.address, state: data.state || '' });
                     
                     // Merge saved sections with defaults
                     if (data.sections) {
@@ -260,6 +261,7 @@ const SecurityFormEdit = () => {
         const payload = {
             branch_code: formData.branch_code,
             address: formData.address,
+            state: formData.state,
             sections,
             requirements,
             installations
@@ -566,6 +568,42 @@ const SecurityFormEdit = () => {
                 Equipment Checklist
             </h1>
 
+            {/* Top Branch Info */}
+            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/3 print:p-2 print:border-[1.5px] print:border-black print:rounded print:shadow-none print:bg-gray-50 print:break-inside-avoid">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 print:grid-cols-3 print:gap-2">
+                    <div className="print:flex print:items-center print:border-b-[1px] print:border-gray-300 print:pb-1.5">
+                        <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider print:text-[13px] print:font-bold print:text-black print:mb-0 print:w-28">Branch Code:</label>
+                        <input 
+                            type="text" 
+                            value={formData.branch_code}
+                            onChange={e => setFormData({...formData, branch_code: e.target.value})}
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 font-mono text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:flex-1"
+                            placeholder="Enter Branch Code"
+                        />
+                    </div>
+                    <div className="print:flex print:items-start print:pt-1">
+                        <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider print:text-[13px] print:font-bold print:text-black print:mb-0 print:w-28 print:pt-0">Address:</label>
+                        <textarea 
+                            value={formData.address}
+                            onChange={e => setFormData({...formData, address: e.target.value})}
+                            rows="2"
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:resize-none print:flex-1"
+                            placeholder="Enter Full Address"
+                        />
+                    </div>
+                    <div className="print:flex print:items-start print:pt-1">
+                        <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider print:text-[13px] print:font-bold print:text-black print:mb-0 print:w-28 print:pt-0">State:</label>
+                        <input 
+                            type="text" 
+                            value={formData.state}
+                            onChange={e => setFormData({...formData, state: e.target.value})}
+                            className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:flex-1"
+                            placeholder="Enter State"
+                        />
+                    </div>
+                </div>
+            </div>
+
             {/* 3-Column Layout matching Reference Image */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 print:grid-cols-3 print:gap-4 print:text-sm">
                 
@@ -586,32 +624,6 @@ const SecurityFormEdit = () => {
 
                 {/* Column 3: Info, Server, Requirements, Installation */}
                 <div className="space-y-6 print:space-y-1.5">
-                    {/* Top Branch Info */}
-                    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/3 print:p-2 print:border-[1.5px] print:border-black print:rounded print:shadow-none print:bg-gray-50 print:break-inside-avoid">
-                        <div className="space-y-4 print:space-y-1">
-                            <div className="print:flex print:items-center print:border-b-[1px] print:border-gray-300 print:pb-1.5">
-                                <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider print:text-[13px] print:font-bold print:text-black print:mb-0 print:w-28">Branch Code:</label>
-                                <input 
-                                    type="text" 
-                                    value={formData.branch_code}
-                                    onChange={e => setFormData({...formData, branch_code: e.target.value})}
-                                    className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 font-mono text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:flex-1"
-                                    placeholder="Enter Branch Code"
-                                />
-                            </div>
-                            <div className="print:flex print:items-start print:pt-1">
-                                <label className="mb-1 block text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider print:text-[13px] print:font-bold print:text-black print:mb-0 print:w-28 print:pt-0">Address:</label>
-                                <textarea 
-                                    value={formData.address}
-                                    onChange={e => setFormData({...formData, address: e.target.value})}
-                                    rows="2"
-                                    className="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 text-theme-sm text-gray-800 outline-none focus:border-brand-500 focus:bg-white dark:border-gray-700 dark:bg-gray-900/50 dark:text-white/90 print:bg-transparent print:border-none print:rounded-none print:px-0 print:py-0 print:text-[13px] print:text-black print:font-bold print:resize-none print:flex-1"
-                                    placeholder="Enter Full Address"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
                     {renderFixedSection('Server Room')}
                     {renderDynamicSection('Requirements', 'req')}
                     {renderDynamicSection('New Installation', 'inst')}
