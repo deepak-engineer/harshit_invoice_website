@@ -118,3 +118,9 @@ jobs:
             invoice_backend/uploads/**
             invoice_backend/.env
             invoice_backend/api/db.php
+
+      # 7. Auto-run Database Migrations
+      - name: Run Database Migrations
+        run: |
+          echo "Triggering schema update..."
+          curl -sS --fail https://lavender-spoonbill-208950.hostingersite.com/invoice_backend/api/update_security_schema.php || echo "Warning: Migration script failed or returned non-200. Check logs."
