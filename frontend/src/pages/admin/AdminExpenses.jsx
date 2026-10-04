@@ -139,7 +139,7 @@ const AdminExpenses = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
-                <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50/50 flex flex-col lg:flex-row lg:items-center gap-4">
+                <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex flex-col lg:flex-row lg:items-center gap-4">
                     
                     <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0 w-full sm:w-auto">
                         {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((tab) => (
@@ -211,7 +211,7 @@ const AdminExpenses = () => {
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                                 {filteredExpenses.map((exp) => (
-                                    <tr key={exp.id} className="hover:bg-gray-50 dark:bg-gray-800/50/50 transition-colors group">
+                                    <tr key={exp.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                         <td className="px-2 py-2 md:px-6 md:py-4">
                                             <div className="font-bold text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{exp.emp_name}</div>
                                             <div className="text-[8px] md:text-xs text-gray-400 dark:text-gray-500 hidden sm:block">ID: {exp.emp_code}</div>

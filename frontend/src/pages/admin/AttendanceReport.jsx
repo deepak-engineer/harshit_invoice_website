@@ -314,7 +314,7 @@ const AttendanceReport = () => {
                                 const isToday = new Date().toDateString() === new Date(y, m-1, dayObj.day).toDateString();
                                 
                                 return (
-                                    <div key={index} className={`border-b border-r border-gray-100 dark:border-gray-800 p-1 md:p-2 flex flex-col hover:bg-gray-50 dark:bg-gray-800/50 transition-colors relative group ${!dayObj.isCurrentMonth ? 'bg-gray-50 dark:bg-gray-800/50/50' : isOff ? 'bg-gray-50 dark:bg-gray-800/50/70' : 'bg-white dark:bg-gray-900'}`}>
+                                    <div key={index} className={`border-b border-r border-gray-100 dark:border-gray-800 p-1 md:p-2 flex flex-col hover:bg-gray-50 dark:bg-gray-800/50 transition-colors relative group ${!dayObj.isCurrentMonth ? 'bg-gray-50 dark:bg-gray-800/50' : isOff ? 'bg-gray-50 dark:bg-gray-800/70' : 'bg-white dark:bg-gray-900'}`}>
                                         <div className="flex flex-col md:flex-row justify-start md:items-center space-y-1 md:space-y-0 md:space-x-2 mb-1 md:mb-2">
                                             <span className={`text-xs md:text-sm font-semibold flex-shrink-0 ${isToday ? 'bg-brand-500 text-white w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center mx-auto md:mx-0' : (isSun ? 'text-error-500 dark:text-error-400 text-center md:text-left' : (!dayObj.isCurrentMonth ? 'text-gray-400 dark:text-gray-500 text-center md:text-left' : 'text-gray-700 dark:text-gray-300 text-center md:text-left'))}`}>
                                                 {dayObj.day}
