@@ -163,13 +163,16 @@ const SecurityFormEdit = () => {
         };
         initData();
         
-        // Update document title for print header
+    }, [id, isEdit]);
+
+    useEffect(() => {
+        // Update document title for print header and file download name
         const originalTitle = document.title;
-        document.title = "Equipment Checklist";
+        document.title = formData.branch_code ? `${formData.branch_code}-equipment-checklist` : "equipment-checklist";
         return () => {
             document.title = originalTitle;
         };
-    }, [id, isEdit]);
+    }, [formData.branch_code]);
 
     const handleSectionQtyChange = (sectionName, equipmentName, newQty) => {
         let val = parseInt(newQty);
