@@ -65,6 +65,9 @@ const SecurityFormEdit = () => {
 
     // State for fixed sections add dropdowns
     const [fixedAddState, setFixedAddState] = useState({});
+    
+    // State for section configurations (Merged, Not Available)
+    const [sectionConfigs, setSectionConfigs] = useState({});
 
     // State for custom equipment modal
     const [showCustomModal, setShowCustomModal] = useState(false);
@@ -138,6 +141,10 @@ const SecurityFormEdit = () => {
                     const data = formRes.data;
                     
                     setFormData({ branch_code: data.branch_code, address: data.address, state: data.state || '' });
+                    
+                    if (data.section_configs) {
+                        setSectionConfigs(data.section_configs);
+                    }
                     
                     // Merge saved sections with defaults
                     if (data.sections) {
@@ -271,6 +278,7 @@ const SecurityFormEdit = () => {
             address: formData.address,
             state: formData.state,
             sections,
+            section_configs: sectionConfigs,
             requirements,
             installations
         };
@@ -347,12 +355,53 @@ const SecurityFormEdit = () => {
             }));
         };
 
+        const handleSectionConfigChange = (field, value) => {
+            setSectionConfigs(prev => ({
+                ...prev,
+                [title]: {
+                    ...prev[title],
+                    [field]: value
+                }
+            }));
+        };
+
+        const config = sectionConfigs[title] || { status: 'AVAILABLE', mergedWith: '' };
+
         return (
             <div className="rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/3 overflow-hidden print:border-[1.5px] print:border-black print:rounded print:shadow-none print:break-inside-avoid">
-                <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-800 font-semibold text-gray-800 dark:text-white/90 text-sm tracking-wide print:py-0.5 print:px-1.5 print:text-[11px] print:font-bold print:uppercase print:border-b-[1px] print:border-black print:bg-gray-100 print:!text-black">
-                    {title}
+                <div className="bg-gray-50 dark:bg-gray-800/50 px-4 py-2 border-b border-gray-200 dark:border-gray-800 font-semibold text-gray-800 dark:text-white/90 text-sm tracking-wide flex justify-between items-center print:py-0.5 print:px-1.5 print:text-[11px] print:font-bold print:uppercase print:border-b-[1px] print:border-black print:bg-gray-100 print:!text-black">
+                    <span>
+                        {title} 
+                        {config.status === 'NOT_AVAILABLE' && <span className="text-error-500 ml-2">(Not Available)</span>}
+                        {config.status === 'MERGED' && <span className="text-brand-500 ml-2">(Merged {config.mergedWith ? `with ${config.mergedWith}` : ''})</span>}
+                    </span>
+                    <div className="flex space-x-2 print:hidden">
+                        <select 
+                            value={config.status || 'AVAILABLE'}
+                            onChange={(e) => handleSectionConfigChange('status', e.target.value)}
+                            className="text-xs px-2 py-1 border-gray-300 rounded focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-900 dark:border-gray-700 font-normal outline-none"
+                        >
+                            <option value="AVAILABLE">Available</option>
+                            <option value="NOT_AVAILABLE">Not Available (N/A)</option>
+                            <option value="MERGED">Merged</option>
+                        </select>
+                        {config.status === 'MERGED' && (
+                            <select 
+                                value={config.mergedWith || ''}
+                                onChange={(e) => handleSectionConfigChange('mergedWith', e.target.value)}
+                                className="text-xs px-2 py-1 border-gray-300 rounded focus:ring-brand-500 focus:border-brand-500 dark:bg-gray-900 dark:border-gray-700 font-normal outline-none"
+                            >
+                                <option value="">Merge with...</option>
+                                {Object.keys(FIXED_SECTIONS).filter(s => s !== title).map(s => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
                 </div>
-                <div className="p-3 grid grid-cols-2 gap-2 print:p-1 print:flex print:flex-col print:space-y-[1px] print:gap-0">
+                
+                {(!config.status || config.status === 'AVAILABLE') ? (
+                    <div className="p-3 grid grid-cols-2 gap-2 print:p-1 print:flex print:flex-col print:space-y-[1px] print:gap-0">
                     {items.map((item, idx) => (
                         <div key={idx} className="flex flex-col justify-between bg-gray-50 dark:bg-gray-800/40 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 text-sm print:flex-row print:!bg-gray-200 print:!border-none print:px-1 print:py-[1px] print:text-[11px] print:leading-tight print:!rounded-[2px] print:items-center">
                             <span className="text-gray-700 dark:text-gray-200 font-semibold text-xs mb-2 line-clamp-2 print:text-[11px] print:font-bold print:!text-black print:mb-0 print:line-clamp-none print:px-1" title={item.equipment_name}>{item.equipment_name}</span>
@@ -419,6 +468,13 @@ const SecurityFormEdit = () => {
                         </button>
                     </div>
                 </div>
+                ) : (
+                    <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50/50 dark:bg-gray-900/50 print:hidden border-t border-dashed border-gray-200 dark:border-gray-700">
+                        {config.status === 'NOT_AVAILABLE' 
+                            ? "This section has been marked as Not Available (N/A)."
+                            : `This section is merged into ${config.mergedWith || 'another section'}.`}
+                    </div>
+                )}
             </div>
         );
     };

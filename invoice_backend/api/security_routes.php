@@ -60,8 +60,8 @@ if (preg_match('/^security-forms$/', $route)) {
         try {
             $pdo->beginTransaction();
             
-            $ins = $pdo->prepare("INSERT INTO security_forms (uuid, branch_code, address, state) VALUES (UUID(), ?, ?, ?)");
-            $ins->execute([$data['branch_code'], $data['address'], $data['state']]);
+            $ins = $pdo->prepare("INSERT INTO security_forms (uuid, branch_code, address, state, section_configs) VALUES (UUID(), ?, ?, ?, ?)");
+            $ins->execute([$data['branch_code'], $data['address'], $data['state'], json_encode($data['section_configs'] ?? [])]);
             $form_id = $pdo->lastInsertId();
             
             $insItem = $pdo->prepare("INSERT INTO security_form_items (form_id, item_type, section_name, equipment_id, quantity) VALUES (?, ?, ?, ?, ?)");
@@ -147,7 +147,7 @@ if (preg_match('/^security-forms\/(\d+)$/', $route, $matches)) {
                     ];
                 }
             }
-            
+            $form['section_configs'] = json_decode($form['section_configs'] ?? '[]', true);
             echo json_encode($form);
         } else {
             http_response_code(404);
@@ -162,8 +162,8 @@ if (preg_match('/^security-forms\/(\d+)$/', $route, $matches)) {
         try {
             $pdo->beginTransaction();
             
-            $upd = $pdo->prepare("UPDATE security_forms SET branch_code = ?, address = ?, state = ? WHERE id = ?");
-            $upd->execute([$data['branch_code'], $data['address'], $data['state'], $id]);
+            $upd = $pdo->prepare("UPDATE security_forms SET branch_code = ?, address = ?, state = ?, section_configs = ? WHERE id = ?");
+            $upd->execute([$data['branch_code'], $data['address'], $data['state'], json_encode($data['section_configs'] ?? []), $id]);
             
             // Delete all existing items for this form
             $pdo->prepare("DELETE FROM security_form_items WHERE form_id = ?")->execute([$id]);
