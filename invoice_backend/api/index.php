@@ -189,6 +189,37 @@ if ($route === 'admin/update-credentials' && $method === 'POST') {
 }
 
 // --- INVOICES ---
+if ($route === 'next-invoice-no' && $method === 'GET') {
+    $currentMonth = (int)date('m');
+    $currentYear = (int)date('Y');
+    
+    if ($currentMonth >= 4) {
+        $finYearStart = $currentYear;
+        $finYearEnd = $currentYear + 1;
+    } else {
+        $finYearStart = $currentYear - 1;
+        $finYearEnd = $currentYear;
+    }
+    
+    // Format: 2026-2027
+    $prefix = $finYearStart . "-" . $finYearEnd;
+    
+    $stmt = $pdo->prepare("SELECT invoice_no FROM invoices WHERE invoice_no LIKE ? ORDER BY id DESC LIMIT 1");
+    $stmt->execute([$prefix . '-%']);
+    $lastInvoice = $stmt->fetchColumn();
+    
+    $nextNum = 1;
+    if ($lastInvoice) {
+        $parts = explode('-', $lastInvoice);
+        if (count($parts) >= 3) {
+            $lastNum = (int)end($parts);
+            $nextNum = $lastNum + 1;
+        }
+    }
+    
+    echo json_encode(["next_invoice_no" => sprintf("%s-%03d", $prefix, $nextNum)]);
+    exit;
+}
 if (preg_match('/^invoices$/', $route)) {
     if ($method === 'GET') {
         $stmt = $pdo->query("SELECT i.id, i.invoice_no, i.invoice_date, c.name as client_name, i.site_id, i.total_amount, i.status FROM invoices i LEFT JOIN clients c ON i.client_id = c.id ORDER BY i.created_at DESC");

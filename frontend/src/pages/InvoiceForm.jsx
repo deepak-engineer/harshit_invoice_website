@@ -240,10 +240,15 @@ const InvoiceForm = () => {
     }
   };
 
-  const generateInvoiceNumber = () => {
-    const year = new Date().getFullYear().toString().slice(-2);
-    const nextYear = parseInt(year) + 1;
-    setInvoice(prev => ({ ...prev, invoice_no: `INV/${year}-${nextYear}/001` }));
+  const generateInvoiceNumber = async () => {
+    try {
+        const res = await api.get('/next-invoice-no');
+        setInvoice(prev => ({ ...prev, invoice_no: res.data.next_invoice_no }));
+    } catch (err) {
+        console.error('Failed to get next invoice no:', err);
+        const year = new Date().getFullYear();
+        setInvoice(prev => ({ ...prev, invoice_no: `${year}-${year + 1}-001` }));
+    }
   };
 
   const fetchInvoice = async () => {
@@ -406,7 +411,7 @@ const InvoiceForm = () => {
           <div className="mt-4 sm:mt-0 flex flex-col items-end gap-3 w-full sm:w-auto">
              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Invoice No:</label>
-                <input type="text" name="invoice_no" value={invoice.invoice_no} onChange={handleInvoiceChange} className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 focus:border-primary focus:ring-1 focus:ring-primary outline-none font-medium w-40 text-right" />
+                <input type="text" name="invoice_no" value={invoice.invoice_no} disabled className="border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 bg-gray-50 dark:bg-gray-800 text-gray-500 font-medium w-40 text-right cursor-not-allowed" />
              </div>
              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">Date:</label>
