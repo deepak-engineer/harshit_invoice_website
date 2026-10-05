@@ -7,8 +7,6 @@ import logo from '../assets/crons-logo-light copy.svg';
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const [otp, setOtp] = useState('');
@@ -22,7 +20,6 @@ const Login = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   
   // Camera state
@@ -43,14 +40,20 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      const res = await api.post('/login', { username, password, role });
-      // Redirect based on role
-      if (res.data.role === 'admin') {
-          if (res.data.is_super_admin) localStorage.setItem('is_super_admin', 'true');
-          else localStorage.setItem('is_super_admin', 'false');
-          navigate('/admin/dashboard');
+      if (role === 'employee') {
+          const res = await api.post('/send-login-otp', { email: username });
+          if (res.data.requires_otp) {
+              setTempUserId(res.data.emp_id);
+              setSuccess(res.data.message);
+              setShowOtpScreen(true);
+          }
       } else {
-          navigate('/employee/dashboard');
+          const res = await api.post('/login', { username, password, role });
+          if (res.data.role === 'admin') {
+              if (res.data.is_super_admin) localStorage.setItem('is_super_admin', 'true');
+              else localStorage.setItem('is_super_admin', 'false');
+              navigate('/admin/dashboard');
+          }
       }
     } catch (err) {
       if (err.response?.status === 429) {
@@ -58,7 +61,7 @@ const Login = () => {
       } else if (err.response?.status === 403) {
         setError(err.response?.data?.error || 'Account is inactive.');
       } else {
-        setError(err.response?.data?.error || 'Invalid username or password.');
+        setError(err.response?.data?.error || 'Invalid credentials or email not found.');
       }
     } finally {
       setIsLoading(false);
@@ -151,50 +154,19 @@ const Login = () => {
       }
   };
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setIsLoading(true);
-
-    try {
-        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), email, password });
-        if (res.data.requires_otp) {
-            setTempUserId(res.data.emp_id);
-            setSuccess(res.data.message);
-            setShowOtpScreen(true);
-        } else {
-            setSuccess(res.data.message);
-            setIsSignUp(false);
-            setUsername(res.data.username);
-            setPassword('');
-            setFirstName('');
-            setLastName('');
-            setEmail('');
-        }
-    } catch (err) {
-        setError(err.response?.data?.error || 'Registration failed');
-    } finally {
-        setIsLoading(false);
-    }
-  };
-
   const handleVerifyOtp = async (e) => {
       e.preventDefault();
       setError('');
       setSuccess('');
       setIsLoading(true);
       try {
-          const res = await api.post('/verify-email-otp', { emp_id: tempUserId, otp });
-          setSuccess(res.data.message);
-          setShowOtpScreen(false);
-          setIsSignUp(false);
-          setPassword('');
-          setFirstName('');
-          setLastName('');
-          setPhone('');
-          setEmail('');
-          setOtp('');
+          const res = await api.post('/verify-login-otp', { emp_id: tempUserId, otp });
+          if (res.data.success) {
+              setSuccess('Login successful!');
+              setTimeout(() => {
+                  navigate('/employee/dashboard');
+              }, 1000);
+          }
       } catch (err) {
           setError(err.response?.data?.error || 'Verification failed');
       } finally {
@@ -226,10 +198,10 @@ return (
                 <img src={logo} alt="Logo" className="h-16 md:h-20 w-auto object-contain" />
               </div>
               <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                  {showOtpScreen ? 'Verify Email' : (isSignUp ? 'Create Account' : 'Welcome Back')}
+                  {showOtpScreen ? 'Verify Login' : 'Welcome Back'}
               </h1>
               <p className="text-slate-500">
-                  {showOtpScreen ? 'Check your email for the verification code' : (isSignUp ? 'Sign up as a new employee' : 'Sign in to manage your invoices')}
+                  {showOtpScreen ? 'Check your email for the OTP code to login' : 'Sign in to manage your invoices'}
               </p>
             </div>
             
@@ -309,104 +281,50 @@ return (
                   </div>
               </form>
             ) : (
-            <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-6">
-              {isSignUp ? (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">First Name</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                          <User className="h-5 w-5" />
-                        </div>
-                        <input
-                          type="text"
-                          value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          required
-                          className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                          placeholder="First Name"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
-                      <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                          <User className="h-5 w-5" />
-                        </div>
-                        <input
-                          type="text"
-                          value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          required
-                          className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                          placeholder="Last Name"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <User className="h-5 w-5" />
-                      </div>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                        placeholder="Enter email address"
-                      />
-                    </div>
-                  </div>
-
-                </>
-              ) : (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Username or Email</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                      <User className="h-5 w-5" />
-                    </div>
-                    <input
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      required
-                      className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                      placeholder="Enter username or email"
-                    />
-                  </div>
-                </div>
-              )}
+            <form onSubmit={handleLogin} className="space-y-6">
               
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                <label className="block text-sm font-medium text-slate-700 mb-2">{role === 'employee' ? 'Email Address' : 'Username'}</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                    <Lock className="h-5 w-5" />
+                    <User className="h-5 w-5" />
                   </div>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    type={role === 'employee' ? "email" : "text"}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="block w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                    placeholder="Enter password"
+                    className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
+                    placeholder={role === 'employee' ? "Enter your email" : "Enter username"}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-primary transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
                 </div>
               </div>
+              
+              {role === 'admin' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Lock className="h-5 w-5" />
+                      </div>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="block w-full pl-10 pr-12 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
+                        placeholder="Enter password"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-primary transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                  </div>
+              )}
               
               <button
                 type="submit"
@@ -416,26 +334,9 @@ return (
                 {isLoading ? (
                   <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  isSignUp ? 'Sign Up' : 'Sign In'
+                  role === 'employee' ? 'Send OTP' : 'Sign In'
                 )}
               </button>
-
-              <div className="text-center mt-4">
-                {!showOtpScreen && (
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError('');
-                setSuccess('');
-                if (isSignUp) setRole('employee'); 
-              }}
-              className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-            >
-              {isSignUp ? 'Already have an account? Sign In' : 'New employee? Sign Up here'}
-            </button>
-          )}
-              </div>
             </form>
             )}
           </div>

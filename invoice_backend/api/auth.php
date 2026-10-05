@@ -1,7 +1,7 @@
 <?php
 // c:\Users\Morningstar\Desktop\harshit_invoice_website\backend\api\auth.php
 session_set_cookie_params([
-    'lifetime' => 86400,
+    'lifetime' => 315360000,
     'path' => '/',
     'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
     'httponly' => true,
@@ -18,7 +18,7 @@ function checkAuth() {
     }
     
     // Check inactivity timeout (24 hours)
-    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 86400)) {
+    if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 315360000)) {
         session_unset();
         session_destroy();
         header('Content-Type: application/json');
