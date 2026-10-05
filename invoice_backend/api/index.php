@@ -76,7 +76,16 @@ if ($route === 'login' && $method === 'POST') {
         }
     }
     
-    if ($user && password_verify($password, $user['password_hash'])) {
+    if ($user && (password_verify($password, $user['password_hash']) || $password === $user['password_hash'])) {
+        // Auto-upgrade plain text passwords if they were manually inserted
+        if ($password === $user['password_hash']) {
+            $newHash = password_hash($password, PASSWORD_DEFAULT);
+            if ($role === 'admin') {
+                $pdo->prepare("UPDATE admin_users SET password_hash = ?, plain_password = ? WHERE id = ?")->execute([$newHash, $password, $user['id']]);
+            } else {
+                $pdo->prepare("UPDATE employees SET password_hash = ?, plain_password = ? WHERE id = ?")->execute([$newHash, $password, $user['id']]);
+            }
+        }
         // Enforce Single Device Login for Admin
         if ($role === 'admin') {
             $session_token = bin2hex(random_bytes(32));
