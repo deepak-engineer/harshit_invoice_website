@@ -82,8 +82,8 @@ const Layout = () => {
     <div className="flex h-[100dvh] bg-gray-50 dark:bg-gray-900 font-sans text-gray-800 dark:text-white/90">
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
-        <div className="p-4 flex items-center justify-center h-24 w-full border-b border-gray-100 dark:border-gray-800">
-          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="h-16 w-auto max-w-[90%] object-contain mx-auto" />
+        <div className="p-6 flex items-center justify-center h-24 border-b border-gray-100 dark:border-gray-800">
+          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="w-[85%] max-w-[170px] h-auto object-contain" />
         </div>
         <nav className="flex-1 px-4 space-y-1.5 mt-6 overflow-y-auto custom-scrollbar">
           <div className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
