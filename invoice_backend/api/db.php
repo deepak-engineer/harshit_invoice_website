@@ -1,4 +1,8 @@
 <?php
+// Environment variables for Resend
+putenv('RESEND_API_KEY=your_resend_api_key_here');
+putenv('RESEND_FROM_EMAIL=noreply@yourdomain.com');
+
 // c:\Users\Morningstar\Desktop\harshit_invoice_website\backend\api\db.php
 $host = 'localhost';
 $db   = 'u698707169_harshit';
