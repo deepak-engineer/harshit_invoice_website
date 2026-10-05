@@ -111,7 +111,7 @@ const InvoiceForm = () => {
       const saved = localStorage.getItem('draft_items');
       if (saved) return JSON.parse(saved);
     }
-    return [{ id: 1, description: '', qty: 1, rate: 0, amount: 0, project_site_details: '', client_project: '', site_id: '', location: '' }];
+    return [{ id: crypto.randomUUID(), description: '', qty: 1, rate: 0, amount: 0, project_site_details: '', client_project: '', site_id: '', location: '' }];
   });
 
   useEffect(() => {
@@ -261,7 +261,7 @@ const InvoiceForm = () => {
         terms_conditions: invData.terms_conditions ? JSON.parse(invData.terms_conditions) : invoice.terms_conditions
       });
       if (fetchedItems && fetchedItems.length > 0) {
-        setItems(fetchedItems.map(item => ({...item, id: Math.random()})));
+        setItems(fetchedItems.map(item => ({...item, id: crypto.randomUUID()})));
       }
     } catch (err) {
       console.error(err);
@@ -294,7 +294,7 @@ const InvoiceForm = () => {
   };
 
   const addItem = () => {
-    setItems([...items, { id: Math.random(), description: '', qty: 1, rate: 0, amount: 0 }]);
+    setItems([...items, { id: crypto.randomUUID(), description: '', qty: 1, rate: 0, amount: 0 }]);
   };
 
   const removeItem = (itemId) => {

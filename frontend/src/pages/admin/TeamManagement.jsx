@@ -170,12 +170,14 @@ const TeamManagement = () => {
                                         </span>
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-2">
-                                        <div className="flex space-x-1.5 md:space-x-3">
-                                            <button onClick={() => openEdit(team)} className="p-1 md:p-0 text-gray-500 hover:text-brand-500 dark:text-gray-400 dark:hover:text-brand-500 transition-colors">
-                                                <Edit2 className="w-3 h-3 md:w-4 md:h-4" />
+                                        <div className="flex space-x-2">
+                                            <button onClick={() => openEdit(team)} className="group relative p-1.5 md:p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all">
+                                                <Edit2 className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Edit Team</span>
                                             </button>
-                                            <button onClick={() => handleDelete(team.id)} className="p-1 md:p-0 text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500 transition-colors">
-                                                <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                                            <button onClick={() => handleDelete(team.id)} className="group relative p-1.5 md:p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
+                                                <Trash2 className="w-3.5 h-3.5 md:w-4 md:h-4" strokeWidth={2} />
+                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Delete Team</span>
                                             </button>
                                         </div>
                                     </td>
