@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from 'react';
+
+const INDIAN_STATES = [
+    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", 
+    "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", 
+    "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", 
+    "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+    "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", 
+    "Delhi", "Lakshadweep", "Puducherry", "Ladakh", "Jammu and Kashmir"
+];
+
 import { Receipt, Search, Filter, CheckCircle, XCircle, Clock, MapPin, Users, Download, IndianRupee, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
@@ -10,15 +20,12 @@ const AdminExpenses = () => {
     // Filters
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState('ALL');
-    const [teamFilter, setTeamFilter] = useState('');
+        const [teamFilter, setTeamFilter] = useState('');
     const [stateFilter, setStateFilter] = useState('');
     
     // Extracted unique teams and states for filters
     const [teams, setTeams] = useState([]);
-    const [states, setStates] = useState([]);
-
-    const [selectedExpense, setSelectedExpense] = useState(null);
+        const [selectedExpense, setSelectedExpense] = useState(null);
     const [viewingPhoto, setViewingPhoto] = useState(null);
 
     useEffect(() => {
@@ -50,20 +57,7 @@ const AdminExpenses = () => {
         }
     };
 
-    const handleUpdateStatus = async (id, status) => {
-        try {
-            await api.put(`/expenses/${id}/status`, { status });
-            toast.success(`Expense ${status.toLowerCase()} successfully`);
-            if (selectedExpense && selectedExpense.id === id) {
-                setSelectedExpense({ ...selectedExpense, status });
-            }
-            fetchExpenses();
-        } catch (err) {
-            toast.error('Failed to update status');
-        }
-    };
-
-    const handleDeleteExpense = async (id) => {
+        const handleDeleteExpense = async (id) => {
         if (!window.confirm("Are you sure you want to delete this expense? This cannot be undone.")) return;
         try {
             await api.delete(`/expenses/${id}`);
@@ -81,11 +75,10 @@ const AdminExpenses = () => {
             (exp.description && exp.description.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
             exp.emp_code.toLowerCase().includes(debouncedSearch.toLowerCase());
             
-        const matchesStatus = statusFilter === 'ALL' || exp.status === statusFilter;
-        const matchesTeam = teamFilter === '' || exp.team_name === teamFilter;
+                const matchesTeam = teamFilter === '' || exp.team_name === teamFilter;
         const matchesState = stateFilter === '' || exp.state === stateFilter;
         
-        return matchesSearch && matchesStatus && matchesTeam && matchesState;
+        return matchesSearch && matchesTeam && matchesState;
     });
 
     const totalAmount = filteredExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
@@ -96,13 +89,7 @@ const AdminExpenses = () => {
         return acc;
     }, {});
 
-    const getStatusIcon = (status) => {
-        if (status === 'APPROVED') return <CheckCircle className="w-4 h-4 text-green-500" />;
-        if (status === 'REJECTED') return <XCircle className="w-4 h-4 text-error-500 dark:text-error-400" />;
-        return <Clock className="w-4 h-4 text-warning-500 dark:text-warning-400" />;
-    };
-
-    return (
+        return (
         <div className="space-y-6 max-w-7xl mx-auto">
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
@@ -141,21 +128,7 @@ const AdminExpenses = () => {
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
                 <div className="p-4 border-b border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex flex-col lg:flex-row lg:items-center gap-4">
                     
-                    <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg shrink-0 w-full sm:w-auto">
-                        {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setStatusFilter(tab)}
-                                className={`px-4 py-2 rounded-md text-sm font-bold transition-all text-center w-full ${
-                                    statusFilter === tab 
-                                        ? 'bg-white dark:bg-gray-900 text-brand-500 shadow-theme-xs' 
-                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300'
-                                }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
+                    
 
                     <div className="flex flex-1 flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
@@ -174,7 +147,7 @@ const AdminExpenses = () => {
                             className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900"
                         >
                             <option value="">All States/Sites</option>
-                            {states.map(s => <option key={s} value={s}>{s}</option>)}
+                            {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
                         <select 
                             value={teamFilter} 
@@ -205,8 +178,7 @@ const AdminExpenses = () => {
                                     <th className="px-2 py-2 md:px-6 md:py-4">Category</th>
                                     <th className="px-2 py-2 md:px-6 md:py-4 text-right">Amount (₹)</th>
                                     <th className="px-2 py-2 md:px-6 md:py-4 hidden md:table-cell">Date</th>
-                                    <th className="px-2 py-2 md:px-6 md:py-4 text-center">Status</th>
-                                    <th className="px-2 py-2 md:px-6 md:py-4 text-center">Action</th>
+                                                                        <th className="px-2 py-2 md:px-6 md:py-4 text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -214,7 +186,7 @@ const AdminExpenses = () => {
                                     <tr key={exp.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
                                         <td className="px-2 py-2 md:px-6 md:py-4">
                                             <div className="font-bold text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{exp.emp_name}</div>
-                                            <div className="text-[8px] md:text-xs text-gray-400 dark:text-gray-500 hidden sm:block">ID: {exp.emp_code}</div>
+                                            <div className="text-[8px] md:text-xs text-gray-400 dark:text-gray-500 hidden sm:block">Emp ID: {exp.emp_code} | Exp ID: #{exp.id.toString(16).toUpperCase()}</div>
                                         </td>
                                         <td className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">
                                             <div className="flex items-center text-[10px] md:text-sm text-gray-700 dark:text-gray-300 truncate max-w-[80px] md:max-w-none">
@@ -237,17 +209,7 @@ const AdminExpenses = () => {
                                         <td className="px-2 py-2 md:px-6 md:py-4 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
                                             {new Date(exp.expense_date).toLocaleDateString('en-GB')}
                                         </td>
-                                        <td className="px-2 py-2 md:px-6 md:py-4 text-center">
-                                            <span className={`inline-flex items-center px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-full text-[8px] md:text-xs font-bold border ${
-                                                exp.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
-                                                exp.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
-                                                'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
-                                            }`}>
-                                                <span className="hidden sm:inline-block">{getStatusIcon(exp.status)}</span>
-                                                <span className="sm:ml-1.5">{exp.status === 'PENDING' ? 'PEN' : exp.status === 'APPROVED' ? 'APP' : 'REJ'}</span>
-                                            </span>
-                                        </td>
-                                        <td className="px-2 py-2 md:px-6 md:py-4 text-center">
+                                                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center">
                                             <button 
                                                 onClick={() => setSelectedExpense(exp)}
                                                 className="px-1.5 py-1 md:px-3 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded md:rounded-lg text-[10px] md:text-xs transition-colors"
@@ -279,7 +241,7 @@ const AdminExpenses = () => {
                             <div className="flex justify-between items-start">
                                 <div>
                                     <h3 className="font-bold text-lg text-gray-800 dark:text-white/90">{selectedExpense.emp_name}</h3>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">ID: {selectedExpense.emp_code}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">Emp ID: {selectedExpense.emp_code} | Exp ID: #{selectedExpense.id.toString(16).toUpperCase()}</p>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-2xl font-bold text-brand-500 flex items-center justify-end">
@@ -311,17 +273,7 @@ const AdminExpenses = () => {
                                         {new Date(selectedExpense.expense_date).toLocaleDateString('en-GB')}
                                     </p>
                                 </div>
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Status</p>
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${
-                                        selectedExpense.status === 'APPROVED' ? 'bg-success-50 dark:bg-success-500/10 text-success-700 dark:text-success-400 border-success-200 dark:border-success-800' :
-                                        selectedExpense.status === 'REJECTED' ? 'bg-error-50 dark:bg-error-500/10 text-red-700 border-error-200 dark:border-error-800' :
-                                        'bg-warning-50 dark:bg-warning-500/10 text-warning-700 dark:text-warning-400 border-warning-200 dark:border-warning-800'
-                                    }`}>
-                                        {selectedExpense.status}
-                                    </span>
-                                </div>
-                            </div>
+                                                            </div>
 
                             <div>
                                 <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">Description</p>
