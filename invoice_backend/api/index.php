@@ -25,6 +25,7 @@ require_once 'attendance_helper.php';
 // OTP/Email Schema Migrations
 try { $pdo->exec("ALTER TABLE employees ADD COLUMN email VARCHAR(255) NULL UNIQUE"); } catch (Exception $e) {}
 try { $pdo->exec("ALTER TABLE employees ADD COLUMN email_verified BOOLEAN DEFAULT 0"); } catch (Exception $e) {}
+try { $pdo->exec("ALTER TABLE email_verifications ADD COLUMN email VARCHAR(255) NULL"); } catch (Exception $e) {}
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS email_verifications (
         id INT AUTO_INCREMENT PRIMARY KEY,

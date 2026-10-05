@@ -1,4 +1,122 @@
 <?php
+
+if ($route === 'admin/send-new-employee-otp' && $method === 'POST') {
+    checkAdminAuth();
+    $data = json_decode(file_get_contents('php://input'), true);
+    $email = trim($data['email'] ?? '');
+    
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        http_response_code(400);
+        echo json_encode(["error" => "Valid email is required"]);
+        exit;
+    }
+    
+    // Check if email already exists
+    $stmt = $pdo->prepare("SELECT id FROM employees WHERE email = ?");
+    $stmt->execute([$email]);
+    if ($stmt->fetch()) {
+        http_response_code(400);
+        echo json_encode(["error" => "Email is already registered to another employee."]);
+        exit;
+    }
+
+    try {
+        $otp = (string)random_int(100000, 999999);
+        $otp_hash = password_hash($otp, PASSWORD_DEFAULT);
+        $expires_at = date('Y-m-d H:i:s', strtotime('+10 minutes'));
+        
+        // user_id = 0 indicates a new employee verification
+        $pdo->prepare("INSERT INTO email_verifications (user_id, email, otp_hash, expires_at) VALUES (0, ?, ?, ?)")->execute([$email, $otp_hash, $expires_at]);
+        
+        $resend_key = getenv('RESEND_API_KEY') ?: 're_1234567890';
+        $from_email = getenv('RESEND_FROM_EMAIL') ?: 'noreply@harshitinvoice.com';
+        
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Authorization: Bearer ' . $resend_key,
+            'Content-Type: application/json'
+        ]);
+        
+        $htmlContent = "
+        <div style='font-family: sans-serif; text-align: center; max-width: 500px; margin: 0 auto; padding: 20px;'>
+            <img src='https://lavender-spoonbill-208950.hostingersite.com/assets/crons-logo-darkcopy-CXYL26Eg.svg' alt='Crons Logo' style='height: 60px; margin-bottom: 20px;' />
+            <h2 style='color: #333;'>Verify New Employee Email</h2>
+            <p style='color: #666; font-size: 16px;'>Your Admin is adding you to the system. Your verification OTP code is:</p>
+            <div style='background-color: #f4f4f4; padding: 15px; font-size: 24px; font-weight: bold; letter-spacing: 4px; color: #4F46E5; border-radius: 8px; margin: 20px 0;'>
+                $otp
+            </div>
+            <p style='color: #999; font-size: 14px;'>This code expires in 10 minutes. Please provide this to your Admin.</p>
+        </div>";
+
+        $email_data = [
+            "from" => "Crons Team <" . $from_email . ">",
+            "to" => [$email],
+            "subject" => "Crons Invoice - Employee Email Verification",
+            "html" => $htmlContent
+        ];
+        
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($email_data));
+        curl_exec($ch);
+        curl_close($ch);
+
+        echo json_encode(["success" => true, "message" => "OTP sent to email."]);
+    } catch(PDOException $e) {
+        http_response_code(500);
+        echo json_encode(["error" => "Failed to send OTP. " . $e->getMessage()]);
+    }
+    exit;
+}
+
+if ($route === 'admin/verify-new-employee-otp' && $method === 'POST') {
+    checkAdminAuth();
+    $data = json_decode(file_get_contents('php://input'), true);
+    $email = trim($data['email'] ?? '');
+    $otp = trim($data['otp'] ?? '');
+    
+    if (!$email || !$otp) {
+        http_response_code(400);
+        echo json_encode(["error" => "Missing email or OTP"]);
+        exit;
+    }
+
+    $stmt = $pdo->prepare("SELECT * FROM email_verifications WHERE email = ? AND verified_at IS NULL ORDER BY created_at DESC LIMIT 1");
+    $stmt->execute([$email]);
+    $verification = $stmt->fetch();
+    
+    if (!$verification) {
+        http_response_code(400);
+        echo json_encode(["error" => "No pending OTP found for this email."]);
+        exit;
+    }
+
+    if ($verification['attempts'] >= 5) {
+        http_response_code(400);
+        echo json_encode(["error" => "Too many attempts. Request a new OTP."]);
+        exit;
+    }
+
+    if (strtotime($verification['expires_at']) < time()) {
+        http_response_code(400);
+        echo json_encode(["error" => "OTP has expired. Request a new one."]);
+        exit;
+    }
+
+    if (!password_verify($otp, $verification['otp_hash'])) {
+        $pdo->prepare("UPDATE email_verifications SET attempts = attempts + 1 WHERE id = ?")->execute([$verification['id']]);
+        http_response_code(400);
+        echo json_encode(["error" => "Invalid OTP."]);
+        exit;
+    }
+
+    // Verified successfully
+    $pdo->prepare("UPDATE email_verifications SET verified_at = CURRENT_TIMESTAMP WHERE id = ?")->execute([$verification['id']]);
+    
+    echo json_encode(["success" => true, "message" => "Email verified successfully."]);
+    exit;
+}
+
 // c:\xampp\htdocs\harshit_invoice_website\invoice_backend\api\attendance_routes.php
 
 require_once 'attendance_helper.php';
@@ -38,8 +156,8 @@ if (preg_match('/^admin\/employees$/', $route)) {
                 exit;
             }
             
-            $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, plain_password, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $hash, $data['password'] ?? '', $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
+            $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, email, email_verified, username, password_hash, plain_password, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['emp_id'], $data['name'], $data['email'] ?? null, $data['username'], $hash, $data['password'] ?? '', $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
             echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         } catch(\Exception $e) {
             http_response_code(500);
@@ -53,7 +171,7 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];
     if ($method === 'GET') {
-        $cols = "id, emp_id, name, phone, username, daily_salary, site_id, team_id, photo, status, city as state, created_at";
+        $cols = "id, emp_id, name, email, username, daily_salary, site_id, team_id, photo, status, city as state, created_at";
         if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin'] == 1) {
             $cols .= ", plain_password, is_active";
         } else {

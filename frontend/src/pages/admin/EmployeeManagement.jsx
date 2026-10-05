@@ -38,12 +38,16 @@ const EmployeeManagement = () => {
     
     const [selectedEmp, setSelectedEmp] = useState(null);
     const [formData, setFormData] = useState({
-        emp_id: '', name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
+        emp_id: '', name: '', email: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
     });
     const [newSiteData, setNewSiteData] = useState({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
     const [newTeamData, setNewTeamData] = useState({ name: '', site_id: '', state: '' });
     const [submittingForm, setSubmittingForm] = useState(false);
     const [newPassword, setNewPassword] = useState('');
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [verifyingOtp, setVerifyingOtp] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -113,6 +117,41 @@ const EmployeeManagement = () => {
             } catch (error) {
                 toast.error(error.response?.data?.error || 'Failed to delete employees');
             }
+        }
+    };
+
+    
+    const handleSendOtp = async () => {
+        if (!formData.email) {
+            toast.error("Please enter email first");
+            return;
+        }
+        setVerifyingOtp(true);
+        try {
+            await api.post('/admin/send-new-employee-otp', { email: formData.email });
+            setOtpSent(true);
+            toast.success('OTP sent to email');
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to send OTP');
+        } finally {
+            setVerifyingOtp(false);
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!otp) {
+            toast.error("Please enter OTP");
+            return;
+        }
+        setVerifyingOtp(true);
+        try {
+            await api.post('/admin/verify-new-employee-otp', { email: formData.email, otp });
+            setIsEmailVerified(true);
+            toast.success('Email verified successfully!');
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to verify OTP');
+        } finally {
+            setVerifyingOtp(false);
         }
     };
 
@@ -333,7 +372,10 @@ const EmployeeManagement = () => {
 
     const openNew = () => {
         const autoEmpId = 'EMP' + Math.floor(10000 + Math.random() * 90000);
-        setFormData({ emp_id: autoEmpId, first_name: '', last_name: '', phone: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
+        setFormData({ emp_id: autoEmpId, first_name: '', last_name: '', email: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
+        setIsEmailVerified(false);
+        setOtpSent(false);
+        setOtp('');
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
         setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(null);
@@ -434,7 +476,7 @@ const EmployeeManagement = () => {
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">ID</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Photo</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Name</th>
-                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Phone</th>
+                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Email</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">Username</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Team</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Site</th>
@@ -472,7 +514,7 @@ const EmployeeManagement = () => {
                                         )}
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 font-medium text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[60px] md:max-w-[120px]">{emp.name}</td>
-                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell">{emp.phone || '-'}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell">{emp.email || '-'}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm truncate max-w-[60px] md:max-w-[100px] hidden sm:table-cell">{emp.username}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-xs">
                                         <div className="flex items-center space-x-1 md:space-x-2">
@@ -617,9 +659,43 @@ const EmployeeManagement = () => {
                                 </div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
-                                    <input type="text" value={formData.phone || ''} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                    <div className="flex space-x-2">
+                                        <input 
+                                            type="email" 
+                                            required 
+                                            disabled={isEmailVerified || (otpSent && !selectedEmp)}
+                                            value={formData.email || ''} 
+                                            onChange={e => setFormData({...formData, email: e.target.value})} 
+                                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none disabled:bg-gray-100 disabled:text-gray-500" 
+                                        />
+                                        {!selectedEmp && !isEmailVerified && !otpSent && (
+                                            <button type="button" onClick={handleSendOtp} disabled={verifyingOtp} className="px-3 py-2 bg-brand-100 text-brand-700 rounded-lg whitespace-nowrap hover:bg-brand-200">
+                                                {verifyingOtp ? 'Sending...' : 'Verify'}
+                                            </button>
+                                        )}
+                                        {!selectedEmp && isEmailVerified && (
+                                            <div className="px-3 py-2 bg-success-50 text-success-600 rounded-lg flex items-center justify-center">
+                                                <CheckCircle className="w-5 h-5" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    {!selectedEmp && otpSent && !isEmailVerified && (
+                                        <div className="mt-2 flex space-x-2">
+                                            <input 
+                                                type="text" 
+                                                placeholder="Enter OTP"
+                                                value={otp}
+                                                onChange={e => setOtp(e.target.value)}
+                                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none"
+                                            />
+                                            <button type="button" onClick={handleVerifyOtp} disabled={verifyingOtp} className="px-3 py-2 bg-brand-500 text-white rounded-lg whitespace-nowrap hover:bg-brand-600">
+                                                {verifyingOtp ? '...' : 'Confirm'}
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
