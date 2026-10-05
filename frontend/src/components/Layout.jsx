@@ -83,7 +83,7 @@ const Layout = () => {
       {/* Sidebar Desktop */}
       <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 transition-all duration-300">
         <div className="p-6 flex items-center justify-center h-24 border-b border-gray-100 dark:border-gray-800">
-          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="w-[85%] max-w-[170px] h-auto object-contain" />
+          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="w-full max-w-[170px] h-auto object-contain" />
         </div>
         <nav className="flex-1 px-4 space-y-1.5 mt-6 overflow-y-auto custom-scrollbar">
           <div className="px-3 mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">
@@ -125,8 +125,10 @@ const Layout = () => {
       {/* Mobile Header & Menu */}
       <div className="md:hidden fixed top-0 w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-50">
         <div className="flex items-center justify-between p-4 h-20">
-          <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="h-10 max-w-[200px] object-contain" />
-          <div className="flex items-center space-x-2">
+          <div className="flex-1 flex items-center h-full">
+            <img src={isDarkMode ? darkLogo : lightLogo} alt="Logo" className="w-full max-w-[140px] h-auto object-contain" />
+          </div>
+          <div className="flex items-center space-x-2 shrink-0">
             <button onClick={toggleDarkMode} className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>

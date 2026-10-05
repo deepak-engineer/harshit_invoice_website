@@ -227,7 +227,9 @@ const Dashboard = () => {
                   {filteredInvoices.map((inv) => (
                     <tr key={inv.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
                       <td className="px-2 py-2 md:px-6 md:py-4">
-                        <div className="font-medium text-xs md:text-sm text-gray-800 dark:text-white/90">{inv.invoice_no}</div>
+                        <div className="font-medium text-xs md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[120px] md:max-w-[200px]" title={inv.invoice_no}>
+                          {inv.invoice_no}
+                        </div>
                         <div className="text-[10px] md:text-sm text-gray-500 dark:text-gray-400 flex items-center mt-1">
                           <Calendar className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5" />
                           {new Date(inv.invoice_date).toLocaleDateString('en-GB')}

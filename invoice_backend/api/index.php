@@ -215,20 +215,12 @@ if ($route === 'next-invoice-no' && $method === 'GET') {
     // Format: 2026-2027
     $prefix = $finYearStart . "-" . $finYearEnd;
     
-    $stmt = $pdo->prepare("SELECT invoice_no FROM invoices WHERE invoice_no LIKE ? ORDER BY id DESC LIMIT 1");
-    $stmt->execute([$prefix . '-%']);
-    $lastInvoice = $stmt->fetchColumn();
+    $data = random_bytes(16);
+    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
+    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+    $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     
-    $nextNum = 1;
-    if ($lastInvoice) {
-        $parts = explode('-', $lastInvoice);
-        if (count($parts) >= 3) {
-            $lastNum = (int)end($parts);
-            $nextNum = $lastNum + 1;
-        }
-    }
-    
-    echo json_encode(["next_invoice_no" => sprintf("%s-%03d", $prefix, $nextNum)]);
+    echo json_encode(["next_invoice_no" => $prefix . "-" . $uuid]);
     exit;
 }
 if (preg_match('/^invoices$/', $route)) {
