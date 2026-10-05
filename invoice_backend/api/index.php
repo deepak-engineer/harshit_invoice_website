@@ -80,11 +80,13 @@ if ($route === 'login' && $method === 'POST') {
         // Auto-upgrade plain text passwords if they were manually inserted
         if ($password === $user['password_hash']) {
             $newHash = password_hash($password, PASSWORD_DEFAULT);
-            if ($role === 'admin') {
-                $pdo->prepare("UPDATE admin_users SET password_hash = ?, plain_password = ? WHERE id = ?")->execute([$newHash, $password, $user['id']]);
-            } else {
-                $pdo->prepare("UPDATE employees SET password_hash = ?, plain_password = ? WHERE id = ?")->execute([$newHash, $password, $user['id']]);
-            }
+            try {
+                if ($role === 'admin') {
+                    $pdo->prepare("UPDATE admin_users SET password_hash = ? WHERE id = ?")->execute([$newHash, $user['id']]);
+                } else {
+                    $pdo->prepare("UPDATE employees SET password_hash = ? WHERE id = ?")->execute([$newHash, $user['id']]);
+                }
+            } catch (Exception $e) {}
         }
         // Enforce Single Device Login for Admin
         if ($role === 'admin') {
