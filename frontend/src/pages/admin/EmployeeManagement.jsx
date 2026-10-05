@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Camera, Key, UserX, CheckCircle, Trash2, X, Wallet, ChevronLeft, ChevronRight, Shield, ShieldOff } from 'lucide-react';
+import { Plus, Edit2, Camera, Key, CheckCircle, Trash2, X, Wallet, ChevronLeft, ChevronRight, Shield, ShieldOff, UserCog, Banknote, LockKeyhole, ImagePlus } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import PhotoUploadModal from './PhotoUploadModal';
@@ -180,6 +180,18 @@ const EmployeeManagement = () => {
             fetchData();
         } catch (error) {
             toast.error(error.response?.data?.error || 'Failed to toggle employee status');
+        }
+    };
+
+    const handleEmployeeStatusToggle = async (emp) => {
+        if (emp.status === 'PENDING') return;
+        const newStatus = emp.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        try {
+            await api.put(`/admin/employees/${emp.id}`, { ...emp, status: newStatus });
+            toast.success(`Status updated to ${newStatus}`);
+            fetchData();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to update status');
         }
     };
 
@@ -492,15 +504,26 @@ const EmployeeManagement = () => {
                                         </td>
                                     )}
                                     <td className="py-2 md:py-3 px-1 md:px-4">
-                                        <span className={`px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[8px] md:text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-success-100 dark:bg-success-500/20 text-success-800 dark:text-success-400' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-error-100 dark:bg-error-500/20 text-error-800 dark:text-error-400'}`}>
-                                            <span className="hidden md:inline">{emp.status}</span>
-                                            <span className="md:hidden">{emp.status === 'ACTIVE' ? 'ACT' : emp.status === 'PENDING' ? 'PEN' : 'INA'}</span>
-                                        </span>
-                                        {emp.is_active == 0 && (
-                                            <span className="ml-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[8px] md:text-xs font-medium bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-400">
-                                                BLOCKED
-                                            </span>
-                                        )}
+                                        <div className="flex items-center space-x-2">
+                                            {emp.status === 'PENDING' ? (
+                                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                                    PENDING
+                                                </span>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => handleEmployeeStatusToggle(emp)}
+                                                    className={`relative inline-flex h-5 w-9 md:h-6 md:w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1 ${emp.status === 'ACTIVE' ? 'bg-success-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                                    title={`Toggle Status (Current: ${emp.status})`}
+                                                >
+                                                    <span className={`inline-block h-3 w-3 md:h-4 md:w-4 transform rounded-full bg-white transition-transform ${emp.status === 'ACTIVE' ? 'translate-x-5 md:translate-x-6' : 'translate-x-1'}`} />
+                                                </button>
+                                            )}
+                                            {emp.is_active == 0 && (
+                                                <span className="px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[8px] md:text-xs font-medium bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-400">
+                                                    BLOCKED
+                                                </span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4">
                                         <div className="flex items-center space-x-1 md:space-x-3 flex-wrap max-w-[80px] md:max-w-none">
@@ -511,19 +534,19 @@ const EmployeeManagement = () => {
                                                 </button>
                                             )}
                                             <button onClick={() => openEdit(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-all">
-                                                <Edit2 className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <UserCog className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Edit Profile</span>
                                             </button>
                                             <button onClick={() => openSalaryReport(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all">
-                                                <Wallet className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <Banknote className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Salary Report</span>
                                             </button>
                                             <button onClick={() => openPassword(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all">
-                                                <Key className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <LockKeyhole className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Reset Password</span>
                                             </button>
                                             <button onClick={() => openFace(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
-                                                <Camera className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
+                                                <ImagePlus className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Upload Photo</span>
                                             </button>
                                             {isSuperAdmin && (
