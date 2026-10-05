@@ -22,6 +22,22 @@ require_once 'db.php';
 require_once 'auth.php';
 require_once 'attendance_helper.php';
 
+// OTP/Email Schema Migrations
+try { $pdo->exec("ALTER TABLE employees ADD COLUMN email VARCHAR(255) NULL UNIQUE"); } catch (Exception $e) {}
+try { $pdo->exec("ALTER TABLE employees ADD COLUMN email_verified BOOLEAN DEFAULT 0"); } catch (Exception $e) {}
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS email_verifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        otp_hash VARCHAR(255) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        attempts INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        verified_at DATETIME NULL
+    )");
+} catch (Exception $e) {}
+
+
 $requestUri = $_SERVER['REQUEST_URI'];
 $path = parse_url($requestUri, PHP_URL_PATH);
 $route = '';
@@ -54,20 +70,6 @@ if ($route === 'login' && $method === 'POST') {
         try { $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_active BOOLEAN DEFAULT 1"); } catch (Exception $e) {}
         try { $pdo->exec("ALTER TABLE employees ADD COLUMN plain_password VARCHAR(255) NULL"); } catch (Exception $e) {}
         try { $pdo->exec("ALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT 1"); } catch (Exception $e) {}
-
-        try { $pdo->exec("ALTER TABLE employees ADD COLUMN email VARCHAR(255) NULL UNIQUE"); } catch (Exception $e) {}
-        try { $pdo->exec("ALTER TABLE employees ADD COLUMN email_verified BOOLEAN DEFAULT 0"); } catch (Exception $e) {}
-        try {
-            $pdo->exec("CREATE TABLE IF NOT EXISTS email_verifications (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
-                otp_hash VARCHAR(255) NOT NULL,
-                expires_at DATETIME NOT NULL,
-                attempts INT DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                verified_at DATETIME NULL
-            )");
-        } catch (Exception $e) {}
 
         
         try {
