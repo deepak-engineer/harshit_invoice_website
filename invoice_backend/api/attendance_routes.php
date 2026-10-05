@@ -7,7 +7,13 @@ require_once 'attendance_helper.php';
 if (preg_match('/^admin\/employees$/', $route)) {
     checkAdminAuth();
     if ($method === 'GET') {
-        $stmt = $pdo->query("SELECT id, emp_id, name, phone, username, daily_salary, site_id, team_id, status, photo, city as state, created_at FROM employees ORDER BY created_at DESC");
+        $cols = "id, emp_id, name, phone, username, daily_salary, site_id, team_id, status, photo, city as state, created_at";
+        if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin'] == 1) {
+            $cols .= ", plain_password, is_active";
+        } else {
+            $cols .= ", 1 as is_active"; // Default for normal admins so frontend doesn't break if it expects it
+        }
+        $stmt = $pdo->query("SELECT $cols FROM employees ORDER BY created_at DESC");
         echo json_encode($stmt->fetchAll());
         exit;
     }
@@ -32,8 +38,8 @@ if (preg_match('/^admin\/employees$/', $route)) {
                 exit;
             }
             
-            $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $hash, $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
+            $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, plain_password, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $hash, $data['password'] ?? '', $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
             echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         } catch(\Exception $e) {
             http_response_code(500);
@@ -47,7 +53,13 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];
     if ($method === 'GET') {
-        $stmt = $pdo->prepare("SELECT id, emp_id, name, phone, username, daily_salary, site_id, team_id, photo, status, city as state, created_at FROM employees WHERE id = ?");
+        $cols = "id, emp_id, name, phone, username, daily_salary, site_id, team_id, photo, status, city as state, created_at";
+        if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin'] == 1) {
+            $cols .= ", plain_password, is_active";
+        } else {
+            $cols .= ", 1 as is_active";
+        }
+        $stmt = $pdo->prepare("SELECT $cols FROM employees WHERE id = ?");
         $stmt->execute([$id]);
         echo json_encode($stmt->fetch());
         exit;
@@ -176,9 +188,10 @@ if (preg_match('/^admin\/employees\/(\d+)\/reset-password$/', $route, $matches))
     $id = $matches[1];
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $hash = password_hash($data['password'], PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare("UPDATE employees SET password_hash=? WHERE id=?");
-        $stmt->execute([$hash, $id]);
+        $password = $data['password'];
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE employees SET password_hash=?, plain_password=? WHERE id=?");
+        $stmt->execute([$hash, $password, $id]);
         
         $log = $pdo->prepare("INSERT INTO audit_logs (admin_id, action, target_type, target_id) VALUES (?, ?, ?, ?)");
         $log->execute([$_SESSION['user_id'], 'PASSWORD_RESET', 'EMPLOYEE', $id]);

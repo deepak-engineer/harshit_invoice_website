@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Camera, Key, UserX, CheckCircle, Trash2, X, Wallet, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit2, Camera, Key, UserX, CheckCircle, Trash2, X, Wallet, ChevronLeft, ChevronRight, Shield, ShieldOff } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import PhotoUploadModal from './PhotoUploadModal';
@@ -10,6 +10,8 @@ const EmployeeManagement = () => {
     const [sites, setSites] = useState([]);
     const [teams, setTeams] = useState([]);
     const [loading, setLoading] = useState(true);
+    
+    const isSuperAdmin = localStorage.getItem('is_super_admin') === 'true';
     
     // Modals state
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -167,6 +169,17 @@ const EmployeeManagement = () => {
             } catch (error) {
                 toast.error(error.response?.data?.error || 'Failed to delete employee');
             }
+        }
+    };
+
+    const handleToggleStatus = async (emp) => {
+        const isCurrentlyActive = emp.is_active == 1;
+        try {
+            await api.put(`/superadmin/employees/${emp.id}/toggle`, { is_active: isCurrentlyActive ? 0 : 1 });
+            toast.success(`Employee ${isCurrentlyActive ? 'blocked' : 'unblocked'} successfully`);
+            fetchData();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to toggle employee status');
         }
     };
 
@@ -414,6 +427,7 @@ const EmployeeManagement = () => {
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Team</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Site</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden xl:table-cell">Salary/Day</th>
+                                {isSuperAdmin && <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Password</th>}
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Status</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Actions</th>
                             </tr>
@@ -472,11 +486,21 @@ const EmployeeManagement = () => {
                                             </button>
                                         </div>
                                     </td>
+                                    {isSuperAdmin && (
+                                        <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell text-gray-500 dark:text-gray-400">
+                                            {emp.plain_password || '********'}
+                                        </td>
+                                    )}
                                     <td className="py-2 md:py-3 px-1 md:px-4">
                                         <span className={`px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[8px] md:text-xs font-medium ${emp.status === 'ACTIVE' ? 'bg-success-100 dark:bg-success-500/20 text-success-800 dark:text-success-400' : emp.status === 'PENDING' ? 'bg-amber-100 text-amber-800' : 'bg-error-100 dark:bg-error-500/20 text-error-800 dark:text-error-400'}`}>
                                             <span className="hidden md:inline">{emp.status}</span>
                                             <span className="md:hidden">{emp.status === 'ACTIVE' ? 'ACT' : emp.status === 'PENDING' ? 'PEN' : 'INA'}</span>
                                         </span>
+                                        {emp.is_active == 0 && (
+                                            <span className="ml-1 px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[8px] md:text-xs font-medium bg-error-100 text-error-800 dark:bg-error-900/30 dark:text-error-400">
+                                                BLOCKED
+                                            </span>
+                                        )}
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4">
                                         <div className="flex items-center space-x-1 md:space-x-3 flex-wrap max-w-[80px] md:max-w-none">
@@ -502,6 +526,14 @@ const EmployeeManagement = () => {
                                                 <Camera className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Upload Photo</span>
                                             </button>
+                                            {isSuperAdmin && (
+                                                <button onClick={() => handleToggleStatus(emp)} className={`group relative p-1 md:p-2 transition-all rounded-lg ${emp.is_active == 1 ? 'text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10' : 'text-error-500 hover:text-success-600 hover:bg-success-50 dark:hover:bg-success-500/10'}`}>
+                                                    {emp.is_active == 1 ? <ShieldOff className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} /> : <Shield className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />}
+                                                    <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
+                                                        {emp.is_active == 1 ? 'Block Employee' : 'Unblock Employee'}
+                                                    </span>
+                                                </button>
+                                            )}
                                             <button onClick={() => handleDelete(emp.id)} className="group relative p-1 md:p-2 text-gray-400 hover:text-error-600 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-all">
                                                 <Trash2 className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Delete</span>

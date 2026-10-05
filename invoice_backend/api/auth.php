@@ -77,4 +77,13 @@ function recordFailedLogin() {
     $_SESSION['login_attempts']++;
     $_SESSION['last_failed_login'] = time();
 }
+function checkSuperAdminAuth() {
+    checkAdminAuth();
+    if (!isset($_SESSION['is_super_admin']) || $_SESSION['is_super_admin'] != 1) {
+        header('Content-Type: application/json');
+        http_response_code(403);
+        echo json_encode(["error" => "Forbidden: Super Admin access required"]);
+        exit;
+    }
+}
 ?>

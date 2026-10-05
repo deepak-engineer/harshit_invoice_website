@@ -43,23 +43,34 @@ if ($route === 'login' && $method === 'POST') {
     if ($role === 'admin') {
         try {
             $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_super_admin TINYINT(1) DEFAULT 0");
+            $pdo->exec("ALTER TABLE admin_users ADD COLUMN plain_password VARCHAR(255) NULL");
+            $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_active BOOLEAN DEFAULT 1");
+            $pdo->exec("ALTER TABLE employees ADD COLUMN plain_password VARCHAR(255) NULL");
+            $pdo->exec("ALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT 1");
+            
             $stmt = $pdo->query("SELECT id FROM admin_users WHERE is_super_admin = 1");
             if (!$stmt->fetch()) {
                 $hash = password_hash('superadmin123', PASSWORD_DEFAULT);
-                $pdo->prepare("INSERT INTO admin_users (username, password_hash, is_super_admin) VALUES (?, ?, 1)")->execute(['superadmin', $hash]);
+                $pdo->prepare("INSERT INTO admin_users (username, password_hash, plain_password, is_super_admin) VALUES (?, ?, ?, 1)")->execute(['superadmin', $hash, 'superadmin123']);
             }
         } catch (Exception $e) {}
         
-        $stmt = $pdo->prepare("SELECT id, password_hash, is_super_admin FROM admin_users WHERE username = ?");
+        $stmt = $pdo->prepare("SELECT id, password_hash, is_super_admin, is_active FROM admin_users WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
-    } else {
-        $stmt = $pdo->prepare("SELECT id, password_hash, status FROM employees WHERE username = ?");
-        $stmt->execute([$username]);
-        $user = $stmt->fetch();
-        if ($user && $user['status'] !== 'ACTIVE') {
+        
+        if ($user && isset($user['is_active']) && $user['is_active'] == 0) {
             http_response_code(403);
-            $msg = $user['status'] === 'PENDING' ? "Account is pending admin approval." : "Account is inactive.";
+            echo json_encode(["error" => "Account is temporarily blocked."]);
+            exit;
+        }
+    } else {
+        $stmt = $pdo->prepare("SELECT id, password_hash, status, is_active FROM employees WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+        if ($user && ($user['status'] !== 'ACTIVE' || (isset($user['is_active']) && $user['is_active'] == 0))) {
+            http_response_code(403);
+            $msg = $user['status'] === 'PENDING' ? "Account is pending admin approval." : "Account is inactive or blocked.";
             echo json_encode(["error" => $msg]);
             exit;
         }
@@ -130,8 +141,8 @@ if ($route === 'employee-signup' && $method === 'POST') {
     try {
         $photo_filename = processBase64Image($photo, '../uploads/employees/');
         
-        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, photo, status) VALUES (?, ?, ?, ?, ?, ?, 'PENDING')");
-        $stmt->execute([$generatedId, $name, $phone, $generatedId, $hash, $photo_filename]);
+        $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, username, password_hash, plain_password, photo, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING')");
+        $stmt->execute([$generatedId, $name, $phone, $generatedId, $hash, $password, $photo_filename]);
         echo json_encode([
             "success" => true, 
             "username" => $generatedId,
@@ -170,15 +181,15 @@ if ($route === 'admin/update-credentials' && $method === 'POST') {
     try {
         if (!empty($new_username) && !empty($new_password)) {
             $hash = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE admin_users SET username = ?, password_hash = ? WHERE id = ?");
-            $stmt->execute([$new_username, $hash, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("UPDATE admin_users SET username = ?, password_hash = ?, plain_password = ? WHERE id = ?");
+            $stmt->execute([$new_username, $hash, $new_password, $_SESSION['user_id']]);
         } elseif (!empty($new_username)) {
             $stmt = $pdo->prepare("UPDATE admin_users SET username = ? WHERE id = ?");
             $stmt->execute([$new_username, $_SESSION['user_id']]);
         } elseif (!empty($new_password)) {
             $hash = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("UPDATE admin_users SET password_hash = ? WHERE id = ?");
-            $stmt->execute([$hash, $_SESSION['user_id']]);
+            $stmt = $pdo->prepare("UPDATE admin_users SET password_hash = ?, plain_password = ? WHERE id = ?");
+            $stmt->execute([$hash, $new_password, $_SESSION['user_id']]);
         }
         echo json_encode(["success" => true, "message" => "Credentials updated successfully. You will need to use these next time you login."]);
     } catch(PDOException $e) {
@@ -438,6 +449,7 @@ require_once 'attendance_routes.php';
 require_once 'expense_routes.php';
 require_once 'work_routes.php';
 require_once 'security_routes.php';
+require_once 'superadmin_routes.php';
 
 http_response_code(404);
 echo json_encode(["error" => "Endpoint not found"]);

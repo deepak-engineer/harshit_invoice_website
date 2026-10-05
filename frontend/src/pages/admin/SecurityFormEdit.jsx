@@ -583,11 +583,19 @@ const SecurityFormEdit = () => {
         let req = 0;
         let inst = 0;
         
+        const getSummaryName = (name) => {
+            if (!name) return '';
+            if (name === 'M.S Bank to ATM') return name;
+            if (name.includes('M.S')) return 'M.S';
+            return name;
+        };
+        
         Object.values(sections).forEach(sec => {
             sec.forEach(item => {
                 let qty = parseInt(item.quantity) || 0;
                 if (qty > 0) {
-                    existingEqBreakdown[item.equipment_name] = (existingEqBreakdown[item.equipment_name] || 0) + qty;
+                    const summaryName = getSummaryName(item.equipment_name);
+                    existingEqBreakdown[summaryName] = (existingEqBreakdown[summaryName] || 0) + qty;
                     fixed += qty;
                 }
             });
@@ -596,7 +604,8 @@ const SecurityFormEdit = () => {
         requirements.forEach(item => {
             let qty = parseInt(item.quantity) || 0;
             if (qty > 0) {
-                reqEqBreakdown[item.equipment_name] = (reqEqBreakdown[item.equipment_name] || 0) + qty;
+                const summaryName = getSummaryName(item.equipment_name);
+                reqEqBreakdown[summaryName] = (reqEqBreakdown[summaryName] || 0) + qty;
                 req += qty;
             }
         });
@@ -604,7 +613,8 @@ const SecurityFormEdit = () => {
         installations.forEach(item => {
             let qty = parseInt(item.quantity) || 0;
             if (qty > 0) {
-                instEqBreakdown[item.equipment_name] = (instEqBreakdown[item.equipment_name] || 0) + qty;
+                const summaryName = getSummaryName(item.equipment_name);
+                instEqBreakdown[summaryName] = (instEqBreakdown[summaryName] || 0) + qty;
                 inst += qty;
             }
         });

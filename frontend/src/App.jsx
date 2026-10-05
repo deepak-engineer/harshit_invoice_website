@@ -10,6 +10,7 @@ import VendorSettings from './pages/VendorSettings';
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
 import EmployeeManagement from './pages/admin/EmployeeManagement';
+import AdminManagement from './pages/admin/AdminManagement';
 import SiteManagement from './pages/admin/SiteManagement';
 import TeamManagement from './pages/admin/TeamManagement';
 import AttendanceReport from './pages/admin/AttendanceReport';
@@ -82,6 +83,7 @@ function App() {
             <Route path="attendance-report" element={<AttendanceReport />} />
             <Route path="attendance-list" element={<AdminAttendanceList />} />
             <Route path="employees" element={<EmployeeManagement />} />
+            <Route path="manage-admins" element={<AdminManagement />} />
             <Route path="teams" element={<TeamManagement />} />
             <Route path="sites" element={<SiteManagement />} />
             <Route path="expenses" element={<AdminExpenses />} />
