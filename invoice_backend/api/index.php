@@ -81,7 +81,7 @@ if ($route === 'login' && $method === 'POST') {
         } catch (Exception $e) {}
         
         $stmt = $pdo->prepare("SELECT id, password_hash, is_super_admin, is_active FROM admin_users WHERE username = ?");
-        $stmt->execute([$username]);
+        $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
         
         if ($user && isset($user['email_verified']) && $user['email_verified'] == 0) {
@@ -95,8 +95,8 @@ if ($route === 'login' && $method === 'POST') {
             exit;
         }
     } else {
-        $stmt = $pdo->prepare("SELECT id, password_hash, status, is_active, email_verified FROM employees WHERE username = ?");
-        $stmt->execute([$username]);
+        $stmt = $pdo->prepare("SELECT id, password_hash, status, is_active, email_verified FROM employees WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $username]);
         $user = $stmt->fetch();
         if ($user && ($user['status'] !== 'ACTIVE' || (isset($user['is_active']) && $user['is_active'] == 0))) {
             http_response_code(403);
@@ -153,11 +153,10 @@ if ($route === 'logout' && $method === 'POST') {
 if ($route === 'employee-signup' && $method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
     $name = trim($data['name'] ?? '');
-    $phone = trim($data['phone'] ?? '');
     $email = trim($data['email'] ?? '');
     $password = $data['password'] ?? '';
     
-    if (empty($name) || empty($phone) || empty($email) || empty($password)) {
+    if (empty($name) || empty($email) || empty($password)) {
         http_response_code(400);
         echo json_encode(["error" => "All fields including email are required"]);
         exit;
@@ -180,8 +179,7 @@ if ($route === 'employee-signup' && $method === 'POST') {
 
     $baseName = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
     if (strlen($baseName) > 10) $baseName = substr($baseName, 0, 10);
-    $phonePrefix = substr(preg_replace('/[^0-9]/', '', $phone), 0, 4);
-    $generatedId = $baseName . $phonePrefix;
+    $generatedId = $baseName . random_int(100, 999);
     
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM employees WHERE username = ?");
     $stmt->execute([$generatedId]);
@@ -193,7 +191,7 @@ if ($route === 'employee-signup' && $method === 'POST') {
     
     try {
         $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, phone, email, username, password_hash, plain_password, status, email_verified) VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', 0)");
-        $stmt->execute([$generatedId, $name, $phone, $email, $generatedId, $hash, $password]);
+        $stmt->execute([$generatedId, $name, NULL, $email, $generatedId, $hash, $password]);
         $emp_id = $pdo->lastInsertId();
 
         // Generate OTP

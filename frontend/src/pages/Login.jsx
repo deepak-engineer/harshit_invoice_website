@@ -9,7 +9,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [showOtpScreen, setShowOtpScreen] = useState(false);
   const [otp, setOtp] = useState('');
@@ -159,7 +158,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, email, password });
+        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), email, password });
         if (res.data.requires_otp) {
             setTempUserId(res.data.emp_id);
             setSuccess(res.data.message);
@@ -171,7 +170,6 @@ const Login = () => {
             setPassword('');
             setFirstName('');
             setLastName('');
-            setPhone('');
             setEmail('');
         }
     } catch (err) {
@@ -348,22 +346,7 @@ return (
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                    <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <User className="h-5 w-5" />
-                      </div>
-                      <input
-                        type="text"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        required
-                        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                        placeholder="Enter phone number"
-                      />
-                    </div>
-                  </div>
+                  
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
                     <div className="relative">
@@ -384,7 +367,7 @@ return (
                 </>
               ) : (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Username</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Username or Email</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                       <User className="h-5 w-5" />
@@ -395,7 +378,7 @@ return (
                       onChange={(e) => setUsername(e.target.value)}
                       required
                       className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
-                      placeholder="Enter username"
+                      placeholder="Enter username or email"
                     />
                   </div>
                 </div>
