@@ -234,12 +234,10 @@ if ($route === 'next-invoice-no' && $method === 'GET') {
     // Format: 2026-2027
     $prefix = $finYearStart . "-" . $finYearEnd;
     
-    $data = random_bytes(16);
-    $data[6] = chr(ord($data[6]) & 0x0f | 0x40);
-    $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
-    $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    // Generate a unique 12-character hexadecimal string
+    $hex = strtoupper(bin2hex(random_bytes(6)));
     
-    echo json_encode(["next_invoice_no" => $prefix . "-" . $uuid]);
+    echo json_encode(["next_invoice_no" => $prefix . "-" . $hex]);
     exit;
 }
 if (preg_match('/^invoices$/', $route)) {
@@ -279,12 +277,9 @@ if (preg_match('/^invoices$/', $route)) {
                 $finYearStart = $currentMonth >= 4 ? $currentYear : $currentYear - 1;
                 $finYearEnd = $finYearStart + 1;
                 $prefix = $finYearStart . "-" . $finYearEnd;
-                
-                $data_bytes = random_bytes(16);
-                $data_bytes[6] = chr(ord($data_bytes[6]) & 0x0f | 0x40);
-                $data_bytes[8] = chr(ord($data_bytes[8]) & 0x3f | 0x80);
-                $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data_bytes), 4));
-                $final_invoice_no = $prefix . "-" . $uuid;
+                // Generate a unique 12-character hexadecimal string
+                $hex = strtoupper(bin2hex(random_bytes(6)));
+                $final_invoice_no = $prefix . "-" . $hex;
             }
 
             $ins = $pdo->prepare("INSERT INTO invoices (invoice_no, invoice_date, payment_terms, vendor_id, client_id, project_site_details, client_project, site_id, location, amount_in_words, total_amount, status, terms_conditions, signature_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
