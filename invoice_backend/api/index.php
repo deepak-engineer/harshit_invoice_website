@@ -48,12 +48,14 @@ if ($route === 'login' && $method === 'POST') {
                 password_hash VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
-            $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_super_admin TINYINT(1) DEFAULT 0");
-            $pdo->exec("ALTER TABLE admin_users ADD COLUMN plain_password VARCHAR(255) NULL");
-            $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_active BOOLEAN DEFAULT 1");
-            $pdo->exec("ALTER TABLE employees ADD COLUMN plain_password VARCHAR(255) NULL");
-            $pdo->exec("ALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT 1");
-            
+        } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_super_admin TINYINT(1) DEFAULT 0"); } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE admin_users ADD COLUMN plain_password VARCHAR(255) NULL"); } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_active BOOLEAN DEFAULT 1"); } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE employees ADD COLUMN plain_password VARCHAR(255) NULL"); } catch (Exception $e) {}
+        try { $pdo->exec("ALTER TABLE employees ADD COLUMN is_active BOOLEAN DEFAULT 1"); } catch (Exception $e) {}
+        
+        try {
             $stmt = $pdo->query("SELECT id FROM admin_users WHERE is_super_admin = 1");
             if (!$stmt->fetch()) {
                 $hash = password_hash('superadmin123', PASSWORD_DEFAULT);
