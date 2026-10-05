@@ -217,7 +217,7 @@ return (
               </div>
             )}
             
-            {!isSignUp && (
+            {!showOtpScreen && (
                 <div className="flex justify-center mb-6 space-x-2 bg-slate-100 p-1 rounded-lg">
                     <button
                         type="button"
