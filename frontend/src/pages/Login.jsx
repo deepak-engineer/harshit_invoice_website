@@ -157,7 +157,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, password, photo });
+        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, password });
         setSuccess(res.data.message);
         setIsSignUp(false);
         setUsername(res.data.username);
@@ -275,29 +275,7 @@ const Login = () => {
                       />
                     </div>
                   </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Profile Photo</label>
-                    <div className="flex items-center space-x-4">
-                      {photo ? (
-                        <div className="relative h-16 w-16 rounded-xl overflow-hidden border-2 border-primary">
-                          <img src={photo} alt="Profile preview" className="h-full w-full object-cover" />
-                          <button 
-                            type="button" 
-                            onClick={() => setPhoto(null)} 
-                            className="absolute inset-0 bg-black/40 text-white flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-xs font-medium"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ) : (
-                        <button type="button" onClick={() => setShowPhotoModal(true)} className="flex items-center justify-center w-full px-4 py-3 border border-slate-200 border-dashed rounded-xl bg-slate-50 hover:bg-slate-100 cursor-pointer transition-colors">
-                          <Camera className="w-5 h-5 text-slate-400 mr-2" />
-                          <span className="text-sm font-medium text-slate-600">Take Photo / Upload</span>
-                        </button>
-                      )}
-                    </div>
-                  </div>
+
                 </>
               ) : (
                 <div>
