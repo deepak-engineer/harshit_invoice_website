@@ -252,28 +252,21 @@ if (preg_match('/^invoices$/', $route)) {
         try {
             $pdo->beginTransaction();
             
-            // Auto-generate unique invoice_no on backend to prevent duplicates
-            $currentMonth = (int)date('m');
-            $currentYear = (int)date('Y');
-            if ($currentMonth >= 4) {
-                $finYearStart = $currentYear;
-                $finYearEnd = $currentYear + 1;
-            } else {
-                $finYearStart = $currentYear - 1;
-                $finYearEnd = $currentYear;
+            // Use frontend generated UUID invoice_no or generate one
+            $final_invoice_no = isset($data['invoice_no']) && !empty($data['invoice_no']) ? $data['invoice_no'] : '';
+            if (!$final_invoice_no) {
+                $currentMonth = (int)date('m');
+                $currentYear = (int)date('Y');
+                $finYearStart = $currentMonth >= 4 ? $currentYear : $currentYear - 1;
+                $finYearEnd = $finYearStart + 1;
+                $prefix = $finYearStart . "-" . $finYearEnd;
+                
+                $data_bytes = random_bytes(16);
+                $data_bytes[6] = chr(ord($data_bytes[6]) & 0x0f | 0x40);
+                $data_bytes[8] = chr(ord($data_bytes[8]) & 0x3f | 0x80);
+                $uuid = vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data_bytes), 4));
+                $final_invoice_no = $prefix . "-" . $uuid;
             }
-            $prefix = $finYearStart . "-" . $finYearEnd;
-            $stmtLast = $pdo->prepare("SELECT invoice_no FROM invoices WHERE invoice_no LIKE ? ORDER BY id DESC LIMIT 1");
-            $stmtLast->execute([$prefix . '-%']);
-            $lastInvoice = $stmtLast->fetchColumn();
-            $nextNum = 1;
-            if ($lastInvoice) {
-                $parts = explode('-', $lastInvoice);
-                if (count($parts) >= 3) {
-                    $nextNum = (int)end($parts) + 1;
-                }
-            }
-            $final_invoice_no = sprintf("%s-%03d", $prefix, $nextNum);
 
             $ins = $pdo->prepare("INSERT INTO invoices (invoice_no, invoice_date, payment_terms, vendor_id, client_id, project_site_details, client_project, site_id, location, amount_in_words, total_amount, status, terms_conditions, signature_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $ins->execute([
