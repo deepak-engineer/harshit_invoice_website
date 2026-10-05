@@ -42,6 +42,12 @@ if ($route === 'login' && $method === 'POST') {
     $user = null;
     if ($role === 'admin') {
         try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS admin_users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                username VARCHAR(100) NOT NULL UNIQUE,
+                password_hash VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
             $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_super_admin TINYINT(1) DEFAULT 0");
             $pdo->exec("ALTER TABLE admin_users ADD COLUMN plain_password VARCHAR(255) NULL");
             $pdo->exec("ALTER TABLE admin_users ADD COLUMN is_active BOOLEAN DEFAULT 1");
