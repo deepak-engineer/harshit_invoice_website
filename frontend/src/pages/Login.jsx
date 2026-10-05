@@ -10,6 +10,12 @@ const Login = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [tempUserId, setTempUserId] = useState(null);
+  const [isResending, setIsResending] = useState(false);
+
   const [photo, setPhoto] = useState(null);
 
   const [role, setRole] = useState('employee');
@@ -148,24 +154,26 @@ const Login = () => {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    if (!photo) {
-        setError('Please capture or upload a profile photo');
-        return;
-    }
     setError('');
     setSuccess('');
     setIsLoading(true);
 
     try {
-        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, password });
-        setSuccess(res.data.message);
-        setIsSignUp(false);
-        setUsername(res.data.username);
-        setPassword('');
-        setPhoto(null);
-        setFirstName('');
-        setLastName('');
-        setPhone('');
+        const res = await api.post('/employee-signup', { name: `${firstName} ${lastName}`.trim(), phone, email, password });
+        if (res.data.requires_otp) {
+            setTempUserId(res.data.emp_id);
+            setSuccess(res.data.message);
+            setShowOtpScreen(true);
+        } else {
+            setSuccess(res.data.message);
+            setIsSignUp(false);
+            setUsername(res.data.username);
+            setPassword('');
+            setFirstName('');
+            setLastName('');
+            setPhone('');
+            setEmail('');
+        }
     } catch (err) {
         setError(err.response?.data?.error || 'Registration failed');
     } finally {
@@ -173,7 +181,43 @@ const Login = () => {
     }
   };
 
-  return (
+  const handleVerifyOtp = async (e) => {
+      e.preventDefault();
+      setError('');
+      setSuccess('');
+      setIsLoading(true);
+      try {
+          const res = await api.post('/verify-email-otp', { emp_id: tempUserId, otp });
+          setSuccess(res.data.message);
+          setShowOtpScreen(false);
+          setIsSignUp(false);
+          setPassword('');
+          setFirstName('');
+          setLastName('');
+          setPhone('');
+          setEmail('');
+          setOtp('');
+      } catch (err) {
+          setError(err.response?.data?.error || 'Verification failed');
+      } finally {
+          setIsLoading(false);
+      }
+  };
+
+  const handleResendOtp = async () => {
+      setError('');
+      setSuccess('');
+      setIsResending(true);
+      try {
+          const res = await api.post('/resend-email-otp', { emp_id: tempUserId });
+          setSuccess(res.data.message);
+      } catch (err) {
+          setError(err.response?.data?.error || 'Failed to resend OTP');
+      } finally {
+          setIsResending(false);
+      }
+  };
+return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary via-secondary/80 to-primary p-4">
       <div className="w-full max-w-md">
         
@@ -184,10 +228,10 @@ const Login = () => {
                 <img src={logo} alt="Logo" className="h-16 md:h-20 w-auto object-contain" />
               </div>
               <h1 className="text-3xl font-bold text-slate-800 mb-2">
-                  {isSignUp ? 'Create Account' : 'Welcome Back'}
+                  {showOtpScreen ? 'Verify Email' : (isSignUp ? 'Create Account' : 'Welcome Back')}
               </h1>
               <p className="text-slate-500">
-                  {isSignUp ? 'Sign up as a new employee' : 'Sign in to manage your invoices'}
+                  {showOtpScreen ? 'Check your email for the verification code' : (isSignUp ? 'Sign up as a new employee' : 'Sign in to manage your invoices')}
               </p>
             </div>
             
@@ -222,6 +266,51 @@ const Login = () => {
                 </div>
             )}
             
+            {showOtpScreen ? (
+              <form onSubmit={handleVerifyOtp} className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Enter Verification Code</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Lock className="h-5 w-5" />
+                      </div>
+                      <input
+                        type="text"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        required
+                        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800 tracking-widest font-bold text-center"
+                        placeholder="000000"
+                        maxLength="6"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg shadow-primary/30 text-sm font-bold text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center">
+                        <RefreshCcw className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" />
+                        Verifying...
+                      </span>
+                    ) : (
+                      'Verify Email'
+                    )}
+                  </button>
+                  <div className="text-center mt-4">
+                    <button
+                        type="button"
+                        onClick={handleResendOtp}
+                        disabled={isResending}
+                        className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
+                    >
+                        {isResending ? 'Sending...' : 'Resend Code'}
+                    </button>
+                  </div>
+              </form>
+            ) : (
             <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-6">
               {isSignUp ? (
                 <>
@@ -272,6 +361,22 @@ const Login = () => {
                         required
                         className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
                         placeholder="Enter phone number"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <User className="h-5 w-5" />
+                      </div>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-shadow bg-slate-50 outline-none text-slate-800"
+                        placeholder="Enter email address"
                       />
                     </div>
                   </div>
@@ -333,20 +438,23 @@ const Login = () => {
               </button>
 
               <div className="text-center mt-4">
-                <button
-                    type="button"
-                    onClick={() => {
-                        setIsSignUp(!isSignUp);
-                        setError('');
-                        setSuccess('');
-                        if (isSignUp) setRole('employee'); // reset role to employee when going back to sign in
-                    }}
-                    className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-                >
-                    {isSignUp ? 'Already have an account? Sign In' : 'New employee? Sign Up here'}
-                </button>
+                {!showOtpScreen && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError('');
+                setSuccess('');
+                if (isSignUp) setRole('employee'); 
+              }}
+              className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+            >
+              {isSignUp ? 'Already have an account? Sign In' : 'New employee? Sign Up here'}
+            </button>
+          )}
               </div>
             </form>
+            )}
           </div>
         </div>
       </div>
