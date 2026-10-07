@@ -351,15 +351,7 @@ const EmployeeDashboard = () => {
                 )}
             </div>
             
-            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
-                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Profile Status</h2>
-                 <div className="flex items-center space-x-2">
-                     <CheckCircle className={`w-5 h-5 ${employee.face_registered ? 'text-green-500' : 'text-slate-300'}`} />
-                     <span className={employee.face_registered ? 'text-slate-700' : 'text-slate-500'}>
-                         Face Registration: {employee.face_registered ? 'Completed' : 'Pending'}
-                     </span>
-                 </div>
-            </div>
+
             
             {/* Salary Report Modal */}
             {salaryReportModal.isOpen && (
