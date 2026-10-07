@@ -157,7 +157,7 @@ const EmployeeManagement = () => {
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        setSubmittingForm(true);
+        if (!selectedEmp && !isEmailVerified) { toast.error("Please verify the email with OTP first"); return; } setSubmittingForm(true);
         try {
             let finalSiteId = formData.site_id;
             let finalTeamId = formData.team_id;
@@ -838,7 +838,7 @@ const EmployeeManagement = () => {
                             </div>
                             <div className="flex justify-end space-x-3 mt-6">
                                 <button type="button" onClick={() => setIsFormOpen(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-gray-800 rounded-lg">Cancel</button>
-                                <button type="submit" disabled={submittingForm} className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-500/90 flex items-center">
+                                <button type="submit" disabled={submittingForm || (!selectedEmp && !isEmailVerified)} className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-500/90 flex items-center">
                                     {submittingForm ? 'Saving...' : 'Save Employee'}
                                 </button>
                             </div>
