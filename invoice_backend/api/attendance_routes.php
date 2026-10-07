@@ -58,8 +58,15 @@ if ($route === 'admin/send-new-employee-otp' && $method === 'POST') {
         ];
         
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($email_data));
-        curl_exec($ch);
+        $result = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        if ($httpcode >= 400 || $result === false) {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to send email. Resend API responded with: " . $result]);
+            exit;
+        }
 
         echo json_encode(["success" => true, "message" => "OTP sent to email."]);
     } catch(PDOException $e) {

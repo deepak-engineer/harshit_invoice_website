@@ -186,7 +186,14 @@ if ($route === 'send-login-otp' && $method === 'POST') {
         
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($email_data));
         $result = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
+
+        if ($httpcode >= 400 || $result === false) {
+            http_response_code(500);
+            echo json_encode(["error" => "Failed to send email. Resend API responded with: " . $result]);
+            exit;
+        }
 
         echo json_encode([
             "success" => true, 
@@ -315,8 +322,15 @@ if ($route === 'resend-email-otp' && $method === 'POST') {
     
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($email_data));
     $result = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
     
+    if ($httpcode >= 400 || $result === false) {
+        http_response_code(500);
+        echo json_encode(["error" => "Failed to send email. Resend API responded with: " . $result]);
+        exit;
+    }
+
     echo json_encode(["success" => true, "message" => "A new OTP has been sent."]);
     exit;
 }
