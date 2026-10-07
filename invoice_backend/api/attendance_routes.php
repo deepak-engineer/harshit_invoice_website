@@ -132,9 +132,9 @@ require_once 'attendance_helper.php';
 if (preg_match('/^admin\/employees$/', $route)) {
     checkAdminAuth();
     if ($method === 'GET') {
-        $cols = "id, emp_id, name, phone, username, daily_salary, site_id, team_id, status, photo, city as state, created_at";
+        $cols = "id, emp_id, name, phone, daily_salary, site_id, team_id, status, photo, city as state, created_at";
         if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin'] == 1) {
-            $cols .= ", plain_password, is_active";
+            $cols .= ", is_active";
         } else {
             $cols .= ", 1 as is_active"; // Default for normal admins so frontend doesn't break if it expects it
         }
@@ -145,7 +145,6 @@ if (preg_match('/^admin\/employees$/', $route)) {
     if ($method === 'POST') {
         try {
             $data = json_decode(file_get_contents('php://input'), true);
-            $hash = password_hash($data['password'] ?? '', PASSWORD_DEFAULT);
             $photo_filename = null;
             if (!empty($data['photo']) && strpos($data['photo'], 'data:image') === 0) {
                 $photo_filename = processBase64Image($data['photo'], '../uploads/employees/');
@@ -163,8 +162,8 @@ if (preg_match('/^admin\/employees$/', $route)) {
                 exit;
             }
             
-            $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, email, email_verified, username, password_hash, plain_password, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$data['emp_id'], $data['name'], $data['email'] ?? null, $data['username'], $hash, $data['password'] ?? '', $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
+            $stmt = $pdo->prepare("INSERT INTO employees (emp_id, name, email, email_verified, daily_salary, site_id, team_id, photo, status, city) VALUES (?, ?, ?, 1, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$data['emp_id'], $data['name'], $data['email'] ?? null, $daily_salary, $site_id, $team_id, $photo_filename, $data['status'] ?? 'ACTIVE', $data['state'] ?? null]);
             echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         } catch(\Exception $e) {
             http_response_code(500);
@@ -178,9 +177,9 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
     checkAdminAuth();
     $id = $matches[1];
     if ($method === 'GET') {
-        $cols = "id, emp_id, name, email, username, daily_salary, site_id, team_id, photo, status, city as state, created_at";
+        $cols = "id, emp_id, name, email, daily_salary, site_id, team_id, photo, status, city as state, created_at";
         if (isset($_SESSION['is_super_admin']) && $_SESSION['is_super_admin'] == 1) {
-            $cols .= ", plain_password, is_active";
+            $cols .= ", is_active";
         } else {
             $cols .= ", 1 as is_active";
         }
@@ -207,11 +206,11 @@ if (preg_match('/^admin\/employees\/(\d+)$/', $route, $matches)) {
             $photo_filename = null;
             if (!empty($data['photo']) && strpos($data['photo'], 'data:image') === 0) {
                 $photo_filename = processBase64Image($data['photo'], '../uploads/employees/');
-                $stmt = $pdo->prepare("UPDATE employees SET emp_id=?, name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, photo=?, status=?, city=? WHERE id=?");
-                $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $daily_salary, $site_id, $team_id, $photo_filename, $data['status'], $data['state'] ?? null, $id]);
+                $stmt = $pdo->prepare("UPDATE employees SET emp_id=?, name=?, phone=?, daily_salary=?, site_id=?, team_id=?, photo=?, status=?, city=? WHERE id=?");
+                $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $daily_salary, $site_id, $team_id, $photo_filename, $data['status'], $data['state'] ?? null, $id]);
             } else {
-                $stmt = $pdo->prepare("UPDATE employees SET emp_id=?, name=?, phone=?, username=?, daily_salary=?, site_id=?, team_id=?, status=?, city=? WHERE id=?");
-                $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $data['username'], $daily_salary, $site_id, $team_id, $data['status'], $data['state'] ?? null, $id]);
+                $stmt = $pdo->prepare("UPDATE employees SET emp_id=?, name=?, phone=?, daily_salary=?, site_id=?, team_id=?, status=?, city=? WHERE id=?");
+                $stmt->execute([$data['emp_id'], $data['name'], $data['phone'] ?? null, $daily_salary, $site_id, $team_id, $data['status'], $data['state'] ?? null, $id]);
             }
             echo json_encode(["success" => true]);
         } catch (\Exception $e) {

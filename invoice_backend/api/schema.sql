@@ -3,8 +3,6 @@ CREATE TABLE IF NOT EXISTS `employees` (
   `emp_id` VARCHAR(50) NOT NULL UNIQUE,
   `name` VARCHAR(255) NOT NULL,
   `phone` VARCHAR(20) DEFAULT NULL,
-  `username` VARCHAR(100) NOT NULL UNIQUE,
-  `password_hash` VARCHAR(255) NOT NULL,
   `daily_salary` DECIMAL(10,2) DEFAULT 0.00,
   `site_id` INT DEFAULT NULL,
   `team_id` INT DEFAULT NULL,

@@ -15,7 +15,6 @@ const EmployeeManagement = () => {
     
     // Modals state
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [isPasswordOpen, setIsPasswordOpen] = useState(false);
     const [isFaceOpen, setIsFaceOpen] = useState(false);
     const [viewingPhoto, setViewingPhoto] = useState(null);
     const [salaryModal, setSalaryModal] = useState({ isOpen: false, emp: null, isApproveMode: false });
@@ -38,12 +37,11 @@ const EmployeeManagement = () => {
     
     const [selectedEmp, setSelectedEmp] = useState(null);
     const [formData, setFormData] = useState({
-        emp_id: '', name: '', email: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
+        emp_id: '', name: '', email: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
     });
     const [newSiteData, setNewSiteData] = useState({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
     const [newTeamData, setNewTeamData] = useState({ name: '', site_id: '', state: '' });
     const [submittingForm, setSubmittingForm] = useState(false);
-    const [newPassword, setNewPassword] = useState('');
     const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
@@ -359,20 +357,11 @@ const EmployeeManagement = () => {
         setSalaryReportModal(prev => ({ ...prev, data, selectedState: newState }));
     };
 
-    const handlePasswordSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await api.post(`/admin/employees/${selectedEmp.id}/reset-password`, { password: newPassword });
-            toast.success('Password reset successfully');
-            setIsPasswordOpen(false);
-        } catch (error) {
-            toast.error('Failed to reset password');
-        }
-    };
+
 
     const openNew = () => {
         const autoEmpId = 'EMP' + Math.floor(10000 + Math.random() * 90000);
-        setFormData({ emp_id: autoEmpId, first_name: '', last_name: '', email: '', username: '', password: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
+        setFormData({ emp_id: autoEmpId, first_name: '', last_name: '', email: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: '' });
         setIsEmailVerified(false);
         setOtpSent(false);
         setOtp('');
@@ -385,7 +374,7 @@ const EmployeeManagement = () => {
     const openEdit = (emp) => {
         const [firstName, ...rest] = (emp.name || '').split(' ');
         const lastName = rest.join(' ');
-        setFormData({ ...emp, first_name: firstName, last_name: lastName, password: '' }); // Don't clear photo, backend ignores if not base64
+        setFormData({ ...emp, first_name: firstName, last_name: lastName }); // Don't clear photo, backend ignores if not base64
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
         setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(emp);
@@ -403,11 +392,7 @@ const EmployeeManagement = () => {
         }
     };
 
-    const openPassword = (emp) => {
-        setSelectedEmp(emp);
-        setNewPassword('');
-        setIsPasswordOpen(true);
-    };
+
 
     const openFace = (emp) => {
         setSelectedEmp(emp);
@@ -477,11 +462,9 @@ const EmployeeManagement = () => {
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Photo</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Name</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Email</th>
-                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden sm:table-cell">Username</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Team</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Site</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden xl:table-cell">Salary/Day</th>
-                                {isSuperAdmin && <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Password</th>}
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Status</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Actions</th>
                             </tr>
@@ -515,7 +498,6 @@ const EmployeeManagement = () => {
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 font-medium text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[60px] md:max-w-[120px]">{emp.name}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell">{emp.email || '-'}</td>
-                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm truncate max-w-[60px] md:max-w-[100px] hidden sm:table-cell">{emp.username}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-xs">
                                         <div className="flex items-center space-x-1 md:space-x-2">
                                             <span className="truncate max-w-[60px] md:max-w-none">{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
@@ -540,11 +522,6 @@ const EmployeeManagement = () => {
                                             </button>
                                         </div>
                                     </td>
-                                    {isSuperAdmin && (
-                                        <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell text-gray-500 dark:text-gray-400">
-                                            {emp.plain_password || '********'}
-                                        </td>
-                                    )}
                                     <td className="py-2 md:py-3 px-1 md:px-4">
                                         <div className="flex items-center space-x-2">
                                             {emp.status === 'PENDING' ? (
@@ -583,10 +560,7 @@ const EmployeeManagement = () => {
                                                 <Banknote className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Salary Report</span>
                                             </button>
-                                            <button onClick={() => openPassword(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 rounded-lg transition-all">
-                                                <LockKeyhole className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
-                                                <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Reset Password</span>
-                                            </button>
+
                                             <button onClick={() => openFace(emp)} className="group relative p-1 md:p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all">
                                                 <ImagePlus className="w-3 h-3 md:w-4 md:h-4" strokeWidth={2} />
                                                 <span className="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-[10px] font-bold text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">Upload Photo</span>
@@ -697,18 +671,6 @@ const EmployeeManagement = () => {
                                         </div>
                                     )}
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
-                                    <input type="text" required value={formData.username} onChange={e => setFormData({...formData, username: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {!selectedEmp && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-                                        <input type="text" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-                                    </div>
-                                )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
@@ -847,25 +809,6 @@ const EmployeeManagement = () => {
                 </div>
             )}
 
-            {/* Password Modal */}
-            {isPasswordOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-sm p-6 shadow-xl">
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-white/90 mb-4">Reset Password</h2>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">For {selectedEmp.name}</p>
-                        <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
-                                <input type="text" required value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none" />
-                            </div>
-                            <div className="flex justify-end space-x-3 mt-6">
-                                <button type="button" onClick={() => setIsPasswordOpen(false)} className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:bg-gray-800 rounded-lg">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-warning-50 dark:bg-warning-500/100 text-white rounded-lg hover:bg-amber-600">Reset</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
 
             {/* Photo Upload Modal */}
             {isFaceOpen && selectedEmp && (
