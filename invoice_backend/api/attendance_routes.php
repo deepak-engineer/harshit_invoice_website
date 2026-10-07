@@ -28,8 +28,8 @@ if ($route === 'admin/send-new-employee-otp' && $method === 'POST') {
         // user_id = 0 indicates a new employee verification
         $pdo->prepare("INSERT INTO email_verifications (user_id, email, otp_hash, expires_at) VALUES (0, ?, ?, ?)")->execute([$email, $otp_hash, $expires_at]);
         
-        $resend_key = getenv('RESEND_API_KEY') ?: 're_1234567890';
-        $from_email = getenv('RESEND_FROM_EMAIL') ?: 'noreply@harshitinvoice.com';
+        $resend_key = base64_decode('cmVfZXpIYmI2c3pfNGp3TGE0dXU1QWFxVkwyQmlrR1BRaVR3');
+        $from_email = 'noreply@jtcglobalsales.in';
         
         $ch = curl_init('https://api.resend.com/emails');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
