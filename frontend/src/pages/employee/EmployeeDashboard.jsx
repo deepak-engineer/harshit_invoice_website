@@ -195,44 +195,50 @@ const EmployeeDashboard = () => {
                 </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                    <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
-                        <Calendar className="w-6 h-6" />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                        <Calendar className="size-6 text-gray-800 dark:text-white/90" />
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-slate-500">Today's Status</p>
-                        <h3 className="text-xl font-bold text-slate-800">
-                            {today ? today.status : 'Not Checked In'}
-                        </h3>
-                    </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                    <div className="p-3 bg-green-50 text-green-600 rounded-xl">
-                        <IndianRupee className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <p className="text-sm font-medium text-slate-500">Daily Salary</p>
-                        <h3 className="text-xl font-bold text-slate-800">₹{employee.daily_salary}</h3>
+                    <div className="mt-5 flex items-end justify-between">
+                        <div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Today's Status</span>
+                            <h4 className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+                                {today ? today.status : 'Not Checked In'}
+                            </h4>
+                        </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center space-x-4">
-                    <div className="p-3 bg-purple-50 text-purple-600 rounded-xl">
-                        <Clock className="w-6 h-6" />
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                        <IndianRupee className="size-6 text-gray-800 dark:text-white/90" />
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-slate-500">Check In Time</p>
-                        <h3 className="text-xl font-bold text-slate-800">
-                            {today?.check_in_time ? new Date(today.check_in_time).toLocaleTimeString() : '--:--'}
-                        </h3>
+                    <div className="mt-5 flex items-end justify-between">
+                        <div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Daily Salary</span>
+                            <h4 className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">₹{employee.daily_salary}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 md:p-6 dark:border-gray-800 dark:bg-white/3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800">
+                        <Clock className="size-6 text-gray-800 dark:text-white/90" />
+                    </div>
+                    <div className="mt-5 flex items-end justify-between">
+                        <div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">Check In Time</span>
+                            <h4 className="mt-2 text-2xl font-bold text-gray-800 dark:text-white/90">
+                                {today?.check_in_time ? new Date(today.check_in_time).toLocaleTimeString() : '--:--'}
+                            </h4>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mt-6">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">Assigned Site</h2>
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Assigned Site</h2>
                 {employee.site ? (
                     <div>
                         <div className="mb-4">
@@ -295,95 +301,45 @@ const EmployeeDashboard = () => {
                 ) : (
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <p className="text-sm text-slate-500">No site assigned yet. Search or create a site:</p>
-                            <button 
-                                onClick={() => setIsCreatingSite(!isCreatingSite)}
-                                className="px-3 py-1.5 bg-blue-50 text-primary text-sm font-semibold rounded-lg hover:bg-blue-100 transition-colors"
-                            >
-                                {isCreatingSite ? 'Cancel' : '+ Create New Site'}
-                            </button>
+                            <p className="text-sm text-slate-500">No site assigned yet. Search and pick a site:</p>
                         </div>
                         
-                        {isCreatingSite ? (
-                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <h3 className="font-bold text-slate-700 mb-3">Create New Site</h3>
-                                <form onSubmit={handleCreateSite} className="space-y-3">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <input 
+                                type="text" 
+                                placeholder="Search site by Name or Branch Code..." 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                            />
+                        </div>
+                        {availableSites.length > 0 ? (
+                            <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
+                                {availableSites.map(site => (
+                                    <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
                                         <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Site Name*</label>
-                                            <input type="text" required value={newSiteData.name} onChange={e => setNewSiteData({...newSiteData, name: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. Alpha Tower" />
+                                            <p className="font-bold text-slate-700 text-sm">{site.name}</p>
+                                            <p className="text-xs text-slate-500">{site.code} - {site.city || site.address}</p>
                                         </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Branch Code*</label>
-                                            <input type="text" required value={newSiteData.code} onChange={e => setNewSiteData({...newSiteData, code: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. ALPHA1" />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">State (For Holidays)*</label>
-                                            <select required value={newSiteData.state} onChange={e => setNewSiteData({...newSiteData, state: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm">
-                                                <option value="">Select State</option>
-                                                {Object.keys(holidays2026).map(st => (
-                                                    <option key={st} value={st}>{st}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">City</label>
-                                            <input type="text" value={newSiteData.city} onChange={e => setNewSiteData({...newSiteData, city: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="e.g. Mumbai" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-slate-600 mb-1">Address</label>
-                                            <input type="text" value={newSiteData.address} onChange={e => setNewSiteData({...newSiteData, address: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm" placeholder="Full address" />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end pt-2">
-                                        <button type="submit" disabled={isSubmittingSite} className="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50">
-                                            {isSubmittingSite ? 'Creating...' : 'Create & Assign Site'}
+                                        <button 
+                                            onClick={() => handleAssignSite(site.id)}
+                                            disabled={isAssigning}
+                                            className="px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                        >
+                                            Pick Site
                                         </button>
                                     </div>
-                                </form>
+                                ))}
                             </div>
                         ) : (
-                            <>
-                                <div>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search site by Name or Branch Code..." 
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                    />
-                                </div>
-                                {availableSites.length > 0 ? (
-                                    <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
-                                        {availableSites.map(site => (
-                                            <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                                                <div>
-                                                    <p className="font-bold text-slate-700 text-sm">{site.name}</p>
-                                                    <p className="text-xs text-slate-500">{site.code} - {site.city || site.address}</p>
-                                                </div>
-                                                <button 
-                                                    onClick={() => handleAssignSite(site.id)}
-                                                    disabled={isAssigning}
-                                                    className="px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                                >
-                                                    Assign
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-xs text-slate-400 p-2 text-center">No sites found matching "{searchTerm}"</p>
-                                )}
-                            </>
+                            <p className="text-xs text-slate-400 p-2 text-center">No sites found matching "{searchTerm}"</p>
                         )}
                     </div>
                 )}
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mt-6">
-                <h2 className="text-lg font-bold text-slate-800 mb-4">Assigned Team</h2>
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Assigned Team</h2>
                 {employee.team ? (
                     <div>
                         <div className="mb-4">
@@ -395,8 +351,8 @@ const EmployeeDashboard = () => {
                 )}
             </div>
             
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mt-6">
-                 <h2 className="text-lg font-bold text-slate-800 mb-4">Profile Status</h2>
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
+                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Profile Status</h2>
                  <div className="flex items-center space-x-2">
                      <CheckCircle className={`w-5 h-5 ${employee.face_registered ? 'text-green-500' : 'text-slate-300'}`} />
                      <span className={employee.face_registered ? 'text-slate-700' : 'text-slate-500'}>

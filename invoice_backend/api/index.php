@@ -314,7 +314,7 @@ if ($route === 'resend-email-otp' && $method === 'POST') {
     ]);
     
     $email_data = [
-        "from" => "Harshit Invoice <" . $from_email . ">",
+        "from" => "Crons Team <" . $from_email . ">",
         "to" => [$emp['email']],
         "subject" => "Verify your email",
         "text" => "Verify your email\n\nYour verification code is:\n\n" . $otp . "\n\nThis code expires in 10 minutes.\n\nIf you did not create this account, you can safely ignore this email."
