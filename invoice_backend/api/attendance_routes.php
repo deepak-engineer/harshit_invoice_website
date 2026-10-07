@@ -633,6 +633,28 @@ if (preg_match('/^admin\/attendance\/update-status$/', $route)) {
     }
 }
 
+if (preg_match('/^admin\/attendance\/delete$/', $route)) {
+    checkAdminAuth();
+    if ($method === 'DELETE') {
+        $data = json_decode(file_get_contents('php://input'), true);
+        
+        if (isset($data['id'])) {
+            $stmt = $pdo->prepare("DELETE FROM attendance WHERE id = ?");
+            $stmt->execute([$data['id']]);
+        } else if (isset($data['emp_id']) && isset($data['attendance_date'])) {
+            $stmt = $pdo->prepare("DELETE FROM attendance WHERE employee_id = ? AND attendance_date = ?");
+            $stmt->execute([$data['emp_id'], $data['attendance_date']]);
+        } else {
+            http_response_code(400);
+            echo json_encode(["error" => "Missing record ID or emp_id/date"]);
+            exit;
+        }
+
+        echo json_encode(["success" => true, "message" => "Attendance record deleted successfully"]);
+        exit;
+    }
+}
+
 // Employee ME endpoints
 if (preg_match('/^me$/', $route)) {
     checkEmployeeAuth();

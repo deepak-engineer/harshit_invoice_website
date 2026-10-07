@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Edit3 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, X, Edit3, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 import { holidays2026 } from '../../utils/holidays2026';
@@ -91,6 +91,20 @@ const AttendanceReport = () => {
             fetchReport();
         } catch (err) {
             toast.error('Failed to update attendance');
+        }
+    };
+
+    const handleDeleteRecord = async () => {
+        if (!window.confirm('Are you sure you want to delete this record?')) return;
+        try {
+            await api.delete('/admin/attendance/delete', { 
+                data: { emp_id: editModal.record.emp_id, attendance_date: editModal.dateStr } 
+            });
+            toast.success('Attendance deleted successfully');
+            setEditModal({ isOpen: false, record: null, dateStr: '', newStatus: '' });
+            fetchReport();
+        } catch (err) {
+            toast.error('Failed to delete attendance');
         }
     };
 
@@ -424,20 +438,30 @@ const AttendanceReport = () => {
                                         <option value="REJECTED">Rejected</option>
                                     </select>
                                 </div>
-                                <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-800 mt-6">
-                                    <button 
-                                        type="button" 
-                                        onClick={() => setEditModal({ isOpen: false, record: null, dateStr: '', newStatus: '' })} 
-                                        className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors"
+                                <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-800 mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={handleDeleteRecord}
+                                        className="p-2.5 text-error-600 dark:text-error-500 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-xl transition-colors"
+                                        title="Delete Record"
                                     >
-                                        Cancel
+                                        <Trash2 className="w-5 h-5" />
                                     </button>
-                                    <button 
-                                        type="submit" 
-                                        className="px-5 py-2.5 bg-brand-500 text-white font-medium rounded-xl hover:bg-brand-500/90 transition-all shadow-theme-xs hover:shadow-md"
-                                    >
-                                        Update Status
-                                    </button>
+                                    <div className="flex space-x-3">
+                                        <button 
+                                            type="button" 
+                                            onClick={() => setEditModal({ isOpen: false, record: null, dateStr: '', newStatus: '' })} 
+                                            className="px-5 py-2.5 text-gray-600 dark:text-gray-400 font-medium hover:bg-gray-100 dark:bg-gray-800 rounded-xl transition-colors"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button 
+                                            type="submit" 
+                                            className="px-5 py-2.5 bg-brand-500 text-white font-medium rounded-xl hover:bg-brand-500/90 transition-all shadow-theme-xs hover:shadow-md"
+                                        >
+                                            Update Status
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
                         </div>

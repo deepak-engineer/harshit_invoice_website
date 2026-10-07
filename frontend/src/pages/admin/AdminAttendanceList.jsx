@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Filter, MapPin, Camera, Clock } from 'lucide-react';
+import { Calendar, Filter, MapPin, Camera, Clock, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -22,6 +22,17 @@ const AdminAttendanceList = () => {
             toast.error('Failed to load attendance list');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this attendance record?')) return;
+        try {
+            await api.delete('/admin/attendance/delete', { data: { id } });
+            toast.success('Attendance deleted successfully');
+            fetchRecords();
+        } catch (error) {
+            toast.error('Failed to delete record');
         }
     };
 
@@ -132,6 +143,7 @@ const AdminAttendanceList = () => {
                                 <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">Check-out</th>
                                 <th className="px-2 py-2 md:px-6 md:py-4 hidden lg:table-cell">Distance (m)</th>
                                 <th className="px-2 py-2 md:px-6 md:py-4">Status</th>
+                                <th className="px-2 py-2 md:px-6 md:py-4 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -201,6 +213,15 @@ const AdminAttendanceList = () => {
                                             <span className="hidden md:inline">{record.status}</span>
                                             <span className="md:hidden">{record.status === 'PRESENT' ? 'PRE' : record.status === 'WORKING' ? 'WRK' : record.status === 'HALF_DAY' ? 'HLF' : 'ABS'}</span>
                                         </span>
+                                    </td>
+                                    <td className="px-2 py-2 md:px-6 md:py-4 text-right">
+                                        <button 
+                                            onClick={() => handleDelete(record.id)}
+                                            className="p-1.5 md:p-2 text-error-600 dark:text-error-500 hover:bg-error-50 dark:hover:bg-error-500/10 rounded-lg transition-colors"
+                                            title="Delete Record"
+                                        >
+                                            <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
