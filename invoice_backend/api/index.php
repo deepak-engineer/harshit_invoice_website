@@ -156,7 +156,7 @@ if ($route === 'send-login-otp' && $method === 'POST') {
         
         // Send email via Resend
         $resend_key = base64_decode('cmVfZXpIYmI2c3pfNGp3TGE0dXU1QWFxVkwyQmlrR1BRaVR3');
-        $from_email = 'onboarding@resend.dev';
+        $from_email = 'noreply@jtcglobalsales.in';
         
         $ch = curl_init('https://api.resend.com/emails');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -303,7 +303,7 @@ if ($route === 'resend-email-otp' && $method === 'POST') {
     $pdo->prepare("INSERT INTO email_verifications (user_id, otp_hash, expires_at) VALUES (?, ?, ?)")->execute([$emp_id, $otp_hash, $expires_at]);
     
     $resend_key = base64_decode('cmVfZXpIYmI2c3pfNGp3TGE0dXU1QWFxVkwyQmlrR1BRaVR3');
-    $from_email = 'onboarding@resend.dev';
+    $from_email = 'noreply@jtcglobalsales.in';
     
     $ch = curl_init('https://api.resend.com/emails');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
