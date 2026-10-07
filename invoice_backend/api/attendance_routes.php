@@ -29,7 +29,7 @@ if ($route === 'admin/send-new-employee-otp' && $method === 'POST') {
         $pdo->prepare("INSERT INTO email_verifications (user_id, email, otp_hash, expires_at) VALUES (0, ?, ?, ?)")->execute([$email, $otp_hash, $expires_at]);
         
         $resend_key = base64_decode('cmVfZXpIYmI2c3pfNGp3TGE0dXU1QWFxVkwyQmlrR1BRaVR3');
-        $from_email = 'noreply@jtcglobalsales.in';
+        $from_email = 'onboarding@resend.dev';
         
         $ch = curl_init('https://api.resend.com/emails');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
