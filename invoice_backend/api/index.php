@@ -170,7 +170,7 @@ if ($route === 'send-login-otp' && $method === 'POST') {
         <div style='font-family: sans-serif; text-align: center; max-width: 500px; margin: 0 auto; padding: 20px;'>
             <img src='https://lavender-spoonbill-208950.hostingersite.com/assets/crons-logo-darkcopy-CXYL26Eg.svg' alt='Crons Logo' style='height: 60px; margin-bottom: 20px;' />
             <h2 style='color: #333;'>Verify your email to Login</h2>
-            <p style='color: #666; font-size: 16px;'>Hello ${$user['name']}, your OTP code is:</p>
+            <p style='color: #666; font-size: 16px;'>Hello {$user['name']}, your OTP code is:</p>
             <div style='background-color: #f4f4f4; padding: 15px; font-size: 24px; font-weight: bold; letter-spacing: 4px; color: #4F46E5; border-radius: 8px; margin: 20px 0;'>
                 $otp
             </div>
