@@ -13,6 +13,7 @@ const EmployeeDashboard = () => {
     // Site Assignment State
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [searchState, setSearchState] = useState('');
     const [availableSites, setAvailableSites] = useState([]);
     const [isAssigning, setIsAssigning] = useState(false);
     
@@ -62,7 +63,7 @@ const EmployeeDashboard = () => {
         if (!stats?.employee?.site) {
             const fetchSites = async () => {
                 try {
-                    const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}`);
+                    const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}&state=${encodeURIComponent(searchState)}`);
                     setAvailableSites(res.data);
                 } catch (error) {
                     console.error("Error fetching sites", error);
@@ -70,7 +71,7 @@ const EmployeeDashboard = () => {
             };
             fetchSites();
         }
-    }, [debouncedSearch, stats?.employee?.site]);
+    }, [debouncedSearch, searchState, stats?.employee?.site]);
 
     const handleAssignSite = async (siteId) => {
         setIsAssigning(true);
@@ -286,14 +287,7 @@ const EmployeeDashboard = () => {
                                         {updating ? 'Updating...' : 'Update Status'}
                                     </button>
                                     
-                                    {today && today.status === 'WORKING' && (
-                                        <button 
-                                            onClick={() => window.location.href = '/employee/work'}
-                                            className="px-4 py-2 bg-amber-500 text-white rounded-lg font-medium hover:bg-amber-600 transition-colors"
-                                        >
-                                            Go to Site Work
-                                        </button>
-                                    )}
+
                                 </div>
                             </div>
                         </div>
@@ -304,14 +298,24 @@ const EmployeeDashboard = () => {
                             <p className="text-sm text-slate-500">No site assigned yet. Search and pick a site:</p>
                         </div>
                         
-                        <div>
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <input 
                                 type="text" 
                                 placeholder="Search site by Name or Branch Code..." 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-white/90"
                             />
+                            <select
+                                value={searchState}
+                                onChange={(e) => setSearchState(e.target.value)}
+                                className="px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-white/90 min-w-[150px]"
+                            >
+                                <option value="">All States</option>
+                                {Object.keys(holidays2026).map(state => (
+                                    <option key={state} value={state}>{state}</option>
+                                ))}
+                            </select>
                         </div>
                         {availableSites.length > 0 ? (
                             <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
