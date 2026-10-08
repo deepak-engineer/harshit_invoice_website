@@ -781,7 +781,10 @@ if (preg_match('/^me\/sites$/', $route)) {
     if ($method === 'GET') {
         $search = $_GET['search'] ?? '';
         $state = $_GET['state'] ?? '';
-        $query = "SELECT id, name, code, city, address, state FROM sites WHERE status = 'ACTIVE'";
+        $query = "SELECT s.id, s.name, s.code, s.city, s.address, s.state, 
+                  (SELECT e.name FROM employees e WHERE e.site_id = s.id LIMIT 1) as picked_by_name,
+                  (SELECT e.id FROM employees e WHERE e.site_id = s.id LIMIT 1) as picked_by_id
+                  FROM sites s WHERE s.status = 'ACTIVE'";
         $params = [];
         if (!empty($search)) {
             $query .= " AND (name LIKE ? OR code LIKE ?)";
@@ -789,10 +792,10 @@ if (preg_match('/^me\/sites$/', $route)) {
             $params[] = "%$search%";
         }
         if (!empty($state)) {
-            $query .= " AND state = ?";
+            $query .= " AND s.state = ?";
             $params[] = $state;
         }
-        $query .= " ORDER BY name ASC LIMIT 20";
+        $query .= " ORDER BY s.name ASC LIMIT 20";
         $stmt = $pdo->prepare($query);
         $stmt->execute($params);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -825,8 +828,21 @@ if (preg_match('/^me\/assign-site$/', $route)) {
             exit;
         }
         
+        $site_id = $data['site_id'];
+        $user_id = $_SESSION['user_id'];
+        
+        // Check if already assigned
+        $check = $pdo->prepare("SELECT name FROM employees WHERE site_id = ? AND id != ?");
+        $check->execute([$site_id, $user_id]);
+        $existing = $check->fetchColumn();
+        if ($existing) {
+            http_response_code(400);
+            echo json_encode(["error" => "This site is already picked by $existing"]);
+            exit;
+        }
+        
         $stmt = $pdo->prepare("UPDATE employees SET site_id = ? WHERE id = ?");
-        $stmt->execute([$data['site_id'], $_SESSION['user_id']]);
+        $stmt->execute([$site_id, $user_id]);
         
         // Dynamically geocode if site is missing coordinates
         $site_stmt = $pdo->prepare("SELECT address, latitude, longitude FROM sites WHERE id = ?");

@@ -77,7 +77,7 @@ const EmployeeDashboard = () => {
             await api.post('/me/assign-site', { site_id: siteId });
             fetchStats();
         } catch (error) {
-            alert('Failed to pick site.');
+            alert(error.response?.data?.error || 'Failed to pick site.');
         } finally {
             setIsAssigning(false);
         }
@@ -343,13 +343,19 @@ const EmployeeDashboard = () => {
                                             <p className="font-bold text-slate-700 dark:text-white/90 text-sm">{site.name}</p>
                                             <p className="text-xs text-slate-500 dark:text-gray-400">Branch Code: {site.code} - {site.city || site.address}</p>
                                         </div>
-                                        <button 
-                                            onClick={() => handleAssignSite(site.id)}
-                                            disabled={isAssigning}
-                                            className="px-4 py-1.5 bg-primary text-white text-xs font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                        >
-                                            Pick
-                                        </button>
+                                        {site.picked_by_name ? (
+                                            <span className="text-xs font-medium text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 rounded-md border border-amber-200 dark:border-amber-500/20">
+                                                Picked by {site.picked_by_name}
+                                            </span>
+                                        ) : (
+                                            <button 
+                                                onClick={() => handleAssignSite(site.id)}
+                                                disabled={isAssigning}
+                                                className="px-4 py-1.5 bg-primary text-white text-xs font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                            >
+                                                Pick
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                             </div>
