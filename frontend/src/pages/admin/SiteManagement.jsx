@@ -23,6 +23,7 @@ const SiteManagement = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [filteredSites, setFilteredSites] = useState([]);
     const [activeTab, setActiveTab] = useState('All');
+    const [selectedState, setSelectedState] = useState('');
 
     const fetchSites = async () => {
         try {
@@ -53,6 +54,10 @@ const SiteManagement = () => {
             result = result.filter(site => site.operational_status === activeTab);
         }
 
+        if (selectedState) {
+            result = result.filter(site => site.state === selectedState);
+        }
+
         if (debouncedSearch) {
             const lowerSearch = debouncedSearch.toLowerCase();
             result = result.filter(site => 
@@ -62,7 +67,7 @@ const SiteManagement = () => {
             );
         }
         setFilteredSites(result);
-    }, [debouncedSearch, sites, activeTab]);
+    }, [debouncedSearch, sites, activeTab, selectedState]);
 
 
 
@@ -131,16 +136,26 @@ const SiteManagement = () => {
             return;
         }
 
-        const lines = bulkData.trim().split('\n');
+        const lines = bulkData.trim().split(/\r?\n/);
         const sitesToAdd = [];
 
         lines.forEach(line => {
             const cols = line.split('\t');
+            if (cols.length === 0 || !cols[0].trim()) return;
+
+            const col0 = cols[0].trim().toLowerCase();
+            const col1 = (cols[1] || '').trim().toLowerCase();
+            
+            // Skip header row
+            if (col0 === 'bank name' || col1 === 'atm id' || col1 === 'branch code') {
+                return;
+            }
+
             if (cols.length >= 7) {
-                // HDFC Format: Bank Name | ATM ID | Status | Location | State | city | Address | Zone
+                // HDFC Format: Bank Name | ATM ID | Status | Location | State | city | Address
                 sitesToAdd.push({
                     name: cols[0]?.trim() || '',
-                    code: cols[1]?.trim() || '',
+                    code: cols[1]?.trim() || '', // ATM ID saved as Branch Code (code)
                     state: cols[4]?.trim() || '',
                     city: cols[5]?.trim() || '',
                     address: cols[6]?.trim() || ''
@@ -157,7 +172,7 @@ const SiteManagement = () => {
         });
 
         if (sitesToAdd.length === 0) {
-            toast.error("Could not parse data. Ensure it is tab-separated.");
+            toast.error("Could not parse data. Ensure it is tab-separated and contains valid rows.");
             return;
         }
 
@@ -211,6 +226,16 @@ const SiteManagement = () => {
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-4">
                 <h1 className="text-2xl font-bold text-gray-800 dark:text-white/90">Site Management</h1>
                 <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                    <select
+                        value={selectedState}
+                        onChange={(e) => setSelectedState(e.target.value)}
+                        className="w-full sm:w-48 rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:focus:border-brand-500 dark:bg-gray-900"
+                    >
+                        <option value="">All States</option>
+                        {Object.keys(holidays2026).map(st => (
+                            <option key={st} value={st}>{st}</option>
+                        ))}
+                    </select>
                     <input 
                         type="text" 
                         placeholder="Search by Code or Name..." 
