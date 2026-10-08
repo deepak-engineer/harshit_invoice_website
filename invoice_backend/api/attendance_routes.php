@@ -771,6 +771,12 @@ if (preg_match('/^me\/site-status$/', $route)) {
             $data['site_id']
         ]);
         
+        // If status is N/A or Panel Fault, unassign the site from the employee automatically
+        if ($data['status'] === 'N/A' || $data['status'] === 'Panel Fault') {
+            $unassign = $pdo->prepare("DELETE FROM employee_sites WHERE employee_id = ? AND site_id = ?");
+            $unassign->execute([$_SESSION['user_id'], $data['site_id']]);
+        }
+        
         echo json_encode(["success" => true]);
         exit;
     }

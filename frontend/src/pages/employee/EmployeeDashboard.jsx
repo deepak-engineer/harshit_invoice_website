@@ -295,7 +295,6 @@ const EmployeeDashboard = () => {
                                                 className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-900 dark:border-gray-700 dark:text-white/90"
                                             >
                                                 <option value="N/A">N/A</option>
-                                                <option value="Pending">Pending</option>
                                                 <option value="Panel Fault">Panel Fault</option>
                                                 <option value="Requirements">Requirements</option>
                                             </select>

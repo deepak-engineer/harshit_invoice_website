@@ -22,6 +22,7 @@ const SiteManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [filteredSites, setFilteredSites] = useState([]);
+    const [activeTab, setActiveTab] = useState('All');
 
     const fetchSites = async () => {
         try {
@@ -46,17 +47,22 @@ const SiteManagement = () => {
     }, [searchTerm]);
 
     useEffect(() => {
-        if (!debouncedSearch) {
-            setFilteredSites(sites);
-        } else {
+        let result = sites;
+        
+        if (activeTab !== 'All') {
+            result = result.filter(site => site.operational_status === activeTab);
+        }
+
+        if (debouncedSearch) {
             const lowerSearch = debouncedSearch.toLowerCase();
-            setFilteredSites(sites.filter(site => 
+            result = result.filter(site => 
                 (site.code && site.code.toLowerCase().includes(lowerSearch)) ||
                 (site.name && site.name.toLowerCase().includes(lowerSearch)) ||
                 (site.id && site.id.toString() === lowerSearch)
-            ));
+            );
         }
-    }, [debouncedSearch, sites]);
+        setFilteredSites(result);
+    }, [debouncedSearch, sites, activeTab]);
 
 
 
@@ -230,6 +236,26 @@ const SiteManagement = () => {
                     </button>
                     </div>
                 </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex space-x-1 border-b border-gray-200 dark:border-gray-800 mb-4 overflow-x-auto custom-scrollbar">
+                {['All', 'N/A', 'Panel Fault', 'Requirements'].map(tab => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
+                            activeTab === tab
+                                ? 'border-brand-500 text-brand-600 dark:text-brand-400'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                        }`}
+                    >
+                        {tab === 'All' ? 'All Sites' : tab}
+                        <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${activeTab === tab ? 'bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'}`}>
+                            {sites.filter(s => tab === 'All' ? true : s.operational_status === tab).length}
+                        </span>
+                    </button>
+                ))}
             </div>
 
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-2 pt-4 pb-3 sm:px-6 dark:border-gray-800 dark:bg-white/3">
