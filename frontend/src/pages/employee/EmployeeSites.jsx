@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, Search, CheckCircle } from 'lucide-react';
+import { MapPin, Search, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
+import { holidays2026 } from '../../utils/holidays2026';
 
 const EmployeeSites = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [searchState, setSearchState] = useState('');
     const [sites, setSites] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isAssigning, setIsAssigning] = useState(false);
@@ -27,7 +29,7 @@ const EmployeeSites = () => {
     const fetchSites = async () => {
         setLoading(true);
         try {
-            const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}`);
+            const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}&state=${encodeURIComponent(searchState)}`);
             setSites(res.data);
         } catch (error) {
             toast.error('Failed to load sites');
@@ -49,7 +51,7 @@ const EmployeeSites = () => {
 
     useEffect(() => {
         fetchSites();
-    }, [debouncedSearch]);
+    }, [debouncedSearch, searchState]);
 
     const handleAssignSite = async (siteId) => {
         setIsAssigning(true);
@@ -66,6 +68,20 @@ const EmployeeSites = () => {
         }
     };
 
+    const handleUnassignSite = async () => {
+        setIsAssigning(true);
+        try {
+            await api.post('/me/unassign-site');
+            toast.success('Site un-assigned successfully!');
+            setCurrentSiteId(null);
+            fetchCurrentSite();
+        } catch (error) {
+            toast.error(error.response?.data?.error || 'Failed to un-assign site.');
+        } finally {
+            setIsAssigning(false);
+        }
+    };
+
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-2">
@@ -73,17 +89,29 @@ const EmployeeSites = () => {
             </div>
 
             <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 shadow-sm">
-                <div className="relative mb-6">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-5 w-5 text-gray-400" />
+                <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                    <div className="relative flex-1">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <Search className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search sites by Branch Code or Name..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-colors text-gray-800 dark:text-white/90"
+                        />
                     </div>
-                    <input
-                        type="text"
-                        placeholder="Search sites by Branch Code or Name..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-colors text-gray-800 dark:text-white/90"
-                    />
+                    <select
+                        value={searchState}
+                        onChange={(e) => setSearchState(e.target.value)}
+                        className="w-full sm:w-auto px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-colors text-gray-800 dark:text-white/90"
+                    >
+                        <option value="">All States</option>
+                        {Object.keys(holidays2026).sort().map(state => (
+                            <option key={state} value={state}>{state}</option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="space-y-3">
@@ -109,15 +137,25 @@ const EmployeeSites = () => {
                                         </div>
                                         <div>
                                             <h3 className="font-bold text-gray-800 dark:text-white/90">{site.name}</h3>
-                                            <p className="text-sm font-semibold text-brand-500 mb-1">Code: {site.code}</p>
+                                            <p className="text-sm font-semibold text-brand-500 mb-1">Branch Code: {site.code}</p>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{site.city ? `${site.city}, ` : ''}{site.state || site.address}</p>
                                         </div>
                                     </div>
-                                    <div className="shrink-0 flex items-center">
+                                    <div className="shrink-0 flex items-center mt-3 sm:mt-0">
                                         {isCurrent ? (
-                                            <div className="flex items-center text-success-600 font-medium bg-success-50 dark:bg-success-900/20 px-4 py-2 rounded-lg">
-                                                <CheckCircle className="w-5 h-5 mr-2" />
-                                                Currently Assigned
+                                            <div className="flex flex-col sm:flex-row items-center gap-3">
+                                                <div className="flex items-center text-success-600 font-medium bg-success-50 dark:bg-success-900/20 px-4 py-2 rounded-lg">
+                                                    <CheckCircle className="w-5 h-5 mr-2" />
+                                                    Currently Assigned
+                                                </div>
+                                                <button
+                                                    onClick={handleUnassignSite}
+                                                    disabled={isAssigning}
+                                                    className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-error-50 text-error-600 font-medium rounded-lg hover:bg-error-100 transition-colors disabled:opacity-50 border border-error-200 dark:bg-error-500/10 dark:text-error-400 dark:border-error-500/20"
+                                                >
+                                                    <XCircle className="w-4 h-4 mr-2" />
+                                                    Un-assign
+                                                </button>
                                             </div>
                                         ) : (
                                             <button

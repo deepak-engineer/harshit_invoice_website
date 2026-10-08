@@ -859,6 +859,17 @@ if (preg_match('/^me\/assign-site$/', $route)) {
     }
 }
 
+if (preg_match('/^me\/unassign-site$/', $route)) {
+    checkEmployeeAuth();
+    if ($method === 'POST') {
+        $stmt = $pdo->prepare("UPDATE employees SET site_id = NULL WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        
+        echo json_encode(["success" => true]);
+        exit;
+    }
+}
+
 // Check IN / Check OUT
 if (preg_match('/^attendance\/check-in$/', $route)) {
     checkEmployeeAuth();
