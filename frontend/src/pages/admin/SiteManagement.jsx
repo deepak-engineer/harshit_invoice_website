@@ -323,7 +323,7 @@ const SiteManagement = () => {
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">ATM ID (Branch Code)</label>
-                                    <input type="text" required value={formData.code} onChange={e => setFormData({...formData, code: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90" />
+                                    <input type="text" inputMode="numeric" pattern="[0-9]*" required value={formData.code} onChange={e => setFormData({...formData, code: e.target.value.replace(/\D/g, '')})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90" placeholder="e.g. 1004" />
                                 </div>
                             </div>
                             <div>
