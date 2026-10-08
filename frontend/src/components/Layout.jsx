@@ -60,7 +60,6 @@ const Layout = () => {
     { name: 'Dashboard', path: '/employee/dashboard', icon: LayoutDashboard },
     { name: 'Mark Attendance', path: '/employee/attendance', icon: Camera },
     { name: 'My Expenses', path: '/employee/expenses', icon: Receipt },
-    { name: 'Sites', path: '/employee/sites', icon: MapPin },
     { name: 'Security Forms', path: '/employee/security-requirements', icon: Shield },
   ];
 

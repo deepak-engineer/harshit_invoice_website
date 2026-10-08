@@ -79,7 +79,20 @@ const EmployeeDashboard = () => {
             await api.post('/me/assign-site', { site_id: siteId });
             fetchStats();
         } catch (error) {
-            alert('Failed to assign site.');
+            alert('Failed to pick site.');
+        } finally {
+            setIsAssigning(false);
+        }
+    };
+
+    const handleUnassignSite = async () => {
+        setIsAssigning(true);
+        try {
+            await api.post('/me/unassign-site');
+            alert('Site un-picked successfully!');
+            fetchStats();
+        } catch (error) {
+            alert('Failed to un-pick site.');
         } finally {
             setIsAssigning(false);
         }
@@ -243,12 +256,12 @@ const EmployeeDashboard = () => {
                 {employee.site ? (
                     <div>
                         <div className="mb-4">
-                            <p className="font-medium text-slate-700 text-lg">{employee.site.name}</p>
+                            <p className="font-medium text-slate-700 dark:text-white/90 text-lg">{employee.site.name}</p>
                             <p className="text-sm font-semibold text-primary mb-1">Branch Code: {employee.site.code}</p>
-                            <p className="text-sm text-slate-500">{employee.site.address}</p>
+                            <p className="text-sm text-slate-500 dark:text-gray-400">{employee.site.address}</p>
                         </div>
                         
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                        <div className="bg-slate-50 dark:bg-gray-800/50 p-4 rounded-xl border border-slate-100 dark:border-gray-700">
                             <h3 className="text-sm font-bold text-slate-700 mb-3">Report Site Status</h3>
                             <div className="space-y-4">
                                 <div>
@@ -286,8 +299,13 @@ const EmployeeDashboard = () => {
                                     >
                                         {updating ? 'Updating...' : 'Update Status'}
                                     </button>
-                                    
-
+                                    <button 
+                                        onClick={handleUnassignSite}
+                                        disabled={isAssigning}
+                                        className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 rounded-lg font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
+                                    >
+                                        Un-pick Site
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -318,19 +336,19 @@ const EmployeeDashboard = () => {
                             </select>
                         </div>
                         {availableSites.length > 0 ? (
-                            <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 rounded-lg p-2">
+                            <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-2 border border-slate-100 dark:border-gray-700 rounded-lg p-2">
                                 {availableSites.map(site => (
-                                    <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                    <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-gray-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700/50 transition-colors border border-transparent dark:border-gray-700">
                                         <div>
-                                            <p className="font-bold text-slate-700 text-sm">{site.name}</p>
-                                            <p className="text-xs text-slate-500">{site.code} - {site.city || site.address}</p>
+                                            <p className="font-bold text-slate-700 dark:text-white/90 text-sm">{site.name}</p>
+                                            <p className="text-xs text-slate-500 dark:text-gray-400">Branch Code: {site.code} - {site.city || site.address}</p>
                                         </div>
                                         <button 
                                             onClick={() => handleAssignSite(site.id)}
                                             disabled={isAssigning}
-                                            className="px-3 py-1 bg-primary text-white text-xs rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                            className="px-4 py-1.5 bg-primary text-white text-xs font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
                                         >
-                                            Pick Site
+                                            Pick
                                         </button>
                                     </div>
                                 ))}
