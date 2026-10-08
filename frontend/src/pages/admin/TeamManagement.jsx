@@ -60,7 +60,7 @@ const TeamManagement = () => {
                 const site = sites.find(s => s.id === team.site_id);
                 const siteCodeMatch = site && site.code && site.code.toLowerCase().includes(lowerSearch);
                 const nameMatch = team.name && team.name.toLowerCase().includes(lowerSearch);
-                const idMatch = team.id && team.id.toString() === lowerSearch;
+                const idMatch = team.id && team.id.toString(16).toLowerCase().includes(lowerSearch);
                 return nameMatch || siteCodeMatch || idMatch;
             }));
         }
@@ -159,7 +159,7 @@ const TeamManagement = () => {
                         <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                             {filteredTeams.map(team => (
                                 <tr key={team.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400">{team.id}</td>
+                                    <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400">#{team.id?.toString(16).toUpperCase().padStart(4, '0')}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[80px] md:max-w-none">{team.name}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
                                         {team.site_id ? sites.find(s => s.id === team.site_id)?.code || 'Unknown' : <span className="text-gray-400 italic">None</span>}

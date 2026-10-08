@@ -409,10 +409,11 @@ if (preg_match('/^admin\/sites$/', $route)) {
     }
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, city, location, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO sites (name, code, address, state, city, location, status, operational_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
-            $data['city'] ?? null, $data['location'] ?? null, $data['status'] ?? 'ACTIVE'
+            $data['city'] ?? null, $data['location'] ?? null, $data['status'] ?? 'ACTIVE',
+            $data['operational_status'] ?? 'N/A'
         ]);
         echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);
         exit;
@@ -461,10 +462,11 @@ if (preg_match('/^admin\/sites\/(\d+)$/', $route, $matches)) {
     $id = $matches[1];
     if ($method === 'PUT') {
         $data = json_decode(file_get_contents('php://input'), true);
-        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, city=?, location=?, status=? WHERE id=?");
+        $stmt = $pdo->prepare("UPDATE sites SET name=?, code=?, address=?, state=?, city=?, location=?, status=?, operational_status=? WHERE id=?");
         $stmt->execute([
             $data['name'], $data['code'], $data['address'], $data['state'] ?? null,
             $data['city'] ?? null, $data['location'] ?? null, $data['status'] ?? 'ACTIVE',
+            $data['operational_status'] ?? 'N/A',
             $id
         ]);
         echo json_encode(["success" => true]);
