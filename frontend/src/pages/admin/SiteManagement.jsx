@@ -123,7 +123,7 @@ const SiteManagement = () => {
     };
 
     const openNew = () => {
-        setFormData({ name: '', code: '', address: '', city: '', state: '', status: 'ACTIVE', operational_status: 'N/A', latitude: '', longitude: '', geofence_radius: 100 });
+        setFormData({ name: '', code: '', address: '', city: '', state: '', status: 'ACTIVE', operational_status: '', latitude: '', longitude: '', geofence_radius: 100 });
         setEditId(null);
         setIsModalOpen(true);
     };
@@ -276,7 +276,7 @@ const SiteManagement = () => {
 
             {/* Tabs */}
             <div className="flex space-x-1 border-b border-gray-200 dark:border-gray-800 mb-4 overflow-x-auto custom-scrollbar">
-                {['All', 'N/A', 'Panel Fault', 'Requirements'].map(tab => (
+                {['All', 'N/A', 'Panel Faulty'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -334,20 +334,18 @@ const SiteManagement = () => {
                                 <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 max-w-[80px] md:max-w-xs truncate hidden sm:table-cell">{site.address}</td>
                                 <td className="py-2 md:py-3 px-1 md:px-2">
                                     <select
-                                        value={site.operational_status || 'N/A'}
+                                        value={site.operational_status || ''}
                                         onChange={(e) => handleStatusChange(site, e.target.value)}
                                         className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full text-[10px] md:text-xs font-medium border-0 focus:ring-1 focus:ring-brand-500 cursor-pointer appearance-none text-center
-                                            ${site.operational_status === 'Requirements' ? 'bg-warning-50 text-warning-700 dark:bg-warning-500/10 dark:text-warning-400' : 
-                                              site.operational_status === 'Panel Fault' ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' :
-                                              site.operational_status === 'Pending' ? 'bg-blue-light-50 text-blue-light-700 dark:bg-blue-light-500/10 dark:text-blue-light-400' :
+                                            ${site.operational_status === 'Panel Faulty' ? 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400' :
+                                              !site.operational_status ? 'bg-gray-50 text-gray-400 dark:bg-gray-800 dark:text-gray-500' :
                                               'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}
                                         `}
                                         title="Click to change status"
                                     >
+                                        <option value="" disabled>Select</option>
                                         <option value="N/A">N/A</option>
-                                        <option value="Panel Fault">Fault</option>
-                                        <option value="Pending">Pend</option>
-                                        <option value="Requirements">Req</option>
+                                        <option value="Panel Faulty">Panel Faulty</option>
                                     </select>
                                 </td>
                                 <td className="py-2 md:py-3 px-1 md:px-2">
@@ -407,11 +405,10 @@ const SiteManagement = () => {
                                 </div>
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                    <select value={formData.operational_status || 'N/A'} onChange={e => setFormData({...formData, operational_status: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:bg-gray-900">
+                                    <select value={formData.operational_status || ''} onChange={e => setFormData({...formData, operational_status: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:bg-gray-900">
+                                        <option value="" disabled>Select</option>
                                         <option value="N/A">N/A</option>
-                                        <option value="Panel Fault">Panel Fault</option>
-                                        <option value="Pending">Pending</option>
-                                        <option value="Requirements">Requirements</option>
+                                        <option value="Panel Faulty">Panel Faulty</option>
                                     </select>
                                 </div>
                             </div>

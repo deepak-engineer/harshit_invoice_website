@@ -359,8 +359,7 @@ const EmployeeDashboard = () => {
                                                 <span>{site.name}</span>
                                                 {site.operational_status && (
                                                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium
-                                                        ${site.operational_status === 'Requirements' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 
-                                                          site.operational_status === 'Panel Fault' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                                                        ${site.operational_status === 'Panel Faulty' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
                                                           'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
                                                     >
                                                         {site.operational_status}
