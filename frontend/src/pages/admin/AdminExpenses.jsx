@@ -20,12 +20,9 @@ const AdminExpenses = () => {
     // Filters
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
-        const [teamFilter, setTeamFilter] = useState('');
     const [stateFilter, setStateFilter] = useState('');
-    
-    // Extracted unique teams and states for filters
-    const [teams, setTeams] = useState([]);
-        const [selectedExpense, setSelectedExpense] = useState(null);
+    const [states, setStates] = useState([]);
+    const [selectedExpense, setSelectedExpense] = useState(null);
     const [viewingPhoto, setViewingPhoto] = useState(null);
 
     useEffect(() => {
@@ -45,10 +42,7 @@ const AdminExpenses = () => {
             const data = res.data || [];
             setExpenses(data);
             
-            // Extract unique teams and states
-            const uniqueTeams = [...new Set(data.map(item => item.team_name).filter(Boolean))];
             const uniqueStates = [...new Set(data.map(item => item.state).filter(Boolean))];
-            setTeams(uniqueTeams);
             setStates(uniqueStates);
         } catch (err) {
             toast.error('Failed to load expenses');
@@ -57,7 +51,18 @@ const AdminExpenses = () => {
         }
     };
 
-        const handleDeleteExpense = async (id) => {
+        const handleUpdateStatus = async (id, newStatus) => {
+        try {
+            await api.put(`/expenses/${id}/status`, { status: newStatus });
+            toast.success(`Expense ${newStatus.toLowerCase()} successfully`);
+            setSelectedExpense(null);
+            fetchExpenses();
+        } catch (err) {
+            toast.error(`Failed to update expense status`);
+        }
+    };
+
+    const handleDeleteExpense = async (id) => {
         if (!window.confirm("Are you sure you want to delete this expense? This cannot be undone.")) return;
         try {
             await api.delete(`/expenses/${id}`);
@@ -75,19 +80,12 @@ const AdminExpenses = () => {
             (exp.description && exp.description.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
             exp.emp_code.toLowerCase().includes(debouncedSearch.toLowerCase());
             
-                const matchesTeam = teamFilter === '' || exp.team_name === teamFilter;
         const matchesState = stateFilter === '' || exp.state === stateFilter;
         
-        return matchesSearch && matchesTeam && matchesState;
+        return matchesSearch && matchesState;
     });
 
     const totalAmount = filteredExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
-
-    const teamExpenses = filteredExpenses.reduce((acc, exp) => {
-        const t = exp.team_name || 'No Team';
-        acc[t] = (acc[t] || 0) + parseFloat(exp.amount || 0);
-        return acc;
-    }, {});
 
         return (
         <div className="space-y-6 max-w-7xl mx-auto">
@@ -111,18 +109,6 @@ const AdminExpenses = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Team-wise Summary Breakdown */}
-                {Object.keys(teamExpenses).length > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                        {Object.entries(teamExpenses).map(([team, amount]) => (
-                            <div key={team} className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 dark:border-gray-800 shadow-theme-xs flex flex-col justify-between hover:border-brand-500/50 transition-colors">
-                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider truncate mb-1" title={team}>{team}</span>
-                                <span className="text-xl font-black text-brand-500">₹{amount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                        ))}
-                    </div>
-                )}
             </div>
 
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-theme-xs border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -149,14 +135,6 @@ const AdminExpenses = () => {
                             <option value="">All States/Sites</option>
                             {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>
-                        <select 
-                            value={teamFilter} 
-                            onChange={e => setTeamFilter(e.target.value)}
-                            className="flex-1 px-3 py-2 text-sm border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900"
-                        >
-                            <option value="">All Teams</option>
-                            {teams.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
                     </div>
                 </div>
 
@@ -174,11 +152,12 @@ const AdminExpenses = () => {
                             <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800 text-[10px] md:text-sm">
                                 <tr>
                                     <th className="px-2 py-2 md:px-6 md:py-4">Employee</th>
-                                    <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">Location & Team</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">Location</th>
                                     <th className="px-2 py-2 md:px-6 md:py-4">Category</th>
                                     <th className="px-2 py-2 md:px-6 md:py-4 text-right">Amount (₹)</th>
                                     <th className="px-2 py-2 md:px-6 md:py-4 hidden md:table-cell">Date</th>
-                                                                        <th className="px-2 py-2 md:px-6 md:py-4 text-center">Action</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 text-center">Status</th>
+                                    <th className="px-2 py-2 md:px-6 md:py-4 text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -193,10 +172,6 @@ const AdminExpenses = () => {
                                                 <MapPin className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5 text-gray-400 dark:text-gray-500 shrink-0" />
                                                 <span className="truncate">{exp.state || 'N/A'}</span>
                                             </div>
-                                            <div className="flex items-center text-gray-500 dark:text-gray-400 mt-1 text-[8px] md:text-xs truncate max-w-[80px] md:max-w-none">
-                                                <Users className="w-3 h-3 md:w-3.5 md:h-3.5 mr-1 md:mr-1.5 text-gray-400 dark:text-gray-500 shrink-0" />
-                                                <span className="truncate">{exp.team_name || 'No Team'}</span>
-                                            </div>
                                         </td>
                                         <td className="px-2 py-2 md:px-6 md:py-4">
                                             <span className="font-semibold text-[10px] md:text-sm text-gray-700 dark:text-gray-300">{exp.category}</span>
@@ -209,7 +184,16 @@ const AdminExpenses = () => {
                                         <td className="px-2 py-2 md:px-6 md:py-4 text-[10px] md:text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
                                             {new Date(exp.expense_date).toLocaleDateString('en-GB')}
                                         </td>
-                                                                                <td className="px-2 py-2 md:px-6 md:py-4 text-center">
+                                        <td className="px-2 py-2 md:px-6 md:py-4 text-center">
+                                            <span className={`px-2 py-1 rounded text-[10px] md:text-xs font-bold ${
+                                                exp.status === 'APPROVED' ? 'bg-success-50 text-success-700' :
+                                                exp.status === 'REJECTED' ? 'bg-error-50 text-error-700' :
+                                                'bg-warning-50 text-warning-700'
+                                            }`}>
+                                                {exp.status || 'PENDING'}
+                                            </span>
+                                        </td>
+                                        <td className="px-2 py-2 md:px-6 md:py-4 text-center">
                                             <button 
                                                 onClick={() => setSelectedExpense(exp)}
                                                 className="px-1.5 py-1 md:px-3 md:py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded md:rounded-lg text-[10px] md:text-xs transition-colors"
@@ -248,7 +232,14 @@ const AdminExpenses = () => {
                                         <IndianRupee className="w-5 h-5 mr-1" />
                                         {parseFloat(selectedExpense.amount).toFixed(2)}
                                     </p>
-                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">{selectedExpense.category}</p>
+                                    <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">{selectedExpense.category}</p>
+                                    <span className={`px-2 py-0.5 rounded text-xs font-bold inline-block ${
+                                        selectedExpense.status === 'APPROVED' ? 'bg-success-50 text-success-700' :
+                                        selectedExpense.status === 'REJECTED' ? 'bg-error-50 text-error-700' :
+                                        'bg-warning-50 text-warning-700'
+                                    }`}>
+                                        {selectedExpense.status || 'PENDING'}
+                                    </span>
                                 </div>
                             </div>
                             
@@ -258,13 +249,6 @@ const AdminExpenses = () => {
                                     <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
                                         <MapPin className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
                                         {selectedExpense.state || 'N/A'}
-                                    </p>
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-1">Team</p>
-                                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center">
-                                        <Users className="w-4 h-4 mr-1.5 text-gray-400 dark:text-gray-500" />
-                                        {selectedExpense.team_name || 'N/A'}
                                     </p>
                                 </div>
                                 <div>
@@ -304,13 +288,31 @@ const AdminExpenses = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex gap-3">
+                        <div className="p-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 flex flex-col sm:flex-row gap-3">
+                            {(!selectedExpense.status || selectedExpense.status === 'PENDING') && (
+                                <>
+                                    <button 
+                                        onClick={() => handleUpdateStatus(selectedExpense.id, 'APPROVED')}
+                                        className="w-full bg-success-500 hover:bg-success-600 text-white py-2.5 rounded-xl font-bold transition-colors shadow-theme-xs flex items-center justify-center"
+                                    >
+                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                        Approve
+                                    </button>
+                                    <button 
+                                        onClick={() => handleUpdateStatus(selectedExpense.id, 'REJECTED')}
+                                        className="w-full bg-error-500 hover:bg-error-600 text-white py-2.5 rounded-xl font-bold transition-colors shadow-theme-xs flex items-center justify-center"
+                                    >
+                                        <XCircle className="w-4 h-4 mr-2" />
+                                        Reject
+                                    </button>
+                                </>
+                            )}
                             <button 
                                 onClick={() => handleDeleteExpense(selectedExpense.id)}
                                 className="w-full bg-error-50 dark:bg-error-500/10 hover:bg-error-100 dark:bg-error-500/20 text-error-600 dark:text-error-500 border border-error-200 dark:border-error-800 py-2.5 rounded-xl font-bold transition-colors shadow-theme-xs flex items-center justify-center"
                             >
                                 <Trash2 className="w-4 h-4 mr-2" />
-                                Delete Expense
+                                Delete
                             </button>
                         </div>
                     </div>
