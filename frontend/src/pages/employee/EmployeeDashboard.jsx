@@ -305,6 +305,7 @@ const EmployeeDashboard = () => {
                                         Un-pick Site
                                     </button>
                                 </div>
+                            </div>
                         </div>
                     </div>
                 ) : (
