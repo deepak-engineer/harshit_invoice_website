@@ -1,5 +1,5 @@
 <?php
-require_once '../config/database.php';
+require_once 'db.php';
 
 $sites = [
     ["HDFC phase 4", "6503", "SHYAMAL RD, AHMEDABAD", "Gujarat", "Ahmedabad", "Ground Floor Shop No. 1 & 2, Sun Avenue One, Manekbaug Shyamal Road, Satellite, Ahmedabad"],
