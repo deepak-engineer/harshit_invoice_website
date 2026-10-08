@@ -608,7 +608,6 @@ if (preg_match('/^vendors(\/default)?$/', $route)) {
 
 require_once 'attendance_routes.php';
 require_once 'expense_routes.php';
-require_once 'work_routes.php';
 require_once 'security_routes.php';
 require_once 'superadmin_routes.php';
 
