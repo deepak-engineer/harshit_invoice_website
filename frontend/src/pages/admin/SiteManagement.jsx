@@ -276,7 +276,7 @@ const SiteManagement = () => {
 
             {/* Tabs */}
             <div className="flex space-x-1 border-b border-gray-200 dark:border-gray-800 mb-4 overflow-x-auto custom-scrollbar">
-                {['All', 'N/A', 'Panel Faulty'].map(tab => (
+                {['All', 'None', 'N/A', 'Panel Faulty'].map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -344,6 +344,7 @@ const SiteManagement = () => {
                                         title="Click to change status"
                                     >
                                         <option value="" disabled>Select</option>
+                                        <option value="None">None</option>
                                         <option value="N/A">N/A</option>
                                         <option value="Panel Faulty">Panel Faulty</option>
                                     </select>
@@ -407,6 +408,7 @@ const SiteManagement = () => {
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                                     <select value={formData.operational_status || ''} onChange={e => setFormData({...formData, operational_status: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:bg-gray-900">
                                         <option value="" disabled>Select</option>
+                                        <option value="None">None</option>
                                         <option value="N/A">N/A</option>
                                         <option value="Panel Faulty">Panel Faulty</option>
                                     </select>
