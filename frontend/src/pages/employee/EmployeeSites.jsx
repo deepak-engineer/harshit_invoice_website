@@ -158,13 +158,13 @@ const EmployeeSites = () => {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <button
-                                                onClick={() => handleAssignSite(site.id)}
-                                                disabled={isAssigning}
-                                                className="w-full sm:w-auto px-6 py-2 bg-brand-500 text-white font-medium rounded-lg hover:bg-brand-600 transition-colors disabled:opacity-50 shadow-sm"
-                                            >
-                                                Assign
-                                            </button>
+                                                <button
+                                                    onClick={() => handleAssignSite(site.id)}
+                                                    disabled={isAssigning}
+                                                    className="w-full sm:w-auto px-6 py-2 bg-brand-500 text-white font-medium rounded-lg hover:bg-brand-600 transition-colors disabled:opacity-50 shadow-sm"
+                                                >
+                                                    Pick
+                                                </button>
                                         )}
                                     </div>
                                 </div>
