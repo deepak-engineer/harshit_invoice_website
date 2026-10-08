@@ -787,7 +787,7 @@ if (preg_match('/^me\/sites$/', $route)) {
     if ($method === 'GET') {
         $search = $_GET['search'] ?? '';
         $state = $_GET['state'] ?? '';
-        $query = "SELECT s.id, s.name, s.code, s.city, s.address, s.state, 
+        $query = "SELECT s.id, s.name, s.code, s.city, s.address, s.state, s.operational_status,
                   (SELECT e.name FROM employee_sites es JOIN employees e ON es.employee_id = e.id WHERE es.site_id = s.id LIMIT 1) as picked_by_name,
                   (SELECT es.employee_id FROM employee_sites es WHERE es.site_id = s.id LIMIT 1) as picked_by_id
                   FROM sites s WHERE s.status = 'ACTIVE'";

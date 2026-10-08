@@ -355,7 +355,18 @@ const EmployeeDashboard = () => {
                                 {availableSites.map(site => (
                                     <div key={site.id} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-gray-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700/50 transition-colors border border-transparent dark:border-gray-700">
                                         <div>
-                                            <p className="font-bold text-slate-700 dark:text-white/90 text-sm">{site.name}</p>
+                                            <p className="font-bold text-slate-700 dark:text-white/90 text-sm flex items-center gap-2">
+                                                <span>{site.name}</span>
+                                                {site.operational_status && (
+                                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium
+                                                        ${site.operational_status === 'Requirements' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400' : 
+                                                          site.operational_status === 'Panel Fault' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' :
+                                                          'bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}
+                                                    >
+                                                        {site.operational_status}
+                                                    </span>
+                                                )}
+                                            </p>
                                             <p className="text-xs text-slate-500 dark:text-gray-400">Branch Code: {site.code} - {site.city || site.address}</p>
                                         </div>
                                         {employee?.sites?.some(s => s.id === site.id) ? (
