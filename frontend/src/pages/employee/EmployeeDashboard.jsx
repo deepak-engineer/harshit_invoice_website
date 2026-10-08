@@ -60,15 +60,16 @@ const EmployeeDashboard = () => {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
+    const fetchSites = async () => {
+        try {
+            const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}&state=${encodeURIComponent(searchState)}`);
+            setAvailableSites(res.data);
+        } catch (error) {
+            console.error("Error fetching sites", error);
+        }
+    };
+
     useEffect(() => {
-        const fetchSites = async () => {
-            try {
-                const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}&state=${encodeURIComponent(searchState)}`);
-                setAvailableSites(res.data);
-            } catch (error) {
-                console.error("Error fetching sites", error);
-            }
-        };
         fetchSites();
     }, [debouncedSearch, searchState]);
 
@@ -76,7 +77,8 @@ const EmployeeDashboard = () => {
         setIsAssigning(true);
         try {
             await api.post('/me/assign-site', { site_id: siteId });
-            fetchStats();
+            await fetchStats();
+            await fetchSites();
         } catch (error) {
             alert(error.response?.data?.error || 'Failed to pick site.');
         } finally {
@@ -89,7 +91,8 @@ const EmployeeDashboard = () => {
         try {
             await api.post('/me/unassign-site', { site_id: siteId });
             alert('Site un-picked successfully!');
-            fetchStats();
+            await fetchStats();
+            await fetchSites();
         } catch (error) {
             alert('Failed to un-pick site.');
         } finally {
@@ -356,7 +359,14 @@ const EmployeeDashboard = () => {
                                             <p className="font-bold text-slate-700 dark:text-white/90 text-sm">{site.name}</p>
                                             <p className="text-xs text-slate-500 dark:text-gray-400">Branch Code: {site.code} - {site.city || site.address}</p>
                                         </div>
-                                        {site.picked_by_name ? (
+                                        {employee?.sites?.some(s => s.id === site.id) ? (
+                                            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-md border border-emerald-200 dark:border-emerald-500/20 flex items-center">
+                                                <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Picked by you
+                                            </span>
+                                        ) : site.picked_by_name ? (
                                             <span className="text-xs font-medium text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 px-3 py-1 rounded-md border border-amber-200 dark:border-amber-500/20">
                                                 Picked by {site.picked_by_name}
                                             </span>
