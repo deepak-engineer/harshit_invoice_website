@@ -301,7 +301,7 @@ const SiteManagement = () => {
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Branch Code</th>
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden md:table-cell">State</th>
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">Address</th>
-                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Op. Status</th>
+                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Status</th>
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Actions</th>
                         </tr>
                     </thead>
@@ -387,7 +387,7 @@ const SiteManagement = () => {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Op. Status</label>
+                                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
                                     <select value={formData.operational_status || 'N/A'} onChange={e => setFormData({...formData, operational_status: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:bg-gray-900">
                                         <option value="N/A">N/A</option>
                                         <option value="Panel Fault">Panel Fault</option>
