@@ -58,11 +58,10 @@ const AdminAttendanceList = () => {
     });
 
     const exportCSV = () => {
-        const headers = ["Employee", "Emp Code", "Team", "State", "Site", "Check-in", "Check-out", "Distance (m)", "Status"];
+        const headers = ["Employee", "Emp Code", "State", "Site", "Check-in", "Check-out", "Distance (m)", "Status"];
         const rows = filteredRecords.map(r => [
             `"${r.emp_name}"`, 
             `"${r.emp_code}"`, 
-            `"${r.team_name || ''}"`, 
             `"${r.state || ''}"`, 
             `"${r.site_name || ''}"`,
             `"${r.check_in_time ? new Date(r.check_in_time).toLocaleTimeString() : ''}"`,
@@ -137,7 +136,7 @@ const AdminAttendanceList = () => {
                         <thead className="bg-gray-50 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 font-medium border-b border-gray-100 dark:border-gray-800 text-[10px] md:text-sm">
                             <tr>
                                 <th className="px-2 py-2 md:px-6 md:py-4">Employee</th>
-                                <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">Team & State</th>
+                                <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">State</th>
                                 <th className="px-2 py-2 md:px-6 md:py-4 hidden md:table-cell">Site</th>
                                 <th className="px-2 py-2 md:px-6 md:py-4">Check-in</th>
                                 <th className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">Check-out</th>
@@ -158,8 +157,7 @@ const AdminAttendanceList = () => {
                                         <p className="text-[8px] md:text-xs text-gray-500 dark:text-gray-400 truncate max-w-[70px] md:max-w-none">{record.emp_code}</p>
                                     </td>
                                     <td className="px-2 py-2 md:px-6 md:py-4 hidden sm:table-cell">
-                                        <p className="font-medium text-gray-700 dark:text-gray-300 text-[10px] md:text-sm truncate max-w-[70px] md:max-w-none">{record.team_name || 'N/A'}</p>
-                                        <p className="text-[8px] md:text-xs text-gray-500 dark:text-gray-400 truncate max-w-[70px] md:max-w-none">{record.state || 'N/A'}</p>
+                                        <p className="font-medium text-gray-700 dark:text-gray-300 text-[10px] md:text-sm truncate max-w-[70px] md:max-w-none">{record.state || 'N/A'}</p>
                                     </td>
                                     <td className="px-2 py-2 md:px-6 md:py-4 hidden md:table-cell">
                                         <p className="font-medium text-gray-700 dark:text-gray-300 text-[10px] md:text-sm truncate max-w-[80px] md:max-w-none">{record.site_name || 'No Site'}</p>

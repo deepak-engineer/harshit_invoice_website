@@ -290,27 +290,16 @@ const EmployeeDashboard = () => {
                                         <div>
                                             <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">Status</label>
                                             <select 
-                                                value={siteStatus} 
+                                                value={siteStatus || ''} 
                                                 onChange={(e) => setSiteStatus(e.target.value)}
                                                 className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-900 dark:border-gray-700 dark:text-white/90"
                                             >
+                                                <option value="" disabled>Select</option>
+                                                <option value="None">None</option>
                                                 <option value="N/A">N/A</option>
-                                                <option value="Panel Fault">Panel Fault</option>
-                                                <option value="Requirements">Requirements</option>
+                                                <option value="Panel Faulty">Panel Faulty</option>
                                             </select>
                                         </div>
-                                        {siteStatus === 'Requirements' && (
-                                            <div>
-                                                <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">Requirements Details</label>
-                                                <textarea 
-                                                    value={requirements}
-                                                    onChange={(e) => setRequirements(e.target.value)}
-                                                    className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-900 dark:border-gray-700 dark:text-white/90"
-                                                    rows="2"
-                                                    placeholder="Type your requirements here..."
-                                                ></textarea>
-                                            </div>
-                                        )}
                                         <button 
                                             onClick={() => handleUpdateStatus(site.id)}
                                             disabled={updating}
@@ -397,18 +386,7 @@ const EmployeeDashboard = () => {
                 </div>
             </div>
             
-            <div className="rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Assigned Team</h2>
-                {employee.team ? (
-                    <div>
-                        <div className="mb-4">
-                            <p className="font-medium text-slate-700 text-lg">{employee.team.name}</p>
-                        </div>
-                    </div>
-                ) : (
-                    <p className="text-sm text-slate-500">No team assigned yet.</p>
-                )}
-            </div>
+
             
 
             
