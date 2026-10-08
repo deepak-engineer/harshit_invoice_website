@@ -302,7 +302,6 @@ const SiteManagement = () => {
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden md:table-cell">State</th>
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2 hidden sm:table-cell">Address</th>
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Op. Status</th>
-                            <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Status</th>
                             <th className="py-2 md:py-3 text-start text-[10px] md:text-xs font-medium text-gray-500 dark:text-gray-400 px-1 md:px-2">Actions</th>
                         </tr>
                     </thead>
@@ -330,12 +329,6 @@ const SiteManagement = () => {
                                           'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'}
                                     `}>
                                         <span className="truncate">{site.operational_status === 'Requirements' ? 'Req' : site.operational_status === 'Panel Fault' ? 'Fault' : site.operational_status === 'Pending' ? 'Pend' : site.operational_status || 'N/A'}</span>
-                                    </span>
-                                </td>
-                                <td className="py-2 md:py-3 px-1 md:px-2">
-                                    <span className={`inline-flex items-center px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full text-[8px] md:text-xs font-medium ${site.status === 'ACTIVE' ? 'bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-400' : 'bg-error-50 text-error-700 dark:bg-error-500/10 dark:text-error-400'}`}>
-                                        <span className="hidden md:inline">{site.status}</span>
-                                        <span className="md:hidden">{site.status === 'ACTIVE' ? 'ACT' : 'INACT'}</span>
                                     </span>
                                 </td>
                                 <td className="py-2 md:py-3 px-1 md:px-2">
@@ -383,7 +376,7 @@ const SiteManagement = () => {
                                 <textarea value={formData.address || ''} onChange={e => setFormData({...formData, address: e.target.value})} rows="3" className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90" placeholder="Enter full address..."></textarea>
                             </div>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">State (For Holidays)</label>
                                     <select value={formData.state || ''} onChange={e => setFormData({...formData, state: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:bg-gray-900">
@@ -400,13 +393,6 @@ const SiteManagement = () => {
                                         <option value="Panel Fault">Panel Fault</option>
                                         <option value="Pending">Pending</option>
                                         <option value="Requirements">Requirements</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
-                                    <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-theme-sm text-gray-800 outline-none transition focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-gray-700 dark:text-white/90 dark:bg-gray-900">
-                                        <option value="ACTIVE">ACTIVE</option>
-                                        <option value="INACTIVE">INACTIVE</option>
                                     </select>
                                 </div>
                             </div>
