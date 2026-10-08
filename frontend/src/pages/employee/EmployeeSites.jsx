@@ -72,11 +72,11 @@ const EmployeeSites = () => {
         setIsAssigning(true);
         try {
             await api.post('/me/unassign-site');
-            toast.success('Site un-assigned successfully!');
+            toast.success('Site un-picked successfully!');
             setCurrentSiteId(null);
             fetchCurrentSite();
         } catch (error) {
-            toast.error(error.response?.data?.error || 'Failed to un-assign site.');
+            toast.error(error.response?.data?.error || 'Failed to un-pick site.');
         } finally {
             setIsAssigning(false);
         }
@@ -154,7 +154,7 @@ const EmployeeSites = () => {
                                                     className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-error-50 text-error-600 font-medium rounded-lg hover:bg-error-100 transition-colors disabled:opacity-50 border border-error-200 dark:bg-error-500/10 dark:text-error-400 dark:border-error-500/20"
                                                 >
                                                     <XCircle className="w-4 h-4 mr-2" />
-                                                    Un-assign
+                                                    Un-pick
                                                 </button>
                                             </div>
                                         ) : (
