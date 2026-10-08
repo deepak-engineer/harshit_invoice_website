@@ -63,7 +63,7 @@ const SiteManagement = () => {
             result = result.filter(site => 
                 (site.code && site.code.toLowerCase().includes(lowerSearch)) ||
                 (site.name && site.name.toLowerCase().includes(lowerSearch)) ||
-                (site.id && site.id.toString() === lowerSearch)
+                (site.id && site.id.toString(16).toLowerCase().includes(lowerSearch))
             );
         }
         setFilteredSites(result);
@@ -316,7 +316,7 @@ const SiteManagement = () => {
                                         onChange={() => handleSelect(site.id)}
                                     />
                                 </td>
-                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400 hidden sm:table-cell">{site.id}</td>
+                                <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-mono text-gray-500 dark:text-gray-400 hidden sm:table-cell">#{site.id?.toString(16).toUpperCase().padStart(4, '0')}</td>
                                 <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-gray-800 dark:text-white/90 truncate max-w-[60px] md:max-w-none">{site.name}</td>
                                 <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm text-gray-500 dark:text-gray-400">{site.code}</td>
                                 <td className="py-2 md:py-3 px-1 md:px-2 text-[10px] md:text-sm font-medium text-brand-500 hidden md:table-cell">{site.state || '-'}</td>
