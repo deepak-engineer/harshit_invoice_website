@@ -45,8 +45,14 @@ if (preg_match('/^security-equipment$/', $route)) {
 if (preg_match('/^security-forms$/', $route)) {
     if ($method === 'GET') {
         try {
-            $stmt = $pdo->query("SELECT id, uuid, branch_code, address, state, created_at FROM security_forms ORDER BY created_at DESC");
-            echo json_encode($stmt->fetchAll());
+            if (isset($_SESSION['role']) && $_SESSION['role'] === 'employee') {
+                $stmt = $pdo->prepare("SELECT id, uuid, branch_code, address, state, created_at FROM security_forms WHERE employee_id = ? ORDER BY created_at DESC");
+                $stmt->execute([$_SESSION['user_id']]);
+                echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+            } else {
+                $stmt = $pdo->query("SELECT id, uuid, branch_code, address, state, created_at FROM security_forms ORDER BY created_at DESC");
+                echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+            }
         } catch (Exception $e) {
             http_response_code(500);
             echo json_encode(["error" => $e->getMessage()]);
@@ -60,8 +66,9 @@ if (preg_match('/^security-forms$/', $route)) {
         try {
             $pdo->beginTransaction();
             
-            $ins = $pdo->prepare("INSERT INTO security_forms (uuid, branch_code, address, state, section_configs) VALUES (UUID(), ?, ?, ?, ?)");
-            $ins->execute([$data['branch_code'], $data['address'], $data['state'], json_encode($data['section_configs'] ?? [])]);
+            $employee_id = (isset($_SESSION['role']) && $_SESSION['role'] === 'employee') ? $_SESSION['user_id'] : null;
+            $ins = $pdo->prepare("INSERT INTO security_forms (uuid, branch_code, address, state, section_configs, employee_id) VALUES (UUID(), ?, ?, ?, ?, ?)");
+            $ins->execute([$data['branch_code'], $data['address'], $data['state'], json_encode($data['section_configs'] ?? []), $employee_id]);
             $form_id = $pdo->lastInsertId();
             
             $insItem = $pdo->prepare("INSERT INTO security_form_items (form_id, item_type, section_name, equipment_id, quantity) VALUES (?, ?, ?, ?, ?)");
