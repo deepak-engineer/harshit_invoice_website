@@ -238,7 +238,7 @@ const EmployeeDashboard = () => {
                 </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
+            <div className="rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Assigned Site</h2>
                 {employee.site ? (
                     <div>
@@ -304,15 +304,15 @@ const EmployeeDashboard = () => {
                                 placeholder="Search site by Name or Branch Code..." 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-white/90"
+                                className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-primary outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-white/90"
                             />
                             <select
                                 value={searchState}
                                 onChange={(e) => setSearchState(e.target.value)}
-                                className="px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-brand-500 outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-white/90 min-w-[150px]"
+                                className="px-4 py-2 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-primary outline-none bg-white dark:bg-gray-900 text-gray-800 dark:text-white/90 min-w-[150px]"
                             >
                                 <option value="">All States</option>
-                                {Object.keys(holidays2026).map(state => (
+                                {Object.keys(holidays2026).sort().map(state => (
                                     <option key={state} value={state}>{state}</option>
                                 ))}
                             </select>
@@ -342,7 +342,7 @@ const EmployeeDashboard = () => {
                 )}
             </div>
             
-            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
+            <div className="rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
                 <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Assigned Team</h2>
                 {employee.team ? (
                     <div>

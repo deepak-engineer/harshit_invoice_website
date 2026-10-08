@@ -780,12 +780,17 @@ if (preg_match('/^me\/sites$/', $route)) {
     checkEmployeeAuth();
     if ($method === 'GET') {
         $search = $_GET['search'] ?? '';
-        $query = "SELECT id, name, code, city, address FROM sites WHERE status = 'ACTIVE'";
+        $state = $_GET['state'] ?? '';
+        $query = "SELECT id, name, code, city, address, state FROM sites WHERE status = 'ACTIVE'";
         $params = [];
         if (!empty($search)) {
             $query .= " AND (name LIKE ? OR code LIKE ?)";
             $params[] = "%$search%";
             $params[] = "%$search%";
+        }
+        if (!empty($state)) {
+            $query .= " AND state = ?";
+            $params[] = $state;
         }
         $query .= " ORDER BY name ASC LIMIT 20";
         $stmt = $pdo->prepare($query);
