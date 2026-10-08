@@ -60,18 +60,16 @@ const EmployeeDashboard = () => {
     }, [searchTerm]);
 
     useEffect(() => {
-        if (!stats?.employee?.site) {
-            const fetchSites = async () => {
-                try {
-                    const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}&state=${encodeURIComponent(searchState)}`);
-                    setAvailableSites(res.data);
-                } catch (error) {
-                    console.error("Error fetching sites", error);
-                }
-            };
-            fetchSites();
-        }
-    }, [debouncedSearch, searchState, stats?.employee?.site]);
+        const fetchSites = async () => {
+            try {
+                const res = await api.get(`/me/sites?search=${encodeURIComponent(debouncedSearch)}&state=${encodeURIComponent(searchState)}`);
+                setAvailableSites(res.data);
+            } catch (error) {
+                console.error("Error fetching sites", error);
+            }
+        };
+        fetchSites();
+    }, [debouncedSearch, searchState]);
 
     const handleAssignSite = async (siteId) => {
         setIsAssigning(true);
@@ -307,16 +305,17 @@ const EmployeeDashboard = () => {
                                         Un-pick Site
                                     </button>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center">
-                            <p className="text-sm text-slate-500">No site assigned yet. Search and pick a site:</p>
-                        </div>
-                        
-                        <div className="flex flex-col sm:flex-row gap-3">
+                    <p className="text-sm text-slate-500">No site assigned yet. Search and pick a site below.</p>
+                )}
+            </div>
+
+            <div className="rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Available Sites</h2>
+                <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
                             <input 
                                 type="text" 
                                 placeholder="Search site by Name or Branch Code..." 
@@ -356,8 +355,7 @@ const EmployeeDashboard = () => {
                         ) : (
                             <p className="text-xs text-slate-400 p-2 text-center">No sites found matching "{searchTerm}"</p>
                         )}
-                    </div>
-                )}
+                </div>
             </div>
             
             <div className="rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
