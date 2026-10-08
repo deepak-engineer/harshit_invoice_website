@@ -9,6 +9,7 @@ const EmployeeDashboard = () => {
     const [siteStatus, setSiteStatus] = useState('N/A');
     const [requirements, setRequirements] = useState('');
     const [updating, setUpdating] = useState(false);
+    const [reportingSiteId, setReportingSiteId] = useState(null);
     
     // Site Assignment State
     const [searchTerm, setSearchTerm] = useState('');
@@ -83,10 +84,10 @@ const EmployeeDashboard = () => {
         }
     };
 
-    const handleUnassignSite = async () => {
+    const handleUnassignSite = async (siteId) => {
         setIsAssigning(true);
         try {
-            await api.post('/me/unassign-site');
+            await api.post('/me/unassign-site', { site_id: siteId });
             alert('Site un-picked successfully!');
             fetchStats();
         } catch (error) {
@@ -117,15 +118,18 @@ const EmployeeDashboard = () => {
         }
     };
 
-    const handleUpdateStatus = async () => {
+    const handleUpdateStatus = async (siteId) => {
+        if(!siteStatus || siteStatus === 'N/A') return;
         setUpdating(true);
         try {
             await api.post('/me/site-status', {
+                site_id: siteId,
                 status: siteStatus,
                 requirements: siteStatus === 'Requirements' ? requirements : ''
             });
             alert('Site status updated successfully!');
             fetchStats();
+            setReportingSiteId(null);
         } catch (error) {
             alert('Failed to update status.');
         } finally {
@@ -250,66 +254,75 @@ const EmployeeDashboard = () => {
             </div>
 
             <div className="rounded-2xl border border-gray-200 bg-white px-4 pt-4 pb-3 sm:px-6 mt-6 dark:border-gray-800 dark:bg-white/3">
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Assigned Site</h2>
-                {employee.site ? (
-                    <div>
-                        <div className="mb-4">
-                            <p className="font-medium text-slate-700 dark:text-white/90 text-lg">{employee.site.name}</p>
-                            <p className="text-sm font-semibold text-primary mb-1">Branch Code: {employee.site.code}</p>
-                            <p className="text-sm text-slate-500 dark:text-gray-400">{employee.site.address}</p>
-                        </div>
-                        
-                        <div className="bg-slate-50 dark:bg-gray-800/50 p-4 rounded-xl border border-slate-100 dark:border-gray-700">
-                            <h3 className="text-sm font-bold text-slate-700 mb-3">Report Site Status</h3>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-600 mb-1">Status</label>
-                                    <select 
-                                        value={siteStatus} 
-                                        onChange={(e) => setSiteStatus(e.target.value)}
-                                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                    >
-                                        <option value="N/A">N/A</option>
-                                        <option value="Pending">Pending</option>
-                                        <option value="Panel Fault">Panel Fault</option>
-                                        <option value="Requirements">Requirements</option>
-                                    </select>
+                <h2 className="text-lg font-semibold text-gray-800 dark:text-white/90 mb-4">Your Picked Sites</h2>
+                {employee.sites && employee.sites.length > 0 ? (
+                    <div className="space-y-4">
+                        {employee.sites.map(site => (
+                            <div key={site.id} className="bg-slate-50 dark:bg-gray-800/50 p-4 rounded-xl border border-slate-100 dark:border-gray-700">
+                                <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
+                                    <div className="mb-2 sm:mb-0">
+                                        <p className="font-medium text-slate-700 dark:text-white/90 text-lg">{site.name}</p>
+                                        <p className="text-sm font-semibold text-primary mb-1">Branch Code: {site.code}</p>
+                                        <p className="text-sm text-slate-500 dark:text-gray-400">{site.address}</p>
+                                    </div>
+                                    <div className="flex space-x-2">
+                                        <button 
+                                            onClick={() => setReportingSiteId(reportingSiteId === site.id ? null : site.id)}
+                                            className="px-3 py-1.5 bg-white border border-gray-200 text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            {reportingSiteId === site.id ? 'Cancel' : 'Report Status'}
+                                        </button>
+                                        <button 
+                                            onClick={() => handleUnassignSite(site.id)}
+                                            disabled={isAssigning}
+                                            className="px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 text-sm rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+                                        >
+                                            Un-pick
+                                        </button>
+                                    </div>
                                 </div>
-                                
-                                {siteStatus === 'Requirements' && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-600 mb-1">Requirements Details</label>
-                                        <textarea 
-                                            value={requirements}
-                                            onChange={(e) => setRequirements(e.target.value)}
-                                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
-                                            rows="3"
-                                            placeholder="Type your requirements here..."
-                                        ></textarea>
+
+                                {reportingSiteId === site.id && (
+                                    <div className="mt-4 pt-4 border-t border-slate-200 dark:border-gray-700 space-y-3">
+                                        <div>
+                                            <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">Status</label>
+                                            <select 
+                                                value={siteStatus} 
+                                                onChange={(e) => setSiteStatus(e.target.value)}
+                                                className="w-full px-3 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-900 dark:border-gray-700 dark:text-white/90"
+                                            >
+                                                <option value="N/A">N/A</option>
+                                                <option value="Pending">Pending</option>
+                                                <option value="Panel Fault">Panel Fault</option>
+                                                <option value="Requirements">Requirements</option>
+                                            </select>
+                                        </div>
+                                        {siteStatus === 'Requirements' && (
+                                            <div>
+                                                <label className="block text-xs font-medium text-slate-600 dark:text-gray-400 mb-1">Requirements Details</label>
+                                                <textarea 
+                                                    value={requirements}
+                                                    onChange={(e) => setRequirements(e.target.value)}
+                                                    className="w-full px-3 py-2 text-sm border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-900 dark:border-gray-700 dark:text-white/90"
+                                                    rows="2"
+                                                    placeholder="Type your requirements here..."
+                                                ></textarea>
+                                            </div>
+                                        )}
+                                        <button 
+                                            onClick={() => handleUpdateStatus(site.id)}
+                                            disabled={updating}
+                                            className="px-4 py-1.5 bg-primary text-white text-sm rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+                                        >
+                                            {updating ? 'Updating...' : 'Save Status'}
+                                        </button>
                                     </div>
                                 )}
-                                
-                                <div className="flex space-x-3">
-                                    <button 
-                                        onClick={handleUpdateStatus}
-                                        disabled={updating}
-                                        className="px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
-                                    >
-                                        {updating ? 'Updating...' : 'Update Status'}
-                                    </button>
-                                    <button 
-                                        onClick={handleUnassignSite}
-                                        disabled={isAssigning}
-                                        className="px-4 py-2 bg-red-50 text-red-600 border border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20 rounded-lg font-medium hover:bg-red-100 transition-colors disabled:opacity-50"
-                                    >
-                                        Un-pick Site
-                                    </button>
-                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 ) : (
-                    <p className="text-sm text-slate-500">No site assigned yet. Search and pick a site below.</p>
+                    <p className="text-sm text-slate-500">No sites picked yet. Search and pick a site below.</p>
                 )}
             </div>
 

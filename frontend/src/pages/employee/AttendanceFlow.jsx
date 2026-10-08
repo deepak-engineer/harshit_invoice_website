@@ -18,6 +18,13 @@ const AttendanceFlow = () => {
   const webcamRef = useRef(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [photoBase64, setPhotoBase64] = useState(null)
+  const [selectedSiteId, setSelectedSiteId] = useState('')
+
+  useEffect(() => {
+    if (employee?.sites?.length === 1 && !selectedSiteId) {
+        setSelectedSiteId(employee.sites[0].id)
+    }
+  }, [employee])
 
   const fetchMe = async () => {
     try {
@@ -46,6 +53,10 @@ const AttendanceFlow = () => {
   }, [webcamRef])
 
   const triggerCheckIn = () => {
+    if (!selectedSiteId) {
+        toast.error('Please select a site first.')
+        return
+    }
     setShowModal(true)
     setPhotoPreview(null)
     setPhotoBase64(null)
@@ -62,7 +73,7 @@ const AttendanceFlow = () => {
       setStatus(`Marking ${type}...`)
 
       const payload = {
-        site_id: employee.site_id,
+        site_id: type === 'CHECK IN' ? selectedSiteId : attendance.site_id,
         photo: photoBase64
       }
 
@@ -93,10 +104,10 @@ const AttendanceFlow = () => {
 
   if (loading) return <div className="p-8 text-center text-slate-500">Loading...</div>
 
-  if (!employee.site_id) {
+  if (!employee.sites || employee.sites.length === 0) {
     return (
       <div className="bg-red-50 p-6 rounded-xl border border-red-200 text-red-700">
-        You do not have an assigned site. Please contact the administrator.
+        You do not have any assigned sites. Please pick a site from your dashboard.
       </div>
     )
   }
@@ -120,12 +131,25 @@ const AttendanceFlow = () => {
 
       <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-slate-100 dark:border-gray-800 overflow-hidden">
         <div className="p-4 bg-slate-50 dark:bg-gray-800/50 border-b border-slate-100 dark:border-gray-800 flex justify-between items-center">
-          <div>
+          <div className="flex-1 mr-4">
             <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Assigned Site</p>
-            <p className="font-bold text-slate-800 dark:text-white/90 flex items-center">
-              <MapPin className="w-4 h-4 mr-1 text-primary" />
-              {employee.site?.name}
-            </p>
+            {isCheckedIn || isCompleted ? (
+                <p className="font-bold text-slate-800 dark:text-white/90 flex items-center">
+                    <MapPin className="w-4 h-4 mr-1 text-primary" />
+                    {employee.sites?.find(s => s.id === attendance.site_id)?.name || 'Unknown Site'}
+                </p>
+            ) : (
+                <select 
+                    value={selectedSiteId}
+                    onChange={(e) => setSelectedSiteId(Number(e.target.value))}
+                    className="mt-1 w-full p-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-primary outline-none dark:bg-gray-900 dark:border-gray-700 dark:text-white/90"
+                >
+                    <option value="">Select a site...</option>
+                    {employee.sites?.map(site => (
+                        <option key={site.id} value={site.id}>{site.name}</option>
+                    ))}
+                </select>
+            )}
           </div>
           {isCheckedIn && (
             <div className="text-right">

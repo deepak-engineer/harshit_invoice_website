@@ -672,9 +672,13 @@ if (preg_match('/^me$/', $route)) {
                 $emp['site_id'] = $emp['team']['site_id'];
             }
             
-            $site_stmt = $pdo->prepare("SELECT * FROM sites WHERE id = ?");
-            $site_stmt->execute([$emp['site_id']]);
-            $emp['site'] = $site_stmt->fetch();
+            $sites_stmt = $pdo->prepare("
+                SELECT s.* FROM sites s
+                JOIN employee_sites es ON s.id = es.site_id
+                WHERE es.employee_id = ?
+            ");
+            $sites_stmt->execute([$emp['id']]);
+            $emp['sites'] = $sites_stmt->fetchAll(PDO::FETCH_ASSOC);
             
             echo json_encode($emp);
         } else {
@@ -707,11 +711,11 @@ if (preg_match('/^me\/salary-report$/', $route)) {
         $end_date = date('Y-m-t', strtotime($start_date));
         
         $stmt = $pdo->prepare("
-            SELECT a.attendance_date, a.status, e.daily_salary, e.name, COALESCE(e.state, t.state, s.state) as site_state
+            SELECT a.attendance_date, a.status, e.daily_salary, e.name, COALESCE(t.state, s.state) as site_state
             FROM attendance a
             JOIN employees e ON a.employee_id = e.id
             LEFT JOIN teams t ON e.team_id = t.id
-            LEFT JOIN sites s ON e.site_id = s.id
+            LEFT JOIN sites s ON a.site_id = s.id
             WHERE e.id = ? AND a.attendance_date BETWEEN ? AND ?
             ORDER BY a.attendance_date ASC
         ");
@@ -754,13 +758,9 @@ if (preg_match('/^me\/site-status$/', $route)) {
     if ($method === 'POST') {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $stmt = $pdo->prepare("SELECT site_id FROM employees WHERE id = ?");
-        $stmt->execute([$_SESSION['user_id']]);
-        $emp = $stmt->fetch();
-        
-        if (!$emp || !$emp['site_id']) {
+        if (empty($data['site_id'])) {
             http_response_code(400);
-            echo json_encode(["error" => "No site assigned to you."]);
+            echo json_encode(["error" => "Site ID missing."]);
             exit;
         }
         
@@ -768,7 +768,7 @@ if (preg_match('/^me\/site-status$/', $route)) {
         $upd->execute([
             $data['status'],
             $data['requirements'] ?? null,
-            $emp['site_id']
+            $data['site_id']
         ]);
         
         echo json_encode(["success" => true]);
@@ -782,8 +782,8 @@ if (preg_match('/^me\/sites$/', $route)) {
         $search = $_GET['search'] ?? '';
         $state = $_GET['state'] ?? '';
         $query = "SELECT s.id, s.name, s.code, s.city, s.address, s.state, 
-                  (SELECT e.name FROM employees e WHERE e.site_id = s.id LIMIT 1) as picked_by_name,
-                  (SELECT e.id FROM employees e WHERE e.site_id = s.id LIMIT 1) as picked_by_id
+                  (SELECT e.name FROM employee_sites es JOIN employees e ON es.employee_id = e.id WHERE es.site_id = s.id LIMIT 1) as picked_by_name,
+                  (SELECT es.employee_id FROM employee_sites es WHERE es.site_id = s.id LIMIT 1) as picked_by_id
                   FROM sites s WHERE s.status = 'ACTIVE'";
         $params = [];
         if (!empty($search)) {
@@ -832,7 +832,7 @@ if (preg_match('/^me\/assign-site$/', $route)) {
         $user_id = $_SESSION['user_id'];
         
         // Check if already assigned
-        $check = $pdo->prepare("SELECT name FROM employees WHERE site_id = ? AND id != ?");
+        $check = $pdo->prepare("SELECT e.name FROM employee_sites es JOIN employees e ON es.employee_id = e.id WHERE es.site_id = ? AND es.employee_id != ?");
         $check->execute([$site_id, $user_id]);
         $existing = $check->fetchColumn();
         if ($existing) {
@@ -841,8 +841,8 @@ if (preg_match('/^me\/assign-site$/', $route)) {
             exit;
         }
         
-        $stmt = $pdo->prepare("UPDATE employees SET site_id = ? WHERE id = ?");
-        $stmt->execute([$site_id, $user_id]);
+        $stmt = $pdo->prepare("INSERT IGNORE INTO employee_sites (employee_id, site_id) VALUES (?, ?)");
+        $stmt->execute([$user_id, $site_id]);
         
         // Dynamically geocode if site is missing coordinates
         $site_stmt = $pdo->prepare("SELECT address, latitude, longitude FROM sites WHERE id = ?");
@@ -878,8 +878,11 @@ if (preg_match('/^me\/assign-site$/', $route)) {
 if (preg_match('/^me\/unassign-site$/', $route)) {
     checkEmployeeAuth();
     if ($method === 'POST') {
-        $stmt = $pdo->prepare("UPDATE employees SET site_id = NULL WHERE id = ?");
-        $stmt->execute([$_SESSION['user_id']]);
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!empty($data['site_id'])) {
+            $stmt = $pdo->prepare("DELETE FROM employee_sites WHERE employee_id = ? AND site_id = ?");
+            $stmt->execute([$_SESSION['user_id'], $data['site_id']]);
+        }
         
         echo json_encode(["success" => true]);
         exit;
