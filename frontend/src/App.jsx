@@ -12,7 +12,6 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import EmployeeManagement from './pages/admin/EmployeeManagement';
 import AdminManagement from './pages/admin/AdminManagement';
 import SiteManagement from './pages/admin/SiteManagement';
-import TeamManagement from './pages/admin/TeamManagement';
 import AttendanceReport from './pages/admin/AttendanceReport';
 import AdminAttendanceList from './pages/admin/AdminAttendanceList';
 import AdminExpenses from './pages/admin/AdminExpenses';
@@ -84,7 +83,6 @@ function App() {
             <Route path="attendance-list" element={<AdminAttendanceList />} />
             <Route path="employees" element={<EmployeeManagement />} />
             <Route path="manage-admins" element={<AdminManagement />} />
-            <Route path="teams" element={<TeamManagement />} />
             <Route path="sites" element={<SiteManagement />} />
             <Route path="expenses" element={<AdminExpenses />} />
             <Route path="security-requirements" element={<SecurityFormsList />} />

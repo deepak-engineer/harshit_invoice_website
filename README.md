@@ -36,3 +36,13 @@ This is a full-stack web application for invoice and employee management, featur
 - Schema auto-migrations (like adding columns or tables) are currently handled at the very top of `index.php` to ensure they run globally before route matching.
 - **Session Timeout**: The session lifetime is set to 10 years in `auth.php` as requested by the user for uninterrupted employee login.
 - Be careful with `ALTER TABLE` queries on Hostinger shared hosting; wrap them in `try-catch` blocks to prevent 500 errors if columns already exist.
+
+## Teams Feature (Archived)
+- The Teams feature (managing teams of employees and mapping them to sites) was removed from the active codebase at the user's request.
+- **To Restore Teams in the Future:**
+  1. The database still retains the 	eams table (id, name, site_id, state, created_at) and the 	eam_id column in the employees table.
+  2. The backend API endpoints (GET /admin/teams, POST /admin/teams, PUT /admin/teams/:id, DELETE /admin/teams/:id) are still intact in ttendance_routes.php.
+  3. Restore the TeamManagement.jsx page (can be found in git history).
+  4. Add the Teams route back to App.jsx under the Admin routes.
+  5. Add the Teams menu item back to dminNavItems in Layout.jsx.
+  6. Add a team dropdown/assignment selector back to the Employee creation/edit form in EmployeeManagement.jsx.

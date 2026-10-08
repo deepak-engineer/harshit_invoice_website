@@ -8,7 +8,6 @@ import { holidays2026 } from '../../utils/holidays2026';
 const EmployeeManagement = () => {
     const [employees, setEmployees] = useState([]);
     const [sites, setSites] = useState([]);
-    const [teams, setTeams] = useState([]);
     const [loading, setLoading] = useState(true);
     
     const isSuperAdmin = localStorage.getItem('is_super_admin') === 'true';
@@ -19,13 +18,11 @@ const EmployeeManagement = () => {
     const [viewingPhoto, setViewingPhoto] = useState(null);
     const [salaryModal, setSalaryModal] = useState({ isOpen: false, emp: null, isApproveMode: false });
     const [salaryInput, setSalaryInput] = useState('');
-    const [teamInput, setTeamInput] = useState('');
     const [siteInput, setSiteInput] = useState('');
     const [salaryReportModal, setSalaryReportModal] = useState({ isOpen: false, emp: null, month: new Date().getMonth() + 1, year: new Date().getFullYear(), data: null, loading: false, selectedState: '' });
     
     // Assignment Search states
     const [siteSearch, setSiteSearch] = useState('');
-    const [teamSearch, setTeamSearch] = useState('');
 
     // Search and bulk delete states
     const [searchTerm, setSearchTerm] = useState('');
@@ -40,7 +37,6 @@ const EmployeeManagement = () => {
         emp_id: '', name: '', email: '', daily_salary: '', site_id: '', team_id: '', photo: '', status: 'ACTIVE', state: ''
     });
     const [newSiteData, setNewSiteData] = useState({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
-    const [newTeamData, setNewTeamData] = useState({ name: '', site_id: '', state: '' });
     const [submittingForm, setSubmittingForm] = useState(false);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
@@ -49,14 +45,12 @@ const EmployeeManagement = () => {
 
     const fetchData = async () => {
         try {
-            const [empRes, siteRes, teamRes] = await Promise.all([
+            const [empRes, siteRes] = await Promise.all([
                 api.get('/admin/employees'),
-                api.get('/admin/sites'),
-                api.get('/admin/teams')
+                api.get('/admin/sites')
             ]);
             setEmployees(empRes.data);
             setSites(siteRes.data);
-            setTeams(teamRes.data);
         } catch (error) {
             toast.error('Failed to load data');
         } finally {
@@ -165,20 +159,10 @@ const EmployeeManagement = () => {
                 finalSiteId = siteRes.data.id;
             }
 
-            if (finalTeamId === 'NEW_TEAM') {
-                const teamPayload = { ...newTeamData };
-                if (teamPayload.site_id === 'NEW_SITE') {
-                    teamPayload.site_id = finalSiteId; // link to newly created site if applicable
-                }
-                const teamRes = await api.post('/admin/teams', teamPayload);
-                finalTeamId = teamRes.data.id;
-            }
-
             const payload = { 
                 ...formData, 
                 name: `${formData.first_name || ''} ${formData.last_name || ''}`.trim(),
-                site_id: finalSiteId === 'NEW_SITE' || !finalSiteId ? '' : finalSiteId, 
-                team_id: finalTeamId === 'NEW_TEAM' || !finalTeamId ? '' : finalTeamId 
+                site_id: finalSiteId === 'NEW_SITE' || !finalSiteId ? '' : finalSiteId
             };
 
             if (selectedEmp) {
@@ -234,14 +218,12 @@ const EmployeeManagement = () => {
 
     const handleApprove = (emp) => {
         setSalaryInput(emp.daily_salary || '');
-        setTeamInput(emp.team_id || '');
         setSiteInput(emp.site_id || '');
         setSalaryModal({ isOpen: true, emp, isApproveMode: true });
     };
 
     const handleUpdateSalary = (emp) => {
         setSalaryInput(emp.daily_salary || '');
-        setTeamInput(emp.team_id || '');
         setSiteInput(emp.site_id || '');
         setSalaryModal({ isOpen: true, emp, isApproveMode: false });
     };
@@ -260,7 +242,6 @@ const EmployeeManagement = () => {
             const payload = { 
                 ...emp, 
                 daily_salary: salary,
-                team_id: teamInput || null,
                 site_id: siteInput || null
             };
             if (isApproveMode) payload.status = 'ACTIVE';
@@ -366,7 +347,6 @@ const EmployeeManagement = () => {
         setOtpSent(false);
         setOtp('');
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
-        setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(null);
         setIsFormOpen(true);
     };
@@ -376,7 +356,6 @@ const EmployeeManagement = () => {
         const lastName = rest.join(' ');
         setFormData({ ...emp, first_name: firstName, last_name: lastName }); // Don't clear photo, backend ignores if not base64
         setNewSiteData({ name: '', code: '', address: '', state: '', status: 'ACTIVE' });
-        setNewTeamData({ name: '', site_id: '', state: '' });
         setSelectedEmp(emp);
         setIsFormOpen(true);
     };
@@ -402,10 +381,6 @@ const EmployeeManagement = () => {
     const filteredSitesOptions = sites.filter(s => 
         (s.code && s.code.toLowerCase().includes(siteSearch.toLowerCase())) || 
         (s.name && s.name.toLowerCase().includes(siteSearch.toLowerCase()))
-    );
-
-    const filteredTeamsOptions = teams.filter(t => 
-        (t.name && t.name.toLowerCase().includes(teamSearch.toLowerCase()))
     );
 
     const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
@@ -462,7 +437,6 @@ const EmployeeManagement = () => {
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Photo</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Name</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden lg:table-cell">Email</th>
-                                <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Team</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Assigned Site</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4 hidden xl:table-cell">Salary/Day</th>
                                 <th className="py-2 md:py-3 text-start text-[10px] md:text-xs px-1 md:px-4">Status</th>
@@ -498,14 +472,6 @@ const EmployeeManagement = () => {
                                     </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 font-medium text-[10px] md:text-sm text-gray-800 dark:text-white/90 truncate max-w-[60px] md:max-w-[120px]">{emp.name}</td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-sm hidden lg:table-cell">{emp.email || '-'}</td>
-                                    <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-xs">
-                                        <div className="flex items-center space-x-1 md:space-x-2">
-                                            <span className="truncate max-w-[60px] md:max-w-none">{emp.team_id ? teams.find(t => t.id === emp.team_id)?.name || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
-                                            <button onClick={() => handleUpdateSalary(emp)} className="p-1 md:p-1.5 rounded-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-brand-500 hover:border-brand-200 hover:bg-brand-50 transition-all shadow-sm" title="Quick Edit Assignments">
-                                                <Edit2 className="w-2.5 h-2.5 md:w-3 md:h-3" strokeWidth={2} />
-                                            </button>
-                                        </div>
-                                    </td>
                                     <td className="py-2 md:py-3 px-1 md:px-4 text-[10px] md:text-xs">
                                         <div className="flex items-center space-x-1 md:space-x-2">
                                             <span className="truncate max-w-[60px] md:max-w-none">{emp.site_id ? sites.find(s => s.id === emp.site_id)?.code || 'Unknown' : <span className="text-gray-400 dark:text-gray-500 italic">None</span>}</span>
@@ -693,22 +659,7 @@ const EmployeeManagement = () => {
                                     </select>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assigned Team</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search team..." 
-                                        value={teamSearch}
-                                        onChange={e => setTeamSearch(e.target.value)}
-                                        className="w-full px-3 py-1 mb-2 text-xs border rounded-lg focus:ring-1 focus:ring-brand-500 outline-none"
-                                    />
-                                    <select value={formData.team_id} onChange={e => setFormData({...formData, team_id: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none">
-                                        <option value="">-- None --</option>
-                                        <option value="NEW_TEAM" className="text-brand-500 font-bold">+ Add New Team</option>
-                                        {filteredTeamsOptions.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                                    </select>
-                                </div>
+                            <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                                     <select value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none">
@@ -752,36 +703,7 @@ const EmployeeManagement = () => {
                                 </div>
                             )}
 
-                            {/* New Team Inline Form */}
-                            {formData.team_id === 'NEW_TEAM' && (
-                                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-200 dark:border-gray-800 mt-4 space-y-3 relative overflow-hidden">
-                                    <div className="absolute top-0 left-0 w-1 h-full bg-blue-light-50 dark:bg-blue-light-500/100"></div>
-                                    <h3 className="font-bold text-sm text-gray-800 dark:text-white/90 flex items-center"><Plus className="w-4 h-4 mr-1 text-blue-light-500 dark:text-blue-light-400"/> Create New Team</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Team Name</label>
-                                            <input type="text" required value={newTeamData.name} onChange={e => setNewTeamData({...newTeamData, name: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" placeholder="e.g. Alpha Team" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Link to Site</label>
-                                            <select value={newTeamData.site_id} onChange={e => setNewTeamData({...newTeamData, site_id: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                                                <option value="">-- Independent Team --</option>
-                                                {formData.site_id === 'NEW_SITE' && <option value="NEW_SITE">Link to New Site Being Created</option>}
-                                                {sites.map(s => <option key={s.id} value={s.id}>{s.name} ({s.code})</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">State (For Holidays)</label>
-                                        <select value={newTeamData.state} onChange={e => setNewTeamData({...newTeamData, state: e.target.value})} className="w-full px-3 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-                                            <option value="">-- Inherit from Site --</option>
-                                            {Object.keys(holidays2026).map(st => (
-                                                <option key={st} value={st}>{st}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                </div>
-                            )}
+
 
                             <div className="grid grid-cols-1 gap-4">
                                 <div>
@@ -860,24 +782,7 @@ const EmployeeManagement = () => {
                                     </div>
                                 </div>
                                 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assigned Team</label>
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search team..." 
-                                        value={teamSearch}
-                                        onChange={e => setTeamSearch(e.target.value)}
-                                        className="w-full px-3 py-1.5 mb-2 text-sm border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-1 focus:ring-brand-500 outline-none"
-                                    />
-                                    <select 
-                                        value={teamInput} 
-                                        onChange={e => setTeamInput(e.target.value)} 
-                                        className="w-full px-3 py-2.5 border border-gray-200 dark:border-gray-800 rounded-xl focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500 outline-none transition-all text-gray-800 dark:text-white/90"
-                                    >
-                                        <option value="">-- No Team --</option>
-                                        {filteredTeamsOptions.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                                    </select>
-                                </div>
+
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assigned Site</label>

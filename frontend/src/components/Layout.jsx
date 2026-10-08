@@ -43,7 +43,6 @@ const Layout = () => {
     { name: 'Attendance', path: '/admin/attendance-list', icon: ClipboardCheck },
     { name: 'Attendance Report', path: '/admin/attendance-report', icon: Calendar },
     { name: 'Employees', path: '/admin/employees', icon: Users },
-    { name: 'Teams', path: '/admin/teams', icon: Users },
     { name: 'Sites', path: '/admin/sites', icon: MapPin },
     { name: 'Expenses', path: '/admin/expenses', icon: Receipt },
     { name: 'Security Forms', path: '/admin/security-requirements', icon: Shield },
