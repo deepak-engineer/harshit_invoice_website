@@ -23,6 +23,7 @@ import SecurityFormEdit from './pages/admin/SecurityFormEdit';
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import AttendanceFlow from './pages/employee/AttendanceFlow';
 import EmployeeExpenses from './pages/employee/EmployeeExpenses';
+import EmployeeSites from './pages/employee/EmployeeSites';
 
 import api from './utils/api';
 
@@ -104,7 +105,7 @@ function App() {
             <Route path="dashboard" element={<EmployeeDashboard />} />
             <Route path="attendance" element={<AttendanceFlow />} />
             <Route path="expenses" element={<EmployeeExpenses />} />
-            <Route path="sites" element={<SiteManagement />} />
+            <Route path="sites" element={<EmployeeSites />} />
             <Route path="security-requirements" element={<SecurityFormsList />} />
             <Route path="security-requirements/new" element={<SecurityFormEdit />} />
             <Route path="security-requirements/:id/edit" element={<SecurityFormEdit />} />
