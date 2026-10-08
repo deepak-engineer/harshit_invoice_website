@@ -69,12 +69,12 @@ const EmployeeExpenses = () => {
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
-            <div className="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+            <div className="flex justify-between items-center bg-white dark:bg-gray-800/50 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-gray-700">
                 <div className="flex items-center space-x-3">
                     <div className="p-2 bg-primary/10 text-primary rounded-xl">
                         <Receipt className="w-6 h-6" />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-800">My Expenses</h1>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white/90">My Expenses</h1>
                 </div>
                 <button 
                     onClick={() => setShowModal(true)}
@@ -90,22 +90,22 @@ const EmployeeExpenses = () => {
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
             ) : expenses.length === 0 ? (
-                <div className="bg-white p-12 rounded-2xl text-center text-slate-500 border border-slate-100">
-                    <Receipt className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+                <div className="bg-white dark:bg-gray-800/50 p-12 rounded-2xl text-center text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-gray-700">
+                    <Receipt className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
                     <p className="text-lg font-medium">No expenses submitted yet</p>
                     <p className="text-sm mt-1">Click "Add Expense" to track your spending.</p>
                 </div>
             ) : (
                 <div className="grid gap-4 sm:grid-cols-2">
                     {expenses.map(exp => (
-                        <div key={exp.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
+                        <div key={exp.id} className="bg-white dark:bg-gray-800/50 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-gray-700 flex flex-col relative overflow-hidden">
                             <div className="flex justify-between items-start mb-3">
                                 <div>
-                                    <div className="font-bold text-slate-800 text-lg flex items-center">
+                                    <div className="font-bold text-slate-800 dark:text-white/90 text-lg flex items-center">
                                         <IndianRupee className="w-4 h-4 mr-1" />
                                         {parseFloat(exp.amount).toFixed(2)}
                                     </div>
-                                    <div className="text-sm text-slate-500 font-medium">{exp.category}</div>
+                                    <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">{exp.category}</div>
                                 </div>
                                 <div className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
                                     exp.status === 'APPROVED' ? 'bg-green-50 text-green-700 border-green-200' :
@@ -117,9 +117,9 @@ const EmployeeExpenses = () => {
                                 </div>
                             </div>
                             {exp.description && (
-                                <p className="text-sm text-slate-600 mb-3 bg-slate-50 p-2 rounded-lg border border-slate-100">{exp.description}</p>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 mb-3 bg-slate-50 dark:bg-gray-700/50 p-2 rounded-lg border border-slate-100 dark:border-gray-600">{exp.description}</p>
                             )}
-                            <div className="mt-auto pt-3 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+                            <div className="mt-auto pt-3 border-t border-slate-100 dark:border-gray-700 flex justify-between items-center text-xs text-slate-400">
                                 <span>{new Date(exp.expense_date).toLocaleDateString('en-GB')}</span>
                                 {exp.receipt_photo && (
                                     <span className="text-primary font-medium flex items-center">
